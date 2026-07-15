@@ -11,7 +11,17 @@ def home():
 
 @app.route("/add_doyang", methods = ['POST'])
 def add_doyang():
-    database.add_doyang()
+    data = request.get_json()
+    name = data.get('name')
+    database.add_doyang(name)
+    return redirect(url_for('home'))
+
+@app.route("/add_category", methods = ['POST'])
+def add_category():
+    data = request.get_json()
+    name = data.get('name')
+    doyang_id_current = data.get('doyang')
+    database.add_category(name, doyang_id_current)
     return redirect(url_for('home'))
 
 if __name__ == "__main__":

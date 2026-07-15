@@ -1,12 +1,18 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, make_response
 import json
 
-app = Flask(__name__)
+import database
 
+app = Flask(__name__)
 
 @app.route("/")
 def home():
     return render_template('main.html')
+
+@app.route("/add_doyang", methods = ['POST'])
+def add_doyang():
+    database.add_doyang()
+    return redirect(url_for('home'))
 
 if __name__ == "__main__":
     app.run(debug=False, host='0.0.0.0', port=5001)

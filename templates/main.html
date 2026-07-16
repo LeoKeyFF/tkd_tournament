@@ -16,16 +16,19 @@
         </div>
         <div class="categories" id="categories">
             Категории:
-            <div class="'categories-list-list" id="categories_list"></div>
+            <div class="'categories-list" id="categories_list"></div>
             <input type="text" id="CategoryInput" placeholder="Введите название категории">
             <button class="add" onclick="addCategory()">+</button>
         </div>
         <div class="categories" id="categories">
             Соперники:
+            <div class="competitors-list" id="competitors_list"></div>
             <input type="text" id="CompetitorInputName" placeholder="Введите имя соперника">
             <input type="text" id="CompetitorInputClub" placeholder="Введите клуб соперника">
             <button class="add" onclick="addCompetitor()">+</button>
         </div>
+        <div id="show"></div>
+        <button class="create" onclick="createGrid()">Создать сетку</button>
 
 </body>
 </html>

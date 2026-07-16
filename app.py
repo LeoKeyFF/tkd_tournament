@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
+    database.create_tables()
     return render_template('main.html')
 
 @app.route("/add_doyang", methods = ['POST'])
@@ -29,8 +30,18 @@ def add_competitor():
     data = request.get_json()
     name = data.get('name')
     club = data.get('club')
-    database.add_competitor(name, club)
+    category_id_current = data.get('category_id_current')
+    database.add_competitor(name, club, category_id_current)
     return redirect(url_for('home'))
+
+@app.route("/create_grid", methods = ['POST'])
+def create_grid():
+    data = request.get_json()
+    category_id = data.get('category_id')
+    database.add_matches(category_id)
+    return redirect(url_for('home'))
+
+#---------------------------------------------------------------------------------------
 
 @app.route("/get_data_doyangs", methods = ['GET'])
 def get_data_doyangs():
@@ -50,6 +61,7 @@ def get_data_doyangs():
         'ids': ids,
         'names': names
     }
+    print(ids, names)
     return jsonify(data)
 
 @app.route("/get_data_categories", methods = ['GET'])
@@ -75,6 +87,35 @@ def get_data_categories():
         'doyangs': doyangs
     }
     return jsonify(data)
+
+@app.route("/get_data_competitors", methods = ['GET'])
+def get_data_competitors():
+    competitors = database.get_from_competitors()
+    if len(competitors) == 0:
+        data = {
+            'ids': [],
+            'names': [],
+            'clubs': [],
+            'categories': []
+        }
+        return jsonify(data)
+    ids = []
+    names = []
+    clubs = []
+    categories = []
+    for competitor in competitors:
+        ids.append(competitor.id)
+        names.append(competitor.name)
+        clubs.append(competitor.club)
+        categories.append(competitor.category)
+    data = {
+        'ids': ids,
+        'names': names,
+        'clubs': clubs,
+        'categories': categories
+    }
+    return jsonify(data)
+
 
 
 if __name__ == "__main__":

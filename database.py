@@ -1,48 +1,131 @@
 import json
+import random
 import sqlite3
+import math
+
+from competitor import Competitor
 
 database_path = "database.db"
 
-def add_doyang(name):
+def create_tables():
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
+
     cursor.execute(
         f"CREATE TABLE IF NOT EXISTS DoYangs ( DoYangID INTEGER PRIMARY KEY," 
           "Name varchar(255)"
         ")"
     )
-    message = f"INSERT INTO DoYangs (Name) VALUES ('{name}')"
-    cursor.execute(message)
-
-    connection.commit()
-    connection.close()
-
-def add_category(name, doyang_id_current):
-    connection = sqlite3.connect(database_path)
-    cursor = connection.cursor()
     cursor.execute(
         f"CREATE TABLE IF NOT EXISTS Categories ( CategoryID INTEGER PRIMARY KEY," 
           "Name varchar(255),"
           "DoYangID INT"
         ")"
     )
-    message = f"INSERT INTO Categories (Name, DoYangID) VALUES ('{name}', {doyang_id_current})"
+    cursor.execute(
+        f"CREATE TABLE IF NOT EXISTS Competitors ( CompetitorID INTEGER PRIMARY KEY," 
+          "Name varchar(255),"
+          "Club varchar(255),"
+          "CategoryID INT"
+        ")"
+    )
+
+    cursor.execute(
+        f"CREATE TABLE IF NOT EXISTS Matches ( MatchID INTEGER PRIMARY KEY," 
+          "CategoryID INT,"
+          "RoundNumber INT," 
+          "Competitor1ID INT," 
+          "Competitor2ID INT," 
+          "Winner INT," 
+          "NextMatchID INT"
+        ")"
+    )
+    
+    connection.commit()
+    connection.close()
+
+def add_doyang(name):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    message = f"INSERT INTO DoYangs (Name) VALUES ('{name}')"
     cursor.execute(message)
 
     connection.commit()
     connection.close()
 
-def add_competitor(name, club):
+def add_category(name, doyang_id):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
-    cursor.execute(
-        f"CREATE TABLE IF NOT EXISTS Competitors ( CompetitorID INTEGER PRIMARY KEY," 
-          "Name varchar(255),"
-          "Club varchar(255)"
-        ")"
-    )
-    message = f"INSERT INTO Competitors (Name, Club) VALUES ('{name}', '{club}')"
+
+    message = f"INSERT INTO Categories (Name, DoYangID) VALUES ('{name}', {doyang_id})"
     cursor.execute(message)
+
+    connection.commit()
+    connection.close()
+
+def add_competitor(name, club, category_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    message = f"INSERT INTO Competitors (Name, Club, CategoryID) VALUES ('{name}', '{club}', {category_id})"
+    cursor.execute(message)
+
+    connection.commit()
+    connection.close()
+
+def add_matches(category_id):
+    competitors = get_from_competitors(category_id)
+    random.shuffle(competitors)
+
+    first_round = 1
+    rounds = [1]
+    while len(competitors) > first_round * 2:
+         first_round = first_round * 2
+         rounds.append(first_round)
+    rounds = rounds[::-1]
+
+    while len(competitors) <= first_round * 2:
+        competitors.append(Competitor(0, '', '', category_id))
+
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+    
+    last_id_selected = cursor.execute(f"SELECT MAX(MatchID) FROM Matches").fetchall()
+    print(last_id_selected)
+    try:
+        last_id = int(last_id_selected[0][0])
+    except Exception as e:
+        last_id = 0
+
+    comp_index = 0
+    next_id = last_id
+    for round in rounds:
+        next_id += round
+        for match_index in range(1, round + 1):
+            if comp_index + 1 < len(competitors):
+                cursor.execute(f"""
+                    INSERT INTO Matches 
+                    (CategoryID, RoundNumber, Competitor1ID, Competitor2ID, NextMatchID) 
+                    VALUES (
+                        {category_id}, 
+                        {round}, 
+                        {competitors[comp_index].id}, 
+                        {competitors[comp_index + 1].id}, 
+                        {next_id + math.ceil(match_index / 2)}
+                    )
+                """)            
+            else:
+                cursor.execute(f"""
+                    INSERT INTO Matches 
+                    (CategoryID, RoundNumber, NextMatchID) 
+                    VALUES (
+                        {category_id}, 
+                        {round}, 
+                        {next_id + math.ceil(match_index / 2)}
+                    )
+                """)            
+            comp_index += 2
 
     connection.commit()
     connection.close()
@@ -53,7 +136,10 @@ def get_from_doyangs():
 
     doyangs = cursor.execute(f"SELECT DoYangID, Name FROM DoYangs")
     doyangs = doyangs.fetchall()
-    print(doyangs)
+
+    connection.commit()
+    connection.close()
+
     return doyangs
 
 def get_from_categories():
@@ -62,5 +148,27 @@ def get_from_categories():
 
     categories = cursor.execute(f"SELECT CategoryID, Name, DoYangID FROM Categories")
     categories = categories.fetchall()
-    print(categories)
+
+    connection.commit()
+    connection.close()
+
     return categories
+
+def get_from_competitors(category = 0):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    if category == 0:
+        competitors_selected = cursor.execute(f"SELECT CompetitorID, Name, Club, CategoryID FROM Competitors")
+    else:
+        competitors_selected = cursor.execute(f"SELECT CompetitorID, Name, Club, CategoryID FROM Competitors"
+                                            f" WHERE CategoryID = {category}")
+    competitors_selected = competitors_selected.fetchall()
+    competitors = []
+    for competitor in competitors_selected:
+        competitors.append(Competitor(competitor[0], competitor[1], competitor[2], competitor[3]))
+
+    connection.commit()
+    connection.close()
+
+    return competitors

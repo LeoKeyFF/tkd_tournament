@@ -1,5 +1,5 @@
-let current_doyang = 1
-let current_category = 1
+let current_doyang = 0
+let current_category = 0
 
 function addDoYang(){
     var text = $('#DoYangInput').val();
@@ -58,7 +58,8 @@ function addCompetitor(){
     $('#CompetitorInputClub').val("");
     const dataToSend = { 
         name: name,
-        club: club
+        club: club,
+        category_id_current: current_category
     };
     $.ajax({
         type: "POST",
@@ -67,13 +68,35 @@ function addCompetitor(){
         data: JSON.stringify(dataToSend),
         dataType: 'json',
         success: function (response, status, jqXHR) {
-            
+            updateDinamicContent()
         },
         error: function (jqXHR, textStatus, errorThrown) {
             // Error handling
         },
         complete: function (jqXHR, textStatus) {
-            
+            updateDinamicContent()
+        }
+    });
+}
+
+function createGrid(){
+    const dataToSend = { 
+        category_id: current_category
+    };
+    $.ajax({
+        type: "POST",
+        url: '/create_grid',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(dataToSend),
+        dataType: 'json',
+        success: function (response, status, jqXHR) {
+
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            // Error handling
+        },
+        complete: function (jqXHR, textStatus) {
+
         }
     });
 }
@@ -100,6 +123,20 @@ function updateDinamicContent(){
         success: function (data) {
             if (data.ids.length > 0){
                 categoriesContent(data.ids, data.names, data.doyangs)
+            }
+        },
+        error: function () {
+            console.error('Error fetching data.');
+        }
+    });
+
+    $.ajax({
+        url: '/get_data_competitors',
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            if (data.ids.length > 0){
+                competitorsContent(data.ids, data.names, data.clubs, data.categories)
             }
         },
         error: function () {

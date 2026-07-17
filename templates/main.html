@@ -3,32 +3,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taekwon-Do</title>   
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="{{ url_for('static', filename='content.js') }}"></script>
+    <script src="{{ url_for('static', filename='match.js') }}"></script>
     <script src="{{ url_for('static', filename='jquery.js') }}"></script>
 </head>
 <body>
-        <div class="doyangs" id="doyangs">
-            Площадки:
-            <div class="'doyangs-list" id="doyangs_list"></div>
-            <input type="text" id="DoYangInput" placeholder="Введите название площадки">
-            <button class="add" onclick="addDoYang()">+</button>
-        </div>
-        <div class="categories" id="categories">
-            Категории:
-            <div class="'categories-list" id="categories_list"></div>
-            <input type="text" id="CategoryInput" placeholder="Введите название категории">
-            <button class="add" onclick="addCategory()">+</button>
-        </div>
-        <div class="categories" id="categories">
-            Соперники:
-            <div class="competitors-list" id="competitors_list"></div>
-            <input type="text" id="CompetitorInputName" placeholder="Введите имя соперника">
-            <input type="text" id="CompetitorInputClub" placeholder="Введите клуб соперника">
-            <button class="add" onclick="addCompetitor()">+</button>
-        </div>
-        <div id="show"></div>
-        <button class="create" onclick="createGrid()">Создать сетку</button>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            createTables()
+            showPage(0);
+            updateDinamicContent();
+            setInterval(function() {updateDinamicContent();}, 5000)
+        });
+    </script>
+
+    <div class="doyangs" id="doyangs">
+        Площадки:
+        <div class="doyangs-list" id="doyangs_list"></div>
+        <input type="text" id="DoYangInput" placeholder="Введите название площадки">
+        <button class="add" onclick="addDoYang()">+</button>
+    </div>
+    <div class="categories" id="categories">
+        Категории:
+        <div class="categories-list" id="categories_list"></div>
+        <input type="text" id="CategoryInput" placeholder="Введите название категории">
+        <button class="add" onclick="addCategory()">+</button>
+    </div>
+    <div class="competitors" id="competitors">
+        Соперники:
+        <div class="competitors-list" id="competitors_list"></div>
+        <input type="text" id="CompetitorInputName" placeholder="Введите имя соперника">
+        <input type="text" id="CompetitorInputClub" placeholder="Введите клуб соперника">
+        <button class="add" onclick="addCompetitor()">+</button>
+        <div class="grid-div" id="grid_div"></div>
+    </div>
+    <div id="show"></div>
+    <button class="back" onclick="backPage()"><-</button>
+    <button class="create" onclick="createGrid()">Создать сетку</button>
+    
 
 </body>
 </html>

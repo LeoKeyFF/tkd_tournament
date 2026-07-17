@@ -85,14 +85,18 @@ def add_matches(category_id):
          rounds.append(first_round)
     rounds = rounds[::-1]
 
-    while len(competitors) <= first_round * 2:
-        competitors.append(Competitor(0, '', '', category_id))
+    while len(competitors) < first_round * 2:
+        for i in range(len(competitors) - 1, -1, -1):
+            if len(competitors) == first_round * 2:
+                break
+            competitors.insert(i + 1, Competitor(0, '', '', category_id))
+
+    print(competitors)
 
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
     
     last_id_selected = cursor.execute(f"SELECT MAX(MatchID) FROM Matches").fetchall()
-    print(last_id_selected)
     try:
         last_id = int(last_id_selected[0][0])
     except Exception as e:
@@ -172,3 +176,32 @@ def get_from_competitors(category = 0):
     connection.close()
 
     return competitors
+
+def get_from_matches(category_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    matches = cursor.execute(f"""
+        SELECT 
+            m.CategoryID,
+            m.RoundNumber,
+            m.Competitor1ID,
+            c1.Name AS Competitor1Name,
+            m.Competitor2ID,
+            c2.Name AS Competitor2Name,
+            m.Winner
+        FROM 
+            Matches m
+        LEFT JOIN 
+            Competitors c1 ON m.Competitor1ID = c1.CompetitorID
+        LEFT JOIN 
+            Competitors c2 ON m.Competitor2ID = c2.CompetitorID
+        WHERE 
+            m.CategoryID = {category_id}
+    """)    
+    matches = matches.fetchall()
+
+    connection.commit()
+    connection.close()
+
+    return matches

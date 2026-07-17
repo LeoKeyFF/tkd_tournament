@@ -1,5 +1,23 @@
 let current_doyang = 0
 let current_category = 0
+let current_page = 0
+
+function createTables(){
+    $.ajax({
+        type: "POST",
+        url: '/create_tables',
+        contentType: 'application/json; charset=utf-8',
+        success: function (response, status, jqXHR) {
+            updateDinamicContent()
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            // Error handling
+        },
+        complete: function (jqXHR, textStatus) {
+            updateDinamicContent()
+        }
+    });
+}
 
 function addDoYang(){
     var text = $('#DoYangInput').val();
@@ -137,6 +155,26 @@ function updateDinamicContent(){
         success: function (data) {
             if (data.ids.length > 0){
                 competitorsContent(data.ids, data.names, data.clubs, data.categories)
+            }
+        },
+        error: function () {
+            console.error('Error fetching data.');
+        }
+    });
+
+    $.ajax({
+        url: '/get_data_matches',
+        method: 'GET',
+        dataType: 'json',
+        data: {
+            category_id: current_category,
+        },
+        success: function (data) { 
+            $("#grid_table").remove()        
+            if (data.rounds.length > 0){
+                matches = convertMatches(data.rows)
+                $("#show").text(matches[0].competitor1name)
+                drawGrid(matches, data.rounds)
             }
         },
         error: function () {

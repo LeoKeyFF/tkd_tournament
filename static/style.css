@@ -1,0 +1,231 @@
+/* Общий сброс и базовые стили */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: #f5f7fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    margin: 0;
+}
+
+/* Карточки-секции (Площадки, Категории, Соперники) */
+.doyangs,
+.categories,
+.competitors {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    padding: 1.5rem 2rem 2rem 2rem;
+    width: 100%;
+    max-width: 640px;
+    margin-bottom: 2rem;
+    transition: opacity 0.2s ease;
+    border: 1px solid #e9edf2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+}
+
+/* Заголовки секций */
+.doyangs,
+.categories,
+.competitors {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #1e293b;
+    letter-spacing: 0.3px;
+}
+
+/* Списки (контейнеры для элементов) */
+.doyangs-list,
+.categories-list,
+.competitors-list {
+    margin: 0.75rem 0 1rem 0;
+    padding: 0.5rem 0;
+    min-height: 3rem;
+    border-top: 1px dashed #dce1e8;
+    border-bottom: 1px dashed #dce1e8;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    order: 1;
+}
+
+/* Кнопки элементов внутри списков (площадки, категории) */
+.doyang-button,
+.category-button {
+    background: #f1f4f9;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 450;
+    color: #0b1e33;
+    border: 1px solid #e2e8f0;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    font-family: inherit;
+}
+
+.doyang-button:hover,
+.category-button:hover {
+    background: #e5eaf0;
+    border-color: #c8d2de;
+}
+
+.doyang-button:active,
+.category-button:active {
+    background: #d5dde6;
+    transform: scale(0.99);
+}
+
+/* Элементы соперников (div) */
+.competitor-div {
+    background: #f1f4f9;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 450;
+    color: #0b1e33;
+    border: 1px solid #e2e8f0;
+    width: 100%;
+    text-align: left;
+    transition: background 0.15s ease;
+}
+
+.competitor-div:not(:last-child) {
+    margin-bottom: 0.25rem;
+}
+
+/* Все инпуты внутри секций - занимают свободное место */
+.doyangs input[type="text"],
+.categories input[type="text"],
+.competitors input[type="text"] {
+    background: #f8fafc;
+    border: 1px solid #d1d9e6;
+    border-radius: 30px;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    color: #0f1a2c;
+    outline: none;
+    transition: border 0.15s ease, box-shadow 0.15s ease;
+    flex: 1;
+    min-width: 120px;
+}
+
+.doyangs input[type="text"]:focus,
+.categories input[type="text"]:focus,
+.competitors input[type="text"]:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    background: #ffffff;
+}
+
+/* Кнопки «+» - фиксированный размер */
+.doyangs button.add,
+.categories button.add,
+.competitors button.add {
+    background: #eef2f6;
+    color: #1e293b;
+    border: 1px solid #d1d9e6;
+    padding: 0.6rem 1.6rem;
+    font-size: 1.2rem;
+    font-weight: 400;
+    line-height: 1;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    flex: 0 0 auto;
+    min-width: 48px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.doyangs button.add:hover,
+.categories button.add:hover,
+.competitors button.add:hover {
+    background: #dce3ec;
+    border-color: #b3c0d0;
+}
+
+.doyangs button.add:active,
+.categories button.add:active,
+.competitors button.add:active {
+    transform: scale(0.95);
+}
+
+/* Для соперников - инпуты чуть уже */
+.competitors input[type="text"] {
+    min-width: 100px;
+}
+
+/* Кнопки навигации и создания */
+.back,
+.create {
+    background: #ffffff;
+    border: 1px solid #d1d9e6;
+    color: #1e293b;
+    padding: 0.6rem 1.8rem;
+    margin: 0.3rem 0.4rem;
+    font-weight: 500;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    font-family: inherit;
+    font-size: 0.95rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.back:hover,
+.create:hover {
+    background: #f1f5f9;
+    border-color: #b8c4d4;
+}
+
+.create {
+    background: #1e293b;
+    border-color: #1e293b;
+    color: white;
+}
+
+.create:hover {
+    background: #0f1a2c;
+    border-color: #0f1a2c;
+}
+
+/* Группа кнопок внизу */
+body > div:last-of-type {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+/* Подсказки для пустых списков */
+.doyangs-list:empty::after,
+.categories-list:empty::after,
+.competitors-list:empty::after {
+    content: "(пусто)";
+    color: #a0b3cc;
+    font-size: 0.85rem;
+    font-weight: 400;
+    padding: 0.4rem 0;
+    display: block;
+    width: 100%;
+    text-align: center;
+}

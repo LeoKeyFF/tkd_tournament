@@ -8,6 +8,7 @@ function doYangsContent(ids, names){
             $(this).toggleClass('active');
             current_doyang = ids[i]
             current_category = 0
+            showPage(1)
             updateDinamicContent()
         });
         $('#doyangs_list').append(doyangButton);
@@ -24,7 +25,9 @@ function categoriesContent(ids, names, doyangs){
             }).on('click', function() {
                 $(this).toggleClass('active');
                 current_category = ids[i]
+                showPage(2)
                 updateDinamicContent()
+
             });
             $('#categories_list').append(categoryButton);
         }
@@ -42,4 +45,93 @@ function competitorsContent(ids, names, clubs, categories){
             $('#competitors_list').append(competitorDiv);
         }
     }
+}
+
+function showPage(page){
+    current_page = page
+    if (page == 0){
+        $("#doyangs").css("display", "block");
+        $("#categories").css("display", "none");
+        $("#competitors").css("display", "none");
+    }
+    else if (page == 1) {
+        $("#doyangs").css("display", "none");
+        $("#categories").css("display", "block");
+        $("#competitors").css("display", "none");
+    }
+    else {
+        $("#doyangs").css("display", "none");
+        $("#categories").css("display", "none");
+        $("#competitors").css("display", "block");
+    }
+}
+
+function backPage(){
+    if (current_page > 0){
+        showPage(current_page - 1)
+    }
+}
+
+function drawGrid(matches, rounds){
+    
+    const table = $('<table>', {
+        id: 'grid_table',
+        class: 'grid-table'
+    });
+    const thead = $('<thead>');
+    const headerRow = $('<tr>');
+
+    for (const round of rounds){
+        th = $('<th>');
+        if (round != 1){
+            divHead =  $('<div>',{
+                class: 'round-header',
+                text: "1/" + round + " Финала"
+            });
+        } else {
+            divHead =  $('<div>',{
+                class: 'round-header',
+                text: "Финал"
+            });
+        }
+
+        th.append(divHead)
+        headerRow.append(th);
+    };
+    thead.append(headerRow);
+    table.append(thead);
+
+    const tbody = $('<tbody>');
+    
+    for (let i = 0; i < rounds[0]; i++){
+        const tr = $('<tr>');
+        for (let match of matches){
+            if (match.rowIndex == i){
+                td = $('<td>', {
+                    rowspan: rounds[0]/match.round
+                });
+
+                divPlayerBox = $('<div>',{
+                    class: 'player-box'
+                }); 
+            
+                divRow1 = $('<div>',{
+                    class: 'player-name',
+                    text: match.competitor1name
+                });
+                divRow2 = $('<div>',{
+                    class: 'player-name',
+                    text: match.competitor2name
+                });
+                divPlayerBox.append(divRow1)
+                divPlayerBox.append($('<hr>'))
+                divPlayerBox.append(divRow2)
+                td.append(divPlayerBox);
+                tr.append(td);
+            }
+        }
+        tbody.append(tr);
+    }  
+    table.append(tbody);
+    $("#grid_div").append(table);
 }

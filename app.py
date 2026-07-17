@@ -7,8 +7,12 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    database.create_tables()
     return render_template('main.html')
+
+@app.route("/create_tables", methods = ['POST'])
+def create_tables():
+    database.create_tables()
+    return redirect(url_for('home'))
 
 @app.route("/add_doyang", methods = ['POST'])
 def add_doyang():
@@ -61,7 +65,6 @@ def get_data_doyangs():
         'ids': ids,
         'names': names
     }
-    print(ids, names)
     return jsonify(data)
 
 @app.route("/get_data_categories", methods = ['GET'])
@@ -116,6 +119,27 @@ def get_data_competitors():
     }
     return jsonify(data)
 
+@app.route("/get_data_matches", methods = ['GET'])
+def get_data_matches():
+    category_id = request.args.get('category_id')
+    matches = database.get_from_matches(category_id)
+    rounds = []
+    for match in matches:
+        if match[1] not in rounds:
+            rounds.append(match[1])
+    rows = []
+    for round in rounds:
+        row_index = 0
+        for match in matches:
+            if (match[1] == round):
+                match_new = match + (int(row_index),)
+                rows.append(match_new)
+                row_index += max(rounds)/round
+    data = {
+        'rows': rows, 
+        'rounds': rounds,
+    }
+    return jsonify(data)
 
 
 if __name__ == "__main__":

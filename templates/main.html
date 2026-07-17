@@ -39,9 +39,23 @@
         <button class="add" onclick="addCompetitor()">+</button>
         <div class="grid-div" id="grid_div"></div>
     </div>
-    <div id="show"></div>
     <button class="back" onclick="backPage()"><-</button>
     <button class="create" onclick="createGrid()">Создать сетку</button>
+
+    <dialog id="chooseWinner" aria-modal="true" >
+        <h2 id="heading">Победитель:</h2>
+        <div display = "flex">
+            <form method="dialog" style="display: grid;">
+                <button class="btn btn-secondary" style="margin: 5px;" type="button" onclick="closeChooseWinner(0)">
+                    <p id ="dialogCompetitor1"></p>
+                </button>
+                <button class="btn btn-secondary" style="margin: 5px;" type="button" onclick="closeChooseWinner(1)" >
+                    <p id ="dialogCompetitor2"></p>
+                </button>
+            </form>
+        </div>
+    </dialog>
+
     
 
 </body>

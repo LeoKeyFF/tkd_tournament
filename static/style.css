@@ -229,3 +229,108 @@ body > div:last-of-type {
     width: 100%;
     text-align: center;
 }
+
+/* ===== СТИЛИ ДЛЯ СЕТКИ (ТАБЛИЦЫ) ===== */
+
+/* Контейнер для сетки */
+.grid-div {
+    width: 100%;
+    max-width: 1200px;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    padding: 0 0.5rem;
+}
+
+/* Таблица сетки */
+.grid-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9edf2;
+    min-width: 600px;
+}
+
+/* Заголовки таблицы (раунды) */
+.grid-table thead th {
+    background: #f1f4f9;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #1e293b;
+    border-bottom: 2px solid #dce1e8;
+    border-right: 1px solid #e2e8f0;
+    min-width: 120px;
+}
+
+.grid-table thead th:last-child {
+    border-right: none;
+}
+
+/* Заголовок раунда */
+.round-header {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+}
+
+/* Ячейки таблицы */
+.grid-table td {
+    padding: 0.5rem;
+    text-align: center;
+    border-right: 1px solid #eef2f6;
+    border-bottom: 1px solid #eef2f6;
+    vertical-align: middle;
+    min-width: 120px;
+    height: 70px;
+}
+
+.grid-table td:last-child {
+    border-right: none;
+}
+
+/* Блок игрока в ячейке */
+.player-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.25rem 0;
+    width: 100%;
+}
+
+/* Имя игрока */
+.player-name {
+    font-size: 0.9rem;
+    color: #0b1e33;
+    padding: 0.2rem 0.3rem;
+    font-weight: 450;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Разделитель между игроками */
+.player-box hr {
+    border: none;
+    border-top: 1px solid #dce1e8;
+    margin: 0.15rem 0;
+    width: 100%;
+}
+
+/* Стили для четных/нечетных строк */
+.grid-table tbody tr:nth-child(odd) {
+    background: #fafbfc;
+}
+
+.grid-table tbody tr:nth-child(even) {
+    background: #ffffff;
+}
+
+/* Пустые ячейки */
+.grid-table td:empty {
+    background: #f8fafc;
+}

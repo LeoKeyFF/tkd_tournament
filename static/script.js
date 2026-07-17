@@ -173,7 +173,6 @@ function updateDinamicContent(){
             $("#grid_table").remove()        
             if (data.rounds.length > 0){
                 matches = convertMatches(data.rows)
-                $("#show").text(matches[0].competitor1name)
                 drawGrid(matches, data.rounds)
             }
         },

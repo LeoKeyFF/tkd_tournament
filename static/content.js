@@ -1,3 +1,9 @@
+let competitor1id = 0
+let competitor1name = ''
+let competitor2id = 0
+let competitor2name = ''
+let match_id = 0
+
 function doYangsContent(ids, names){
     $('#doyangs_list').empty();
     for (let i = 0; i < ids.length; i++){
@@ -113,7 +119,15 @@ function drawGrid(matches, rounds){
 
                 divPlayerBox = $('<div>',{
                     class: 'player-box'
-                }); 
+                }).on('click', function() {
+                    competitor1id = match.competitor1id;
+                    competitor1name = match.competitor1name;
+                    competitor2id = match.competitor2id;
+                    competitor2name = match.competitor2name;
+                    match_id = match.matchId;
+                    openChooseWinner();
+                }
+                ); 
             
                 divRow1 = $('<div>',{
                     class: 'player-name',
@@ -134,4 +148,48 @@ function drawGrid(matches, rounds){
     }  
     table.append(tbody);
     $("#grid_div").append(table);
+}
+
+function openChooseWinner(){
+    const dialog = $("#chooseWinner")[0];
+    $("#dialogCompetitor1").text(competitor1name);
+    $("#dialogCompetitor2").text(competitor2name);
+    dialog.addEventListener('click', function (e) {
+        if (e.target === this) {
+            this.close();
+        }
+    });
+    dialog.showModal(); 
+}
+
+function closeChooseWinner(w){
+    const dialog = $("#chooseWinner")[0];
+    dialog.close();
+    let winner
+    if (w == 0)
+        winner = competitor1id
+    else
+        winner = competitor2id;
+
+    const dataToSend = { 
+        winner: winner,
+        match_id: match_id,
+    };
+
+    $.ajax({
+        type: "POST",
+        url: '/set_winner',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(dataToSend),
+        dataType: 'json',
+        success: function (response, status, jqXHR) {
+            updateDynamicContent()
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            // Error handling
+        },
+        complete: function (jqXHR, textStatus) {
+            updateDynamicContent()
+        }
+    });
 }

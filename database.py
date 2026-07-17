@@ -118,7 +118,7 @@ def add_matches(category_id):
                         {competitors[comp_index + 1].id}, 
                         {next_id + math.ceil(match_index / 2)}
                     )
-                """)            
+                """)  
             else:
                 cursor.execute(f"""
                     INSERT INTO Matches 
@@ -133,6 +133,27 @@ def add_matches(category_id):
 
     connection.commit()
     connection.close()
+
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    empty_competitors = cursor.execute(f"""
+        SELECT 
+            MatchID,
+            Competitor1ID
+        FROM 
+            Matches
+        WHERE 
+            Competitor1ID IS NOT NULL 
+            AND Competitor1ID != ''
+            AND (Competitor2ID IS NULL OR Competitor2ID = 0);
+    """).fetchall()
+
+    connection.commit()
+    connection.close()
+
+    for competitor in empty_competitors:
+        set_winner(competitor[0], competitor[1])
 
 def get_from_doyangs():
     connection = sqlite3.connect(database_path)
@@ -189,7 +210,8 @@ def get_from_matches(category_id):
             c1.Name AS Competitor1Name,
             m.Competitor2ID,
             c2.Name AS Competitor2Name,
-            m.Winner
+            m.Winner,
+            m.MatchID
         FROM 
             Matches m
         LEFT JOIN 
@@ -205,3 +227,35 @@ def get_from_matches(category_id):
     connection.close()
 
     return matches
+
+def set_winner(match_id, winner):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    cursor.execute(
+        f"UPDATE Matches SET Winner = {winner} WHERE MatchID = {match_id}"
+    )
+    next_match_id = cursor.execute(
+        f"SELECT NextMatchID FROM Matches WHERE MatchID = {match_id}"
+    ).fetchall()[0][0]
+
+    cursor.execute(f"""
+        UPDATE Matches 
+        SET 
+            Competitor1ID = 
+                CASE WHEN Competitor1ID IS NULL OR Competitor1ID = '' 
+                THEN {winner}
+                ELSE Competitor1ID 
+                END,
+            Competitor2ID = 
+                CASE WHEN Competitor1ID IS NOT NULL AND Competitor1ID != '' 
+                    AND (Competitor2ID IS NULL OR Competitor2ID = '')
+                THEN {winner}
+                ELSE Competitor2ID 
+                END
+        WHERE 
+            MatchID = {next_match_id}
+    """)    
+
+    connection.commit()
+    connection.close()

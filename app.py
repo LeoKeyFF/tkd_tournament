@@ -45,6 +45,14 @@ def create_grid():
     database.add_matches(category_id)
     return redirect(url_for('home'))
 
+@app.route("/set_winner", methods = ['POST'])
+def set_winner():
+    data = request.get_json()
+    match_id = data.get('match_id')
+    winner = data.get('winner')
+    print(match_id, winner)
+    database.set_winner(match_id, winner)
+    return redirect(url_for('home'))
 #---------------------------------------------------------------------------------------
 
 @app.route("/get_data_doyangs", methods = ['GET'])

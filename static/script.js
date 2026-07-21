@@ -46,7 +46,6 @@ function addDoYang(){
 function addCategory(){
     var text = $('#CategoryInput').val();
     $('#CategoryInput').val("");
-    console.log(current_doyang);
     const dataToSend = { 
         name: text,
         doyang: current_doyang
@@ -140,7 +139,7 @@ function updateDinamicContent(){
         dataType: 'json',
         success: function (data) {
             if (data.ids.length > 0){
-                categoriesContent(data.ids, data.names, data.doyangs)
+                categoriesContent(data.ids, data.names, data.doyangs, data.doyangs_list)
             }
         },
         error: function () {
@@ -154,7 +153,7 @@ function updateDinamicContent(){
         dataType: 'json',
         success: function (data) {
             if (data.ids.length > 0){
-                competitorsContent(data.ids, data.names, data.clubs, data.categories)
+                competitorsContent(data.ids, data.names, data.clubs, data.categories, data.categories_list)
             }
         },
         error: function () {
@@ -170,7 +169,8 @@ function updateDinamicContent(){
             category_id: current_category,
         },
         success: function (data) { 
-            $("#grid_table").remove()        
+            $("#grid_div").empty()  
+            // $("#grid_table").remove()        
             if (data.rounds.length > 0){
                 matches = convertMatches(data.rows)
                 drawGrid(matches, data.rounds)

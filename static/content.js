@@ -7,13 +7,12 @@ let match_id = 0
 function doYangsContent(ids, names){
     $('#doyangs_list').empty();
     for (let i = 0; i < ids.length; i++){
-        doyangButton = $('<button>', {
+        const doyangButton = $('<button>', {
             class: 'doyang-button',
             text: names[i]
         }).on('click', function() {
             $(this).toggleClass('active');
             current_doyang = ids[i]
-            current_category = 0
             showPage(1)
             updateDinamicContent()
         });
@@ -21,11 +20,11 @@ function doYangsContent(ids, names){
     }
 }
 
-function categoriesContent(ids, names, doyangs){
+function categoriesContent(ids, names, doyangs, doyangs_list){
     $('#categories_list').empty();
     for (let i = 0; i < ids.length; i++){
         if (doyangs[i] == current_doyang){
-            categoryButton = $('<button>', {
+            const categoryButton = $('<button>', {
                 class: 'category-button',
                 text: names[i]
             }).on('click', function() {
@@ -38,19 +37,50 @@ function categoriesContent(ids, names, doyangs){
             $('#categories_list').append(categoryButton);
         }
     }
+    for (let doyang of doyangs_list){
+        if (doyang[0] == current_doyang && !$('#path_card_doyang').length){
+            const pathDoyang = $('<div>', {
+                class: 'cardpath',
+                text: doyang[1],
+                id: 'path_card_doyang'
+            }).on('click', function(){
+                showPage(0)
+            });
+            $('#path_card_doyang').remove();
+            $('#path').append(pathDoyang);
+
+            break
+        }
+    };
+
 }
 
-function competitorsContent(ids, names, clubs, categories){
+function competitorsContent(ids, names, clubs, categories, categories_list){
     $('#competitors_list').empty();
     for (let i = 0; i < ids.length; i++){
         if (categories[i] == current_category){
-            competitorDiv = $('<div>', {
+            const competitorDiv = $('<div>', {
                 class: 'competitor-div',
-                text: names[i]
+                text: names[i] + ' | ' + '(' + clubs[i] + ')'
             });
             $('#competitors_list').append(competitorDiv);
         }
     }
+    for (let category of categories_list){
+        if (category[0] == current_category && !$('#path_card_category').length){
+            const pathCategory = $('<div>', {
+                class: 'cardpath',
+                text: category[1],
+                id: 'path_card_category'
+            }).on('click', function(){
+                showPage(1)
+            });
+            // $('#path_card_category').remove();
+            $('#path').append(pathCategory);
+
+            break
+        }
+    };
 }
 
 function showPage(page){
@@ -59,11 +89,21 @@ function showPage(page){
         $("#doyangs").css("display", "block");
         $("#categories").css("display", "none");
         $("#competitors").css("display", "none");
+
+        $("#path_card_doyang").remove();
+        $('#path_card_category').remove();
+
+        current_doyang = 0;
+        current_category = 0;
     }
     else if (page == 1) {
         $("#doyangs").css("display", "none");
         $("#categories").css("display", "block");
         $("#competitors").css("display", "none");
+
+        $('#path_card_category').remove();
+
+        current_category = 0;
     }
     else {
         $("#doyangs").css("display", "none");
@@ -116,37 +156,52 @@ function drawGrid(matches, rounds){
                 td = $('<td>', {
                     rowspan: rounds[0]/match.round
                 });
-
-                divPlayerBox = $('<div>',{
-                    class: 'player-box'
-                }).on('click', function() {
-                    competitor1id = match.competitor1id;
-                    competitor1name = match.competitor1name;
-                    competitor2id = match.competitor2id;
-                    competitor2name = match.competitor2name;
-                    match_id = match.matchId;
-                    openChooseWinner();
+                const divCompetitorBox = $('<div>',{
+                    class: 'competitor-box'
+                }); 
+                if (match.competitor1id != 0 && match.competitor1id != null 
+                    && match.competitor2id != 0 && match.competitor2id != null 
+                    && match.winner == null){
+                    divCompetitorBox.on('click', function() {
+                        competitor1id = match.competitor1id;
+                        competitor1name = match.competitor1name;
+                        competitor2id = match.competitor2id;
+                        competitor2name = match.competitor2name;
+                        match_id = match.matchId;
+                        openChooseWinner();
+                    })
                 }
-                ); 
             
-                divRow1 = $('<div>',{
-                    class: 'player-name',
+                const divRow1 = $('<div>',{
+                    class: 'competitor-name',
                     text: match.competitor1name
                 });
-                divRow2 = $('<div>',{
-                    class: 'player-name',
+                const divRow2 = $('<div>',{
+                    class: 'competitor-name',
                     text: match.competitor2name
                 });
-                divPlayerBox.append(divRow1)
-                divPlayerBox.append($('<hr>'))
-                divPlayerBox.append(divRow2)
-                td.append(divPlayerBox);
+
+                if(match.competitor1id == match.winner){
+                    divRow1.toggleClass('competitor-name-winner')
+                }
+                if(match.competitor2id == match.winner){
+                    divRow2.toggleClass('competitor-name-winner')
+                }
+
+                divCompetitorBox.append(divRow1)
+                divCompetitorBox.append($('<hr>'))
+                divCompetitorBox.append(divRow2)
+
+                td.append(divCompetitorBox);
                 tr.append(td);
             }
         }
         tbody.append(tr);
     }  
     table.append(tbody);
+    $("#grid_div").append(
+        'Сетка:'
+    );
     $("#grid_div").append(table);
 }
 

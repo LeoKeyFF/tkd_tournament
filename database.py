@@ -106,6 +106,8 @@ def add_matches(category_id):
     next_id = last_id
     for round in rounds:
         next_id += round
+        if round == 1:
+            next_id = -1
         for match_index in range(1, round + 1):
             if comp_index + 1 < len(competitors):
                 cursor.execute(f"""

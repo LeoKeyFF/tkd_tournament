@@ -25,8 +25,8 @@ body {
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
     padding: 1.5rem 2rem 2rem 2rem;
-    width: 100%;
-    max-width: 640px;
+    width: 90%;
+    /* max-width: 640px; */
     margin-bottom: 2rem;
     transition: opacity 0.2s ease;
     border: 1px solid #e9edf2;
@@ -122,7 +122,8 @@ body {
     outline: none;
     transition: border 0.15s ease, box-shadow 0.15s ease;
     flex: 1;
-    min-width: 120px;
+    width: 40%;
+    /* min-width: 120px; */
 }
 
 .doyangs input[type="text"]:focus,
@@ -148,7 +149,8 @@ body {
     cursor: pointer;
     transition: background 0.15s ease, border-color 0.15s ease;
     flex: 0 0 auto;
-    min-width: 48px;
+    width: 44px;
+    /* min-width: 48px; */
     height: 44px;
     display: inline-flex;
     align-items: center;
@@ -190,8 +192,7 @@ body {
     box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 }
 
-.back:hover,
-.create:hover {
+.back:hover {
     background: #f1f5f9;
     border-color: #b8c4d4;
 }
@@ -200,6 +201,10 @@ body {
     background: #1e293b;
     border-color: #1e293b;
     color: white;
+}
+.back {
+    height: 100%;
+    aspect-ratio: 1 / 1ж
 }
 
 .create:hover {
@@ -230,7 +235,7 @@ body > div:last-of-type {
     text-align: center;
 }
 
-/* ===== СТИЛИ ДЛЯ СЕТКИ (ТАБЛИЦЫ) ===== */
+/* ===== СТИЛИ ДЛЯ СЕТКИ (ТАБЛИЦЫ) - ТУРНИРНАЯ СЕТКА ===== */
 
 /* Контейнер для сетки */
 .grid-div {
@@ -245,29 +250,22 @@ body > div:last-of-type {
 .grid-table {
     width: 100%;
     border-collapse: collapse;
-    background: #ffffff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e9edf2;
+    background: transparent;
     min-width: 600px;
+    border: none;
 }
 
 /* Заголовки таблицы (раунды) */
 .grid-table thead th {
-    background: #f1f4f9;
+    background: transparent;
     padding: 0.75rem 1rem;
     text-align: center;
     font-weight: 600;
     font-size: 0.95rem;
     color: #1e293b;
+    border: none;
     border-bottom: 2px solid #dce1e8;
-    border-right: 1px solid #e2e8f0;
     min-width: 120px;
-}
-
-.grid-table thead th:last-child {
-    border-right: none;
 }
 
 /* Заголовок раунда */
@@ -278,59 +276,114 @@ body > div:last-of-type {
     letter-spacing: 0.3px;
 }
 
-/* Ячейки таблицы */
 .grid-table td {
     padding: 0.5rem;
     text-align: center;
-    border-right: 1px solid #eef2f6;
-    border-bottom: 1px solid #eef2f6;
+    border: none;
     vertical-align: middle;
     min-width: 120px;
     height: 70px;
+    background: transparent;
 }
 
-.grid-table td:last-child {
-    border-right: none;
+.grid-table tbody tr {
+    background: transparent;
 }
 
-/* Блок игрока в ячейке */
-.player-box {
+.competitor-box {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    padding: 0.25rem 0;
+    padding: 0.5rem 0.75rem;
     width: 100%;
+    background: #ffffff;
+    border: 2px solid #dce1e8;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    min-height: 60px;
+    justify-content: center;
+}
+
+/* Эффект при наведении на матч */
+.competitor-box:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    transform: translateY(-1px);
+    background: #f8faff;
 }
 
 /* Имя игрока */
-.player-name {
+.competitor-name {
     font-size: 0.9rem;
     color: #0b1e33;
-    padding: 0.2rem 0.3rem;
+    padding: 0.15rem 0.2rem;
     font-weight: 450;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: center;
+}
+.competitor-name-winner{
+    color: #08b719;
 }
 
 /* Разделитель между игроками */
-.player-box hr {
+.competitor-box hr {
     border: none;
-    border-top: 1px solid #dce1e8;
+    border-top: 1.5px solid #dce1e8;
     margin: 0.15rem 0;
+    width: 80%;
+    align-self: center;
+}
+
+/* Стили для кнопки-матча */
+.competitor-box button {
+    all: unset;
+    display: flex;
+    flex-direction: column;
     width: 100%;
+    cursor: pointer;
 }
 
-/* Стили для четных/нечетных строк */
-.grid-table tbody tr:nth-child(odd) {
-    background: #fafbfc;
+
+/* ===== СТИЛИ ДЛЯ ДИАЛОГОВОГО ОКНА ===== */
+dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.grid-table tbody tr:nth-child(even) {
-    background: #ffffff;
+/* ===== ПУТЬ ===== */
+.path{
+    display: flex;
+    padding-bottom: 15px;
+    width: 100%;
+    height: 60px;
 }
 
-/* Пустые ячейки */
-.grid-table td:empty {
-    background: #f8fafc;
+.cardpath{
+    background: #f1f4f9;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 450;
+    color: #0b1e33;
+    border: 1px solid #e2e8f0;
+    /* width: 20%; */
+    min-width: 20%;
+    max-width: 40%;
+    height: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    font-family: inherit;
+    padding: 0.6rem 1.8rem;
+    margin: 0.3rem 0.4rem;
 }

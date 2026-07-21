@@ -19,6 +19,10 @@
         });
     </script>
 
+    <div class="path" id="path">
+            <button class="back" onclick="backPage()"><-</button>
+    </div>
+
     <div class="doyangs" id="doyangs">
         Площадки:
         <div class="doyangs-list" id="doyangs_list"></div>
@@ -32,15 +36,14 @@
         <button class="add" onclick="addCategory()">+</button>
     </div>
     <div class="competitors" id="competitors">
+        <div class="grid-div" id="grid_div"></div>
         Соперники:
         <div class="competitors-list" id="competitors_list"></div>
         <input type="text" id="CompetitorInputName" placeholder="Введите имя соперника">
         <input type="text" id="CompetitorInputClub" placeholder="Введите клуб соперника">
         <button class="add" onclick="addCompetitor()">+</button>
-        <div class="grid-div" id="grid_div"></div>
+        <button class="create" onclick="createGrid()">Создать сетку</button>
     </div>
-    <button class="back" onclick="backPage()"><-</button>
-    <button class="create" onclick="createGrid()">Создать сетку</button>
 
     <dialog id="chooseWinner" aria-modal="true" >
         <h2 id="heading">Победитель:</h2>

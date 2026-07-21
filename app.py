@@ -78,11 +78,13 @@ def get_data_doyangs():
 @app.route("/get_data_categories", methods = ['GET'])
 def get_data_categories():
     categories = database.get_from_categories()
+    doyangs_list = database.get_from_doyangs()
     if len(categories) == 0:
         data = {
             'ids': [],
             'names': [],
-            'doyangs': []
+            'doyangs': [],
+            'doyangs_list': []
         }
         return jsonify(data)
     ids = []
@@ -95,19 +97,22 @@ def get_data_categories():
     data = {
         'ids': ids,
         'names': names,
-        'doyangs': doyangs
+        'doyangs': doyangs, 
+        'doyangs_list': doyangs_list
     }
     return jsonify(data)
 
 @app.route("/get_data_competitors", methods = ['GET'])
 def get_data_competitors():
     competitors = database.get_from_competitors()
+    categories_list = database.get_from_categories()
     if len(competitors) == 0:
         data = {
             'ids': [],
             'names': [],
             'clubs': [],
-            'categories': []
+            'categories': [], 
+            'categories_list': []
         }
         return jsonify(data)
     ids = []
@@ -123,7 +128,8 @@ def get_data_competitors():
         'ids': ids,
         'names': names,
         'clubs': clubs,
-        'categories': categories
+        'categories': categories,
+        'categories_list': categories_list
     }
     return jsonify(data)
 

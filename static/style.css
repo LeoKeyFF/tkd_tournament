@@ -123,7 +123,6 @@ body {
     transition: border 0.15s ease, box-shadow 0.15s ease;
     flex: 1;
     width: 40%;
-    /* min-width: 120px; */
 }
 
 .doyangs input[type="text"]:focus,

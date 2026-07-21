@@ -84,7 +84,7 @@ def get_data_categories():
             'ids': [],
             'names': [],
             'doyangs': [],
-            'doyangs_list': []
+            'doyangs_list': doyangs_list
         }
         return jsonify(data)
     ids = []
@@ -112,7 +112,7 @@ def get_data_competitors():
             'names': [],
             'clubs': [],
             'categories': [], 
-            'categories_list': []
+            'categories_list': categories_list
         }
         return jsonify(data)
     ids = []

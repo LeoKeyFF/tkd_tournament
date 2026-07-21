@@ -20,7 +20,7 @@
     </script>
 
     <div class="path" id="path">
-            <button class="back" onclick="backPage()"><-</button>
+            <button class="back" onclick="backPage()">🔙</button>
     </div>
 
     <div class="doyangs" id="doyangs">
@@ -38,21 +38,21 @@
     <div class="competitors" id="competitors">
         <div class="grid-div" id="grid_div"></div>
         Соперники:
-        <div class="competitors-list" id="competitors_list"></div>
+        <div class="competitors-list" id="competitors_list"></div>ы
         <input type="text" id="CompetitorInputName" placeholder="Введите имя соперника">
         <input type="text" id="CompetitorInputClub" placeholder="Введите клуб соперника">
-        <button class="add" onclick="addCompetitor()">+</button>
-        <button class="create" onclick="createGrid()">Создать сетку</button>
+        <button class="add" onclick="addCompetitor()" id="addCompetitor">+</button>
+        <button class="create" onclick="createGrid()" id="createGrid">Создать сетку</button>
     </div>
 
     <dialog id="chooseWinner" aria-modal="true" >
         <h2 id="heading">Победитель:</h2>
         <div display = "flex">
             <form method="dialog" style="display: grid;">
-                <button class="btn btn-secondary" style="margin: 5px;" type="button" onclick="closeChooseWinner(0)">
+                <button class="" style="margin: 5px;" type="button" onclick="closeChooseWinner(0)">
                     <p id ="dialogCompetitor1"></p>
                 </button>
-                <button class="btn btn-secondary" style="margin: 5px;" type="button" onclick="closeChooseWinner(1)" >
+                <button class="" style="margin: 5px;" type="button" onclick="closeChooseWinner(1)" >
                     <p id ="dialogCompetitor2"></p>
                 </button>
             </form>

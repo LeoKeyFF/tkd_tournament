@@ -148,7 +148,8 @@ def add_matches(category_id):
         WHERE 
             Competitor1ID IS NOT NULL 
             AND Competitor1ID != ''
-            AND (Competitor2ID IS NULL OR Competitor2ID = 0);
+            AND (Competitor2ID IS NULL OR Competitor2ID = 0)
+            AND (CategoryID = {category_id});
     """).fetchall()
 
     connection.commit()

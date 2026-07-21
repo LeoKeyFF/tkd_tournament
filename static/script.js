@@ -137,10 +137,8 @@ function updateDinamicContent(){
         url: '/get_data_categories',
         method: 'GET',
         dataType: 'json',
-        success: function (data) {
-            if (data.ids.length > 0){
-                categoriesContent(data.ids, data.names, data.doyangs, data.doyangs_list)
-            }
+        success: function (data) {        
+            categoriesContent(data.ids, data.names, data.doyangs, data.doyangs_list)
         },
         error: function () {
             console.error('Error fetching data.');
@@ -152,9 +150,7 @@ function updateDinamicContent(){
         method: 'GET',
         dataType: 'json',
         success: function (data) {
-            if (data.ids.length > 0){
-                competitorsContent(data.ids, data.names, data.clubs, data.categories, data.categories_list)
-            }
+            competitorsContent(data.ids, data.names, data.clubs, data.categories, data.categories_list)
         },
         error: function () {
             console.error('Error fetching data.');
@@ -170,10 +166,20 @@ function updateDinamicContent(){
         },
         success: function (data) { 
             $("#grid_div").empty()  
-            // $("#grid_table").remove()        
             if (data.rounds.length > 0){
+                $("#CompetitorInputName").css("display", "none")
+                $("#CompetitorInputClub").css("display", "none")
+                $("#addCompetitor").css("display", "none")
+                $("#createGrid").css("display", "none")
+
                 matches = convertMatches(data.rows)
                 drawGrid(matches, data.rounds)
+            }
+            else{
+                $("#CompetitorInputName").css("display", "")
+                $("#CompetitorInputClub").css("display", "")
+                $("#addCompetitor").css("display", "")
+                $("#createGrid").css("display", "")
             }
         },
         error: function () {

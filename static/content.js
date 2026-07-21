@@ -46,7 +46,7 @@ function categoriesContent(ids, names, doyangs, doyangs_list){
             }).on('click', function(){
                 showPage(0)
             });
-            $('#path_card_doyang').remove();
+            // $('#path_card_doyang').remove();
             $('#path').append(pathDoyang);
 
             break

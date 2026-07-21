@@ -37,22 +37,23 @@ function categoriesContent(ids, names, doyangs, doyangs_list){
             $('#categories_list').append(categoryButton);
         }
     }
-    for (let doyang of doyangs_list){
-        if (doyang[0] == current_doyang && !$('#path_card_doyang').length){
-            const pathDoyang = $('<div>', {
-                class: 'cardpath',
-                text: doyang[1],
-                id: 'path_card_doyang'
-            }).on('click', function(){
-                showPage(0)
-            });
-            // $('#path_card_doyang').remove();
-            $('#path').append(pathDoyang);
 
-            break
-        }
-    };
+    if (currentPath === '/') {
+        for (let doyang of doyangs_list){
+            if (doyang[0] == current_doyang && !$('#path_card_doyang').length){
+                const pathDoyang = $('<div>', {
+                    class: 'cardpath',
+                    text: doyang[1],
+                    id: 'path_card_doyang'
+                }).on('click', function(){
+                    showPage(0)
+                });
+                $('#path').append(pathDoyang);
 
+                break
+            }
+        };
+    }
 }
 
 function competitorsContent(ids, names, clubs, categories, categories_list){
@@ -75,7 +76,6 @@ function competitorsContent(ids, names, clubs, categories, categories_list){
             }).on('click', function(){
                 showPage(1)
             });
-            // $('#path_card_category').remove();
             $('#path').append(pathCategory);
 
             break

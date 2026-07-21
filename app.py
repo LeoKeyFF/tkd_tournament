@@ -9,6 +9,10 @@ app = Flask(__name__)
 def home():
     return render_template('main.html')
 
+@app.route("/pj")
+def home_pj():
+    return render_template('pj.html')
+
 @app.route("/create_tables", methods = ['POST'])
 def create_tables():
     database.create_tables()

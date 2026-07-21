@@ -12,37 +12,25 @@
 <body>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            current_doyang = 1
+            current_page = 1
             createTables()
-            showPage(0);
+            showPage(1);
             updateDinamicContent();
             setInterval(function() {updateDinamicContent();}, 5000)
         });
-    </script>
-
+    </script>  
+    Экран президента площадки 1:
     <div class="path" id="path">
-            <button class="back" onclick="backPage()">🔙</button>
-    </div>
-
-    <div class="doyangs" id="doyangs">
-        Площадки:
-        <div class="doyangs-list" id="doyangs_list"></div>
-        <input type="text" id="DoYangInput" placeholder="Введите название площадки">
-        <button class="add" onclick="addDoYang()">+</button>
     </div>
     <div class="categories" id="categories">
         Категории:
         <div class="categories-list" id="categories_list"></div>
-        <input type="text" id="CategoryInput" placeholder="Введите название категории">
-        <button class="add" onclick="addCategory()">+</button>
     </div>
     <div class="competitors" id="competitors">
         <div class="grid-div" id="grid_div"></div>
         Соперники:
         <div class="competitors-list" id="competitors_list"></div>
-        <input type="text" id="CompetitorInputName" placeholder="Введите имя соперника">
-        <input type="text" id="CompetitorInputClub" placeholder="Введите клуб соперника">
-        <button class="add" onclick="addCompetitor()" id="addCompetitor">+</button>
-        <button class="create" onclick="createGrid()" id="createGrid">Создать сетку</button>
     </div>
 
     <dialog id="chooseWinner" aria-modal="true" >
@@ -59,7 +47,6 @@
         </div>
     </dialog>
 
-    
 
 </body>
 </html>

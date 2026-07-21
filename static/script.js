@@ -2,6 +2,8 @@ let current_doyang = 0
 let current_category = 0
 let current_page = 0
 
+const currentPath = window.location.pathname;
+
 function createTables(){
     $.ajax({
         type: "POST",
@@ -119,19 +121,21 @@ function createGrid(){
 }
 
 function updateDinamicContent(){
-    $.ajax({
-        url: '/get_data_doyangs',
-        method: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            if (data.ids.length > 0){
-                doYangsContent(data.ids, data.names)
+    if (currentPath === '/') {
+        $.ajax({
+            url: '/get_data_doyangs',
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                if (data.ids.length > 0){
+                    doYangsContent(data.ids, data.names)
+                }
+            },
+            error: function () {
+                console.error('Error fetching data.');
             }
-        },
-        error: function () {
-            console.error('Error fetching data.');
-        }
-    });
+        });
+    }
     
     $.ajax({
         url: '/get_data_categories',

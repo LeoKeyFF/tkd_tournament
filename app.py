@@ -42,6 +42,15 @@ def add_competitor():
     database.add_competitor(name, club, category_id_current)
     return redirect(url_for('home'))
 
+@app.route("/pj/add_judge", methods = ['POST'])
+def add_judge():
+    data = request.get_json()
+    login = data.get('login')
+    doyang_id = data.get('doyang_id_current')
+    category_id = data.get('category_id_current')
+    database.add_judge(login, doyang_id, category_id)
+    return redirect(url_for('home'))
+
 @app.route("/create_grid", methods = ['POST'])
 def create_grid():
     data = request.get_json()
@@ -159,6 +168,40 @@ def get_data_matches():
     }
     return jsonify(data)
 
+@app.route("/pj/get_data_judges", methods = ['GET'])
+def get_data_judges():
+    doyang = request.args.get('doyang_id')
+    judges = database.get_from_judges(doyang)
+    if len(judges) == 0:
+        data = {
+            'ids': [],
+            'logins': [],
+            'scores1': [],
+            'scores2': [],
+            'winners': []
+        }
+        return jsonify(data)
+    ids = []
+    logins = []
+    scores1 = []
+    scores2 = []
+    winners = []
+    for judge in judges:
+        ids.append(judge[0])
+        logins.append(judge[1])
+        scores1.append(judge[2])
+        scores2.append(judge[3])
+        winners.append(judge[4])
+    data = {
+        'ids': ids,
+        'logins': logins,
+        'scores1': scores1,
+        'scores2': scores2, 
+        'winners': winners
+    }
+    return jsonify(data)
+
 
 if __name__ == "__main__":
+    database.create_tables()
     app.run(debug=False, host='0.0.0.0', port=5001)

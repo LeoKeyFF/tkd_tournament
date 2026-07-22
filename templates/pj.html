@@ -8,13 +8,14 @@
     <script src="{{ url_for('static', filename='content.js') }}"></script>
     <script src="{{ url_for('static', filename='match.js') }}"></script>
     <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='judges.js') }}"></script>
+
 </head>
 <body>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             current_doyang = 1
             current_page = 1
-            createTables()
             showPage(1);
             updateDinamicContent();
             setInterval(function() {updateDinamicContent();}, 5000)
@@ -23,6 +24,7 @@
     Экран президента площадки 1:
     <div class="path" id="path">
     </div>
+    <div class="judges-table" id="judges_table"></div>
     <div class="categories" id="categories">
         Категории:
         <div class="categories-list" id="categories_list"></div>
@@ -31,6 +33,13 @@
         <div class="grid-div" id="grid_div"></div>
         Соперники:
         <div class="competitors-list" id="competitors_list"></div>
+    </div>
+
+    <div class="judges" id="judges">
+        Судьи:
+        <div class="judges-list" id="judges_list"></div>
+        <input type="text" id="judge_intput_login" placeholder="Логин судьи">
+        <button class="add" onclick="addJudge()">+</button>
     </div>
 
     <dialog id="chooseWinner" aria-modal="true" >

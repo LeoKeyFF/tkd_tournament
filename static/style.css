@@ -20,7 +20,8 @@ body {
 /* Карточки-секции (Площадки, Категории, Соперники) */
 .doyangs,
 .categories,
-.competitors {
+.competitors,
+.judges {
     background: #ffffff;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
@@ -39,7 +40,8 @@ body {
 /* Заголовки секций */
 .doyangs,
 .categories,
-.competitors {
+.competitors,
+.judges {
     font-weight: 600;
     font-size: 1.1rem;
     color: #1e293b;
@@ -49,7 +51,8 @@ body {
 /* Списки (контейнеры для элементов) */
 .doyangs-list,
 .categories-list,
-.competitors-list {
+.competitors-list,
+.judges-list {
     margin: 0.75rem 0 1rem 0;
     padding: 0.5rem 0;
     min-height: 3rem;
@@ -92,7 +95,8 @@ body {
 }
 
 /* Элементы соперников (div) */
-.competitor-div {
+.competitor-div,
+.judge-div {
     background: #f1f4f9;
     padding: 0.6rem 1rem;
     border-radius: 8px;
@@ -108,11 +112,16 @@ body {
 .competitor-div:not(:last-child) {
     margin-bottom: 0.25rem;
 }
+.judge-div:not(:last-child) {
+    margin-bottom: 0.25rem;
+}
+
 
 /* Все инпуты внутри секций - занимают свободное место */
 .doyangs input[type="text"],
 .categories input[type="text"],
-.competitors input[type="text"] {
+.competitors input[type="text"], 
+.judges input[type="text"]{
     background: #f8fafc;
     border: 1px solid #d1d9e6;
     border-radius: 30px;
@@ -127,7 +136,8 @@ body {
 
 .doyangs input[type="text"]:focus,
 .categories input[type="text"]:focus,
-.competitors input[type="text"]:focus {
+.competitors input[type="text"]:focus ,
+.judges input[type="text"]:focus {
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     background: #ffffff;
@@ -136,7 +146,8 @@ body {
 /* Кнопки «+» - фиксированный размер */
 .doyangs button.add,
 .categories button.add,
-.competitors button.add {
+.competitors button.add,
+.judges button.add{
     background: #eef2f6;
     color: #1e293b;
     border: 1px solid #d1d9e6;
@@ -158,14 +169,16 @@ body {
 
 .doyangs button.add:hover,
 .categories button.add:hover,
-.competitors button.add:hover {
+.competitors button.add:hover,
+.judges button.add:hover{
     background: #dce3ec;
     border-color: #b3c0d0;
 }
 
 .doyangs button.add:active,
 .categories button.add:active,
-.competitors button.add:active {
+.competitors button.add:active,
+.judges button.add:active{
     transform: scale(0.95);
 }
 
@@ -223,7 +236,8 @@ body > div:last-of-type {
 /* Подсказки для пустых списков */
 .doyangs-list:empty::after,
 .categories-list:empty::after,
-.competitors-list:empty::after {
+.competitors-list:empty::after,
+.judges-list:empty::after {
     content: "(пусто)";
     color: #a0b3cc;
     font-size: 0.85rem;

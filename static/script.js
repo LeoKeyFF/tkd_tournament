@@ -4,23 +4,6 @@ let current_page = 0
 
 const currentPath = window.location.pathname;
 
-function createTables(){
-    $.ajax({
-        type: "POST",
-        url: '/create_tables',
-        contentType: 'application/json; charset=utf-8',
-        success: function (response, status, jqXHR) {
-            updateDinamicContent()
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            // Error handling
-        },
-        complete: function (jqXHR, textStatus) {
-            updateDinamicContent()
-        }
-    });
-}
-
 function addDoYang(){
     var text = $('#DoYangInput').val();
     $('#DoYangInput').val("");
@@ -190,4 +173,20 @@ function updateDinamicContent(){
             console.error('Error fetching data.');
         }
     });
+    if (currentPath === '/pj') {
+        $.ajax({
+            url: '/pj/get_data_judges',
+            method: 'GET',
+            dataType: 'json',
+            data: {
+                doyang_id: current_doyang,
+            },
+            success: function (data) {        
+                judgesContent(data.ids, data.logins, data.scores1, data.scores2, data.winners)
+            },
+            error: function () {
+                console.error('Error fetching data.');
+            }
+        });        
+    }
 }

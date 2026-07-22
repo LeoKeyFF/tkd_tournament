@@ -10,7 +10,6 @@ database_path = "database.db"
 def create_tables():
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
-
     cursor.execute(
         f"CREATE TABLE IF NOT EXISTS DoYangs ( DoYangID INTEGER PRIMARY KEY," 
           "Name varchar(255)"
@@ -38,6 +37,17 @@ def create_tables():
           "Competitor2ID INT," 
           "Winner INT," 
           "NextMatchID INT"
+        ")"
+    )
+
+    cursor.execute(
+        f"CREATE TABLE IF NOT EXISTS Judges ( JudgeID INTEGER PRIMARY KEY," 
+          "Login varchar(255),"
+          "DoYangID INT,"
+          "CategoryID INT,"
+          "Competitor1Score INT," 
+          "Competitor2Score INT," 
+          "Winner INT" 
         ")"
     )
     
@@ -158,6 +168,17 @@ def add_matches(category_id):
     for competitor in empty_competitors:
         set_winner(competitor[0], competitor[1])
 
+def add_judge(login, doyang_id, category_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    message = f"INSERT INTO Judges (Login, DoYangID, CategoryID) VALUES ('{login}', {doyang_id}, {category_id})"
+    cursor.execute(message)
+
+    connection.commit()
+    connection.close()
+
+
 def get_from_doyangs():
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
@@ -230,6 +251,18 @@ def get_from_matches(category_id):
     connection.close()
 
     return matches
+
+def get_from_judges(doyang_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    judges = cursor.execute(f"SELECT JudgeID, Login, Competitor1Score, Competitor1Score, Winner FROM Judges WHERE DoYangID = {doyang_id}")
+    judges = judges.fetchall()
+
+    connection.commit()
+    connection.close()
+
+    return judges
 
 def set_winner(match_id, winner):
     connection = sqlite3.connect(database_path)

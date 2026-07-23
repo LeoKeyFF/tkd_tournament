@@ -119,7 +119,6 @@ function backPage(){
 }
 
 function drawGrid(matches, rounds){
-    
     const table = $('<table>', {
         id: 'grid_table',
         class: 'grid-table'
@@ -238,13 +237,13 @@ function closeChooseWinner(w){
         data: JSON.stringify(dataToSend),
         dataType: 'json',
         success: function (response, status, jqXHR) {
-            updateDynamicContent()
+            updateDinamicContent()
         },
         error: function (jqXHR, textStatus, errorThrown) {
             // Error handling
         },
         complete: function (jqXHR, textStatus) {
-            updateDynamicContent()
+            updateDinamicContent()
         }
     });
 }

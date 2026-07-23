@@ -3,7 +3,6 @@ function addJudge(){
     $('#judge_intput_login').val("");
     const dataToSend = { 
         login: login,
-        category_id_current: current_category,
         doyang_id_current: current_doyang
     };
     $.ajax({

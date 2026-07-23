@@ -47,8 +47,7 @@ def add_judge():
     data = request.get_json()
     login = data.get('login')
     doyang_id = data.get('doyang_id_current')
-    category_id = data.get('category_id_current')
-    database.add_judge(login, doyang_id, category_id)
+    database.add_judge(login, doyang_id)
     return redirect(url_for('home'))
 
 @app.route("/create_grid", methods = ['POST'])

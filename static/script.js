@@ -92,13 +92,13 @@ function createGrid(){
         data: JSON.stringify(dataToSend),
         dataType: 'json',
         success: function (response, status, jqXHR) {
-
+            updateDinamicContent
         },
         error: function (jqXHR, textStatus, errorThrown) {
             // Error handling
         },
         complete: function (jqXHR, textStatus) {
-
+            updateDinamicContent
         }
     });
 }

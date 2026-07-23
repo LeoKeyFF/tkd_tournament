@@ -12,7 +12,9 @@ def create_tables():
     cursor = connection.cursor()
     cursor.execute(
         f"CREATE TABLE IF NOT EXISTS DoYangs ( DoYangID INTEGER PRIMARY KEY," 
-          "Name varchar(255)"
+          "Name varchar(255),"
+          "PlayingCategoryID INT"
+          
         ")"
     )
     cursor.execute(
@@ -44,7 +46,7 @@ def create_tables():
         f"CREATE TABLE IF NOT EXISTS Judges ( JudgeID INTEGER PRIMARY KEY," 
           "Login varchar(255),"
           "DoYangID INT,"
-          "CategoryID INT,"
+        #   "CategoryID INT,"
           "Competitor1Score INT," 
           "Competitor2Score INT," 
           "Winner INT" 
@@ -58,7 +60,7 @@ def add_doyang(name):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
 
-    message = f"INSERT INTO DoYangs (Name) VALUES ('{name}')"
+    message = f"INSERT INTO DoYangs (Name, PlayingCategoryID) VALUES ('{name}', 0)"
     cursor.execute(message)
 
     connection.commit()
@@ -168,11 +170,11 @@ def add_matches(category_id):
     for competitor in empty_competitors:
         set_winner(competitor[0], competitor[1])
 
-def add_judge(login, doyang_id, category_id):
+def add_judge(login, doyang_id):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
 
-    message = f"INSERT INTO Judges (Login, DoYangID, CategoryID) VALUES ('{login}', {doyang_id}, {category_id})"
+    message = f"INSERT INTO Judges (Login, DoYangID) VALUES ('{login}', {doyang_id})"
     cursor.execute(message)
 
     connection.commit()

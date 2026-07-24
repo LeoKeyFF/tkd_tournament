@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, m
 import json
 
 import database
+import excel_filles
 
 app = Flask(__name__)
 
@@ -104,8 +105,8 @@ def get_data_categories():
     doyangs = []
     for category in categories:
         ids.append(category[0])
-        names.append(category[1])
-        doyangs.append(category[2])
+        names.append(category[1] + ' от ' + str(category[2]) + ' до ' + str(category[3]) + ' от ' + str(category[4]) + ' до ' + str(category[5]) + ' от ' + str(category[6]) + ' до ' + str(category[7]) + ' (' + category[8] + ')')
+        doyangs.append(category[9])
     data = {
         'ids': ids,
         'names': names,
@@ -116,7 +117,8 @@ def get_data_categories():
 
 @app.route("/get_data_competitors", methods = ['GET'])
 def get_data_competitors():
-    competitors = database.get_from_competitors()
+    category = request.args.get('category_id')
+    competitors = database.get_from_competitors(category)
     categories_list = database.get_from_categories()
     if len(competitors) == 0:
         data = {
@@ -203,4 +205,6 @@ def get_data_judges():
 
 if __name__ == "__main__":
     database.create_tables()
+    excel_filles.read_categories()
+    excel_filles.read_cometitors()
     app.run(debug=False, host='0.0.0.0', port=5001)

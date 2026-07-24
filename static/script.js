@@ -136,6 +136,9 @@ function updateDinamicContent(){
         url: '/get_data_competitors',
         method: 'GET',
         dataType: 'json',
+        data: {
+            category_id: current_category,
+        },
         success: function (data) {
             competitorsContent(data.ids, data.names, data.clubs, data.categories, data.categories_list)
         },

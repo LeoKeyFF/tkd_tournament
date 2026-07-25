@@ -15,68 +15,13 @@ function addDoYang(){
         url: '/add_doyang',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(dataToSend),
-        dataType: 'json',
+        // dataType: 'json',
         success: function (response, status, jqXHR) {
-            updateDinamicContent()
+            updateDoYangs()
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            // Error handling
         },
         complete: function (jqXHR, textStatus) {
-            updateDinamicContent()
-        }
-    });
-}
-
-function addCategory(){
-    var text = $('#CategoryInput').val();
-    $('#CategoryInput').val("");
-    const dataToSend = { 
-        name: text,
-        doyang: current_doyang
-    };
-    $.ajax({
-        type: "POST",
-        url: '/add_category',
-        contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify(dataToSend),
-        dataType: 'json',
-        success: function (response, status, jqXHR) {
-            updateDinamicContent()
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            // Error handling
-        },
-        complete: function (jqXHR, textStatus) {
-            updateDinamicContent()
-        }
-    });
-}
-
-function addCompetitor(){
-    var name = $('#CompetitorInputName').val();
-    var club = $('#CompetitorInputClub').val();
-    $('#CompetitorInputName').val("");
-    $('#CompetitorInputClub').val("");
-    const dataToSend = { 
-        name: name,
-        club: club,
-        category_id_current: current_category
-    };
-    $.ajax({
-        type: "POST",
-        url: '/add_competitor',
-        contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify(dataToSend),
-        dataType: 'json',
-        success: function (response, status, jqXHR) {
-            updateDinamicContent()
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            // Error handling
-        },
-        complete: function (jqXHR, textStatus) {
-            updateDinamicContent()
         }
     });
 }
@@ -91,19 +36,18 @@ function addDoYangToCategories(){
         url: '/add_doyang_to_categories',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(dataToSend),
-        dataType: 'json',
+        // dataType: 'json',
         success: function (response, status, jqXHR) {
             choosen_categories = []
             showPage(1)
-            updateDinamicContent()
+            updateCategories(function() {
+                showPage(1)
+            })
         },
         error: function (jqXHR, textStatus, errorThrown) {
             // Error handling
         },
         complete: function (jqXHR, textStatus) {
-            choosen_categories = []
-            showPage(1)
-            updateDinamicContent()
         }
     });  
 }
@@ -117,20 +61,40 @@ function createGrid(){
         url: '/create_grid',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(dataToSend),
-        dataType: 'json',
+        // dataType: 'json',
         success: function (response, status, jqXHR) {
-            updateDinamicContent()
+            updateMatches()
         },
         error: function (jqXHR, textStatus, errorThrown) {
             // Error handling
         },
         complete: function (jqXHR, textStatus) {
-            updateDinamicContent()
         }
     });
 }
 
 function updateDinamicContent(){
+    updateMatches()
+    
+    if (currentPath === '/pj') {
+        $.ajax({
+            url: '/pj/get_data_judges',
+            method: 'GET',
+            dataType: 'json',
+            data: {
+                doyang_id: current_doyang,
+            },
+            success: function (data) {        
+                judgesContent(data.ids, data.logins, data.scores1, data.scores2, data.winners)
+            },
+            error: function () {
+                console.error('Error fetching data.');
+            }
+        });        
+    }
+}
+
+function updateDoYangs(callback){
     if (currentPath === '/') {
         $.ajax({
             url: '/get_data_doyangs',
@@ -138,43 +102,34 @@ function updateDinamicContent(){
             dataType: 'json',
             success: function (data) {
                 if (data.ids.length > 0){
-                    doYangsContent(data.ids, data.names)
-                }
+                    doYangsContent(data.ids, data.names);
+                };
+                callback();
             },
             error: function () {
                 console.error('Error fetching data.');
             }
         });
     }
-    
+}
+
+function updateCategories(callback){
     $.ajax({
         url: '/get_data_categories',
         method: 'GET',
         dataType: 'json',
         success: function (data) {        
-            categoriesContent(data.ids, data.names, data.doyangs, data.doyangs_list)
-            allCategories(data.ids, data.names, data.doyangs, data.doyangs_list)
+            categoriesContent(data.ids, data.names, data.doyangs, data.doyangs_list);
+            allCategories(data.ids, data.names, data.doyangs, data.doyangs_list);
+            callback();
         },
         error: function () {
             console.error('Error fetching data.');
         }
     });
+}
 
-    $.ajax({
-        url: '/get_data_competitors',
-        method: 'GET',
-        dataType: 'json',
-        data: {
-            category_id: current_category,
-        },
-        success: function (data) {
-            competitorsContent(data.ids, data.names, data.clubs, data.categories, data.categories_list)
-        },
-        error: function () {
-            console.error('Error fetching data.');
-        }
-    });
-
+function updateMatches(){
     $.ajax({
         url: '/get_data_matches',
         method: 'GET',
@@ -204,20 +159,22 @@ function updateDinamicContent(){
             console.error('Error fetching data.');
         }
     });
-    if (currentPath === '/pj') {
-        $.ajax({
-            url: '/pj/get_data_judges',
-            method: 'GET',
-            dataType: 'json',
-            data: {
-                doyang_id: current_doyang,
-            },
-            success: function (data) {        
-                judgesContent(data.ids, data.logins, data.scores1, data.scores2, data.winners)
-            },
-            error: function () {
-                console.error('Error fetching data.');
-            }
-        });        
-    }
+}
+
+function updateCompetitors(callback){
+    $.ajax({
+        url: '/get_data_competitors',
+        method: 'GET',
+        dataType: 'json',
+        data: {
+            category_id: current_category,
+        },
+        success: function (data) {
+            competitorsContent(data.ids, data.names, data.clubs, data.categories, data.categories_list);
+            callback();
+        },
+        error: function () {
+            console.error('Error fetching data.');
+        }
+    });
 }

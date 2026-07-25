@@ -21,23 +21,6 @@ def add_doyang():
     database.add_doyang(name)
     return redirect(url_for('home'))
 
-@app.route("/add_category", methods = ['POST'])
-def add_category():
-    data = request.get_json()
-    name = data.get('name')
-    doyang_id_current = data.get('doyang')
-    database.add_category(name, doyang_id_current)
-    return redirect(url_for('home'))
-
-@app.route("/add_competitor", methods = ['POST'])
-def add_competitor():
-    data = request.get_json()
-    name = data.get('name')
-    club = data.get('club')
-    category_id_current = data.get('category_id_current')
-    database.add_competitor(name, club, category_id_current)
-    return redirect(url_for('home'))
-
 @app.route("/pj/add_judge", methods = ['POST'])
 def add_judge():
     data = request.get_json()

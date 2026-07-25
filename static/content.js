@@ -14,9 +14,10 @@ function doYangsContent(ids, names){
             text: names[i]
         }).on('click', function() {
             $(this).toggleClass('active');
-            current_doyang = ids[i]
-            showPage(1)
-            updateDinamicContent()
+            current_doyang = ids[i];
+            updateCategories(function(){
+                showPage(1);
+            });
         });
         $('#doyangs_list').append(doyangButton);
     }
@@ -31,10 +32,10 @@ function categoriesContent(ids, names, doyangs, doyangs_list){
                 text: names[i]
             }).on('click', function() {
                 $(this).toggleClass('active');
-                current_category = ids[i]
-                showPage(2)
-                updateDinamicContent()
-
+                current_category = ids[i];
+                updateCompetitors(function() {
+                    showPage(2)
+                });
             });
             $('#categories_list').append(categoryButton);
         }
@@ -254,25 +255,25 @@ function closeChooseWinner(w){
         data: JSON.stringify(dataToSend),
         dataType: 'json',
         success: function (response, status, jqXHR) {
-            updateDinamicContent()
+            updateMatches()
         },
         error: function (jqXHR, textStatus, errorThrown) {
             // Error handling
         },
         complete: function (jqXHR, textStatus) {
-            updateDinamicContent()
+            updateMatches()
         }
     });
 }
 
 function openAllCategories(){
-    showPage(3);
-    updateDinamicContent()
+    updateCategories(function(){
+        showPage(3);
+    });
 }
 
 function allCategories(ids, names, doyangs, doyangs_list){
     $('#categories_list_all').empty();
-    // $("#choosed_categories").text(choosen_categories)
     for (let i = 0; i < ids.length; i++){
         const categoryButton = $('<button>', {
             class: 'button-primary category-button',
@@ -291,7 +292,8 @@ function allCategories(ids, names, doyangs, doyangs_list){
                 else {
                     choosen_categories.push(ids[i]);
                 }
-                updateDinamicContent()
+                allCategories(ids, names, doyangs, doyangs_list)
+                // updateDinamicContent()
             })
         }
         else {

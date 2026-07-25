@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, make_response
 import json
 
+import category_py
 import database
-import excel_filles
 
 app = Flask(__name__)
 
@@ -13,11 +13,6 @@ def home():
 @app.route("/pj")
 def home_pj():
     return render_template('pj.html')
-
-@app.route("/create_tables", methods = ['POST'])
-def create_tables():
-    database.create_tables()
-    return redirect(url_for('home'))
 
 @app.route("/add_doyang", methods = ['POST'])
 def add_doyang():
@@ -66,6 +61,15 @@ def set_winner():
     print(match_id, winner)
     database.set_winner(match_id, winner)
     return redirect(url_for('home'))
+
+@app.route("/add_doyang_to_categories", methods = ['POST'])
+def add_doyang_to_categories():
+    data = request.get_json()
+    doyang_id = data.get('doyang_id')
+    category_ids = data.get('categories')
+    print(category_ids)
+    database.add_doyang_to_categories(category_ids, doyang_id)
+    return redirect(url_for('home'))
 #---------------------------------------------------------------------------------------
 
 @app.route("/get_data_doyangs", methods = ['GET'])
@@ -105,7 +109,18 @@ def get_data_categories():
     doyangs = []
     for category in categories:
         ids.append(category[0])
-        names.append(category[1] + ' от ' + str(category[2]) + ' до ' + str(category[3]) + ' от ' + str(category[4]) + ' до ' + str(category[5]) + ' от ' + str(category[6]) + ' до ' + str(category[7]) + ' (' + category[8] + ')')
+        names.append(
+            category_py.category_name(
+                name=category[1], 
+                belt_from=category[2],
+                belt_to=category[3],
+                weight_from=category[4],
+                weight_to=category[5],
+                age_from=category[6],
+                age_to=category[7],
+                type=category[8]
+            )
+        )
         doyangs.append(category[9])
     data = {
         'ids': ids,
@@ -204,7 +219,5 @@ def get_data_judges():
 
 
 if __name__ == "__main__":
-    database.create_tables()
-    excel_filles.read_categories()
-    excel_filles.read_cometitors()
+    database.start_tournament()
     app.run(debug=False, host='0.0.0.0', port=5001)

@@ -81,6 +81,33 @@ function addCompetitor(){
     });
 }
 
+function addDoYangToCategories(){
+    const dataToSend = { 
+        categories: choosen_categories,
+        doyang_id: current_doyang
+    };
+    $.ajax({
+        type: "POST",
+        url: '/add_doyang_to_categories',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(dataToSend),
+        dataType: 'json',
+        success: function (response, status, jqXHR) {
+            choosen_categories = []
+            showPage(1)
+            updateDinamicContent()
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            // Error handling
+        },
+        complete: function (jqXHR, textStatus) {
+            choosen_categories = []
+            showPage(1)
+            updateDinamicContent()
+        }
+    });  
+}
+
 function createGrid(){
     const dataToSend = { 
         category_id: current_category
@@ -92,13 +119,13 @@ function createGrid(){
         data: JSON.stringify(dataToSend),
         dataType: 'json',
         success: function (response, status, jqXHR) {
-            updateDinamicContent
+            updateDinamicContent()
         },
         error: function (jqXHR, textStatus, errorThrown) {
             // Error handling
         },
         complete: function (jqXHR, textStatus) {
-            updateDinamicContent
+            updateDinamicContent()
         }
     });
 }
@@ -126,6 +153,7 @@ function updateDinamicContent(){
         dataType: 'json',
         success: function (data) {        
             categoriesContent(data.ids, data.names, data.doyangs, data.doyangs_list)
+            allCategories(data.ids, data.names, data.doyangs, data.doyangs_list)
         },
         error: function () {
             console.error('Error fetching data.');

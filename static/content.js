@@ -4,11 +4,13 @@ let competitor2id = 0
 let competitor2name = ''
 let match_id = 0
 
+let choosen_categories = []
+
 function doYangsContent(ids, names){
     $('#doyangs_list').empty();
     for (let i = 0; i < ids.length; i++){
         const doyangButton = $('<button>', {
-            class: 'doyang-button',
+            class: 'button-secondary doyang-button secondary-clickable',
             text: names[i]
         }).on('click', function() {
             $(this).toggleClass('active');
@@ -25,7 +27,7 @@ function categoriesContent(ids, names, doyangs, doyangs_list){
     for (let i = 0; i < ids.length; i++){
         if (doyangs[i] == current_doyang){
             const categoryButton = $('<button>', {
-                class: 'category-button',
+                class: 'button-secondary category-button secondary-clickable',
                 text: names[i]
             }).on('click', function() {
                 $(this).toggleClass('active');
@@ -41,8 +43,8 @@ function categoriesContent(ids, names, doyangs, doyangs_list){
     if (currentPath === '/') {
         for (let doyang of doyangs_list){
             if (doyang[0] == current_doyang && !$('#path_card_doyang').length){
-                const pathDoyang = $('<div>', {
-                    class: 'cardpath',
+                const pathDoyang = $('<button>', {
+                    class: 'button-primary primary-clickable cardpath',
                     text: doyang[1],
                     id: 'path_card_doyang'
                 }).on('click', function(){
@@ -60,8 +62,8 @@ function competitorsContent(ids, names, clubs, categories, categories_list){
     $('#competitors_list').empty();
     for (let i = 0; i < ids.length; i++){
         if (categories[i] == current_category){
-            const competitorDiv = $('<div>', {
-                class: 'competitor-div',
+            const competitorDiv = $('<button>', {
+                class: 'button-secondary competitor-div',
                 text: names[i] + ' | ' + '(' + clubs[i] + ')'
             });
             $('#competitors_list').append(competitorDiv);
@@ -69,8 +71,8 @@ function competitorsContent(ids, names, clubs, categories, categories_list){
     }
     for (let category of categories_list){
         if (category[0] == current_category && !$('#path_card_category').length){
-            const pathCategory = $('<div>', {
-                class: 'cardpath',
+            const pathCategory = $('<button>', {
+                class: 'button-primary primary-clickable cardpath',
                 text: category[1],
                 id: 'path_card_category'
             }).on('click', function(){
@@ -89,6 +91,8 @@ function showPage(page){
         $("#doyangs").css("display", "block");
         $("#categories").css("display", "none");
         $("#competitors").css("display", "none");
+        $("#add_categories").css("display", "none");
+        $("#path").css("display", "");
 
         $("#path_card_doyang").remove();
         $('#path_card_category').remove();
@@ -100,15 +104,28 @@ function showPage(page){
         $("#doyangs").css("display", "none");
         $("#categories").css("display", "block");
         $("#competitors").css("display", "none");
+        $("#add_categories").css("display", "none");
+        $("#path").css("display", "");
 
         $('#path_card_category').remove();
 
         current_category = 0;
     }
-    else {
+    else if (page == 2){
         $("#doyangs").css("display", "none");
         $("#categories").css("display", "none");
         $("#competitors").css("display", "block");
+        $("#add_categories").css("display", "none");
+        $("#path").css("display", "");
+    }
+    else {
+        choosen_categories = [];
+
+        $("#doyangs").css("display", "none");
+        $("#categories").css("display", "none");
+        $("#competitors").css("display", "none");
+        $("#add_categories").css("display", "block");
+        $("#path").css("display", "none");
     }
 }
 
@@ -246,4 +263,55 @@ function closeChooseWinner(w){
             updateDinamicContent()
         }
     });
+}
+
+function openAllCategories(){
+    showPage(3);
+    updateDinamicContent()
+}
+
+function allCategories(ids, names, doyangs, doyangs_list){
+    $('#categories_list_all').empty();
+    // $("#choosed_categories").text(choosen_categories)
+    for (let i = 0; i < ids.length; i++){
+        const categoryButton = $('<button>', {
+            class: 'button-primary category-button',
+            text: names[i]
+        });
+
+        if (doyangs[i] == 0){
+            categoryButton.addClass('button-primary')
+            categoryButton.addClass('primary-clickable')
+            categoryButton.removeClass('button-secondary')
+
+            categoryButton.on('click', function() {
+                if (choosen_categories.includes(ids[i])){
+                    choosen_categories = choosen_categories.filter(item => item !== ids[i]);
+                }
+                else {
+                    choosen_categories.push(ids[i]);
+                }
+                updateDinamicContent()
+            })
+        }
+        else {
+            categoryButton.removeClass('button-primary')
+            categoryButton.removeClass('primary-clickable')
+            categoryButton.addClass('button-secondary')
+
+        }
+
+        if (choosen_categories.includes(ids[i])){
+            categoryButton.addClass('chosen')
+            categoryButton.removeClass('primary-clickable')
+        }
+        else {
+            categoryButton.removeClass('chosen')
+            if (doyangs[i] == 0){
+                categoryButton.addClass('primary-clickable')
+            }
+        }
+        $('#categories_list_all').append(categoryButton);
+    }
+    
 }

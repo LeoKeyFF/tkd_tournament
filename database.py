@@ -4,8 +4,23 @@ import sqlite3
 import math
 
 from competitor import Competitor
+import excel_filles
 
 database_path = "database.db"
+
+def start_tournament():
+    create_tables()
+
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    if len(cursor.execute(f"SELECT * FROM Competitors").fetchall()) == 0:
+        print('..........creation!!!! AAAAAAAAAAAAAAAAAAAAAAAAAA..............AAAAAAAAAAAAAAAAAAAAAA')
+        excel_filles.read_categories()
+        excel_filles.read_cometitors()
+
+    connection.commit()
+    connection.close()
 
 def create_tables():
     connection = sqlite3.connect(database_path)
@@ -103,7 +118,7 @@ def add_category(
         INSERT INTO Categories (
             Name, Gender, BeltFrom, BeltTo, WeightFrom, WeightTo, AgeFrom, AgeTo, Type, DoYangID
         ) VALUES (
-            '{name}', '{gender}', {belt_from}, {belt_to}, {weight_from}, {weight_to}, {age_from}, {age_to}, '{type}', 1
+            '{name}', '{gender}', {belt_from}, {belt_to}, {weight_from}, {weight_to}, {age_from}, {age_to}, '{type}', 0
         )
     """
     cursor.execute(message)
@@ -229,6 +244,22 @@ def add_judge(login, doyang_id):
 
     message = f"INSERT INTO Judges (Login, DoYangID) VALUES ('{login}', {doyang_id})"
     cursor.execute(message)
+
+    connection.commit()
+    connection.close()
+
+def add_doyang_to_categories(category_ids, doyang_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    for category in category_ids:
+        cursor.execute(f"""
+            UPDATE Categories
+            SET 
+                DoYangID = {doyang_id}
+            WHERE 
+                CategoryID = {category}
+        """)   
 
     connection.commit()
     connection.close()

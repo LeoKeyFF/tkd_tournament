@@ -120,12 +120,14 @@ def get_data_doyangs():
 def get_data_categories():
     categories = database.get_from_categories()
     doyangs_list = database.get_from_doyangs()
+    competitors_amounts = database.get_competitors_amounts()
     if len(categories) == 0:
         data = {
             'ids': [],
             'names': [],
             'doyangs': [],
-            'doyangs_list': doyangs_list
+            'doyangs_list': doyangs_list,
+            'competitors_amounts': []
         }
         return jsonify(data)
     ids = []
@@ -150,7 +152,8 @@ def get_data_categories():
         'ids': ids,
         'names': names,
         'doyangs': doyangs, 
-        'doyangs_list': doyangs_list
+        'doyangs_list': doyangs_list,
+        'competitors_amounts': competitors_amounts
     }
     return jsonify(data)
 
@@ -158,7 +161,26 @@ def get_data_categories():
 def get_data_competitors():
     category = request.args.get('category_id')
     competitors = database.get_from_competitors(category)
-    categories_list = database.get_from_categories()
+    categories_list_initial = database.get_from_categories()
+    categories_list = []
+    for category_initial in categories_list_initial:
+        category = []
+        category.append(category_initial[0])
+        category.append(
+            category_py.category_name(
+                name=category_initial[1], 
+                belt_from=category_initial[2],
+                belt_to=category_initial[3],
+                weight_from=category_initial[4],
+                weight_to=category_initial[5],
+                age_from=category_initial[6],
+                age_to=category_initial[7],
+                type=category_initial[8]
+            )
+        )
+        category.append(category_initial[9])
+        categories_list.append(category)
+
     if len(competitors) == 0:
         data = {
             'ids': [],
@@ -172,6 +194,7 @@ def get_data_competitors():
     names = []
     clubs = []
     categories = []
+
     for competitor in competitors:
         ids.append(competitor.id)
         names.append(competitor.name)
@@ -240,6 +263,15 @@ def get_data_judges():
         'winners': winners
     }
     return jsonify(data)
+
+#---------------------------------------------------------------------------------------
+
+@app.route("/delete_doyang", methods = ['POST'])
+def delete_doyang():
+    data = request.get_json()
+    doyang_id = data.get('doyang_id')
+    database.delete_doyang(doyang_id)
+    return redirect(url_for('home'))
 
 
 if __name__ == "__main__":

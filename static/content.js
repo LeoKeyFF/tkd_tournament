@@ -9,9 +9,8 @@ let choosen_categories = []
 function doYangsContent(ids, names){
     $('#doyangs_list').empty();
     for (let i = 0; i < ids.length; i++){
-        const doyangButton = $('<button>', {
-            class: 'button-secondary doyang-button secondary-clickable',
-            text: names[i]
+        const doyangButton = $('<table>', {
+            class: 'button-secondary doyang-button secondary-clickable table-row'
         }).on('click', function() {
             $(this).toggleClass('active');
             current_doyang = ids[i];
@@ -19,24 +18,73 @@ function doYangsContent(ids, names){
                 showPage(1);
             });
         });
+        const tr = $('<tr>', {
+        });
+        const td1 = $('<td>', {
+            colspan: 6,
+            class: 'table-row-name'
+        });
+        const td2 = $('<td>', {
+            class: 'table-row-del'
+        });
+        const delButton = $('<button>',{
+            class: 'button-primary primary-clickable del-button',
+            text: '🗑️'
+        }).on('click', function(){
+            event.stopPropagation();
+            deleteDoYang(ids[i]);
+        })
+        td1.append(names[i])
+        td2.append(delButton)
+        tr.append(td1)
+        tr.append(td2)
+        doyangButton.append(tr)
+        $('#categories_list').append(doyangButton);
         $('#doyangs_list').append(doyangButton);
     }
 }
 
-function categoriesContent(ids, names, doyangs, doyangs_list){
+function categoriesContent(ids, names, doyangs, doyangs_list, competitors_amounts){
     $('#categories_list').empty();
     for (let i = 0; i < ids.length; i++){
         if (doyangs[i] == current_doyang){
-            const categoryButton = $('<button>', {
-                class: 'button-secondary category-button secondary-clickable',
-                text: names[i]
+            const categoryButton = $('<table>', {
+                class: 'button-secondary category-button secondary-clickable table-row'
             }).on('click', function() {
                 $(this).toggleClass('active');
                 current_category = ids[i];
+                updateMatches()
                 updateCompetitors(function() {
                     showPage(2)
                 });
             });
+
+            const tr = $('<tr>', {
+            });
+            const td1 = $('<td>', {
+                colspan: 5,
+                class: 'table-row-name'
+            });
+            const td2 = $('<td>', {
+                class: 'table-row-amount'
+            });
+            const td3 = $('<td>', {
+                class: 'table-row-del'
+            });
+            const delButton = $('<button>',{
+                class: 'button-primary primary-clickable del-button',
+                text: '🗑️'
+            }).on('click', function(){
+                event.stopPropagation();
+                deleteDoYangFromCategory(ids[i]);
+            })
+            td1.append(names[i])
+            td2.append(competitors_amounts[i])
+            td3.append(delButton)
+            tr.append(td1)
+            tr.append(td2)
+            tr.append(td3)
+            categoryButton.append(tr)
             $('#categories_list').append(categoryButton);
         }
     }
@@ -170,7 +218,7 @@ function drawGrid(matches, rounds){
         const tr = $('<tr>');
         for (let match of matches){
             if (match.rowIndex == i){
-                td = $('<td>', {
+                const td = $('<td>', {
                     rowspan: rounds[0]/match.round
                 });
                 const divCompetitorBox = $('<div>',{
@@ -216,9 +264,9 @@ function drawGrid(matches, rounds){
         tbody.append(tr);
     }  
     table.append(tbody);
-    $("#grid_div").append(
-        'Сетка:'
-    );
+    // $("#grid_div").append(
+    //     'Сетка:'
+    // );
     $("#grid_div").append(table);
 }
 
@@ -255,7 +303,7 @@ function closeChooseWinner(w){
         data: JSON.stringify(dataToSend),
         dataType: 'json',
         success: function (response, status, jqXHR) {
-            updateMatches()
+            // updateMatches()
         },
         error: function (jqXHR, textStatus, errorThrown) {
             // Error handling

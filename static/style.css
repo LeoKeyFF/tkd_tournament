@@ -381,3 +381,44 @@ dialog {
     height: 55px;
     font-size: 1.1rem;
 }
+
+
+/* ===== СТИЛИ ДЛЯ ТАБЛИЦЫ - СТРОК ===== */
+
+.table-row {
+    border-collapse: separate;
+    cursor: pointer;
+    overflow: hidden;
+    width: 100%;
+    table-layout: fixed;
+}
+.table-row td {
+    vertical-align: middle;
+    border: none;
+    white-space: nowrap;
+}
+.table-row-name {
+    text-align: start;
+}
+.table-row-amount {
+    text-align: center;
+}
+.table-row-del {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.del-button {
+    white-space: nowrap;
+    height: 100%;
+    aspect-ratio: 2/1;
+    padding: 0rem 0rem;
+    margin: 0 auto;
+    font-size: 0.7rem;
+    display: block;
+}
+
+.del-button:hover {
+  background-color: red;
+}

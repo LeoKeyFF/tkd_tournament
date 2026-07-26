@@ -39,7 +39,7 @@ function addDoYangToCategories(){
         // dataType: 'json',
         success: function (response, status, jqXHR) {
             choosen_categories = []
-            showPage(1)
+            // showPage(1)
             updateCategories(function() {
                 showPage(1)
             })
@@ -50,6 +50,31 @@ function addDoYangToCategories(){
         complete: function (jqXHR, textStatus) {
         }
     });  
+}
+
+function deleteDoYangFromCategory(category){
+    if (confirm('Убрать категорию с площадки?')) {
+        const dataToSend = { 
+            categories: [category],
+            doyang_id: 0
+        };
+        $.ajax({
+            type: "POST",
+            url: '/add_doyang_to_categories',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(dataToSend),
+            // dataType: 'json',
+            success: function (response, status, jqXHR) {
+                updateCategories(function() {
+                })
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // Error handling
+            },
+            complete: function (jqXHR, textStatus) {
+            }
+        });  
+    }
 }
 
 function createGrid(){
@@ -101,9 +126,7 @@ function updateDoYangs(callback){
             method: 'GET',
             dataType: 'json',
             success: function (data) {
-                if (data.ids.length > 0){
-                    doYangsContent(data.ids, data.names);
-                };
+                doYangsContent(data.ids, data.names);
                 callback();
             },
             error: function () {
@@ -119,7 +142,7 @@ function updateCategories(callback){
         method: 'GET',
         dataType: 'json',
         success: function (data) {        
-            categoriesContent(data.ids, data.names, data.doyangs, data.doyangs_list);
+            categoriesContent(data.ids, data.names, data.doyangs, data.doyangs_list, data.competitors_amounts);
             allCategories(data.ids, data.names, data.doyangs, data.doyangs_list);
             callback();
         },
@@ -177,4 +200,26 @@ function updateCompetitors(callback){
             console.error('Error fetching data.');
         }
     });
+}
+
+function deleteDoYang(id){
+    if (confirm('Удалить площадку?')) {
+        const dataToSend = {
+            doyang_id: id
+        }
+        $.ajax({
+            type: "POST",
+            url: '/delete_doyang',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(dataToSend),
+            success: function (response, status, jqXHR) {
+                updateDoYangs(function() {})
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // Error handling
+            },
+            complete: function (jqXHR, textStatus) {
+            }
+        }); 
+    } 
 }

@@ -71,7 +71,6 @@ def read_cometitors():
 
     database.delete_unused_categories()
 
-
 def read_categories():
     datatype = {
         'name': str,

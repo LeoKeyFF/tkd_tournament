@@ -16,11 +16,15 @@ def start_tournament():
 
     if len(cursor.execute(f"SELECT * FROM Competitors").fetchall()) == 0:
         print('..........creation!!!! AAAAAAAAAAAAAAAAAAAAAAAAAA..............AAAAAAAAAAAAAAAAAAAAAA')
+        connection.commit()
+        connection.close()
+
         excel_filles.read_categories()
         excel_filles.read_cometitors()
-
-    connection.commit()
-    connection.close()
+        create_grids()
+    else:
+        connection.commit()
+        connection.close()
 
 def create_tables():
     connection = sqlite3.connect(database_path)
@@ -427,3 +431,62 @@ def delete_unused_categories():
 
     connection.commit()
     connection.close()
+
+def create_grids():
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    categories = cursor.execute(f"SELECT CategoryID FROM Categories")
+    categories = categories.fetchall()
+
+    connection.commit()
+    connection.close()
+
+    for category in categories:
+        add_matches(category[0])
+
+def get_competitors_amounts():
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    categories = cursor.execute(f"SELECT CategoryID FROM Categories")
+    categories = categories.fetchall()
+
+    competitors_amounts = []
+
+    for category in categories:
+        amount = cursor.execute(f"""
+            SELECT COUNT(*) FROM Competitors
+            WHERE 
+                Sparring = {category[0]} OR Tuly = {category[0]} 
+                OR Power = {category[0]} OR SpecialTechnic = {category[0]} 
+                OR TeamSparring = {category[0]} OR TeamTuly = {category[0]} 
+                OR TeamPower = {category[0]} OR TeamSpecialTechnic = {category[0]} OR Traditional = {category[0]}       
+        """).fetchall()
+        competitors_amounts.append(amount[0][0])
+
+    connection.commit()
+    connection.close()
+
+    return competitors_amounts
+
+def delete_doyang(doyang_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    cursor.execute(f"""
+        UPDATE Categories
+        SET 
+            DoYangID = 0
+        WHERE 
+            DoYangID = {doyang_id}
+    """) 
+
+    cursor.execute(f"""
+        DELETE FROM DoYangs
+        WHERE 
+            DoYangID = {doyang_id}
+    """) 
+
+    connection.commit()
+    connection.close()    

@@ -14,11 +14,15 @@
 <body>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            current_doyang = 1
-            current_page = 1
-            showPage(1);
+            showPage(0);
+            updateDoYangs(function(){
+                showPage(0);
+            });
+            updateCategories();
+            updateCompetitors();
+            updateMatches();
             updateDinamicContent();
-            setInterval(function() {updateDinamicContent();}, 5000)
+            setInterval(function() {updateDinamicContent();}, 5000);
         });
     </script>  
     Экран президента площадки 1:

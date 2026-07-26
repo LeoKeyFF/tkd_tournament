@@ -1,0 +1,33 @@
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taekwon-Do</title>   
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='upload.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+</head>
+<body>
+
+    <div class="upload-container">
+        Загрузка таблицы спротсменов:
+        <div class="drop-zone" id="dropZone">
+            <label for="file_input">Выберите файл (.xlsx)</label>
+            <input class="input-file" type="file" id="file_input" name="file_input" accept=".xlsx" data-button-text="Загрузить файл"/>
+        </div>
+
+        <button id="uploadBtn" onclick="uploadFile()" class="button-secondary start-tournament secondary-clickable">
+            Начать турнир
+        </button>
+
+        <div id="status" style="margin: 10px 0; color: #333;"></div>
+
+    </div>
+    <script>
+        $('#file_input').on('change', function() {
+            const file = this.files[0];
+            $('#status').text(file ? `${file.name}` : '');
+        });
+    </script>
+</body>
+</html>

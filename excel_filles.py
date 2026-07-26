@@ -12,7 +12,7 @@ def set_tech_qual(tech_qual_str):
 
 def read_cometitors():
     df = pd.read_excel(
-        'competitors_old_data.xlsx',
+        'uploads/competitors.xlsx',
         engine='openpyxl',
         dtype={
             'ФИО': str,

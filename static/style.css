@@ -61,7 +61,8 @@ body {
 .categories,
 .competitors,
 .judges,
-.add-categories-screen {
+.add-categories-screen,
+.upload-container {
     background: #ffffff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
     padding: 1.5rem 2rem 2rem 2rem;
@@ -83,7 +84,10 @@ body {
     box-shadow: 0 0 0 rgba(0, 0, 0, 0.00);
     border: 0;
 }
-
+.upload-container {
+    display: flex;
+    flex-direction: column;
+}
 .doyangs-list,
 .categories-list,
 .competitors-list,
@@ -113,7 +117,7 @@ body {
     text-align: left;
 }
 
-input {
+input[type="text"] {
     background: #f8fafc;
     border: 1px solid #d1d9e6;
     padding: 0.6rem 1rem;
@@ -124,7 +128,7 @@ input {
     width: 70%;
 }
 
-input:focus {
+input[type="text"]:focus {
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     background: #ffffff;
@@ -319,4 +323,61 @@ dialog {
     max-width: 40%;
     height: 100%;
     text-align: left;
+}
+
+/* ===== UPLOAD ====== */
+.drop-zone {
+    background: #eef2f6;
+    color: #1e293b;
+    border: 1px dashed #d1d9e6;
+    padding: 1.6rem 0.9rem;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    margin-bottom: 1.8rem;
+    position: relative;
+    width: 60%;
+    height: 160px;
+}
+.drop-zone p {
+    margin: 0.3rem 0 0.1rem;
+    color: #1b4b63;
+    font-weight: 450;
+}
+.drop-zone .hint {
+    font-size: 0.9rem;
+    color: #3f6f87;
+    opacity: 0.8;
+}
+.input-file::file-selector-button {
+    background: #ffffff;
+    color: #0b1e33;
+    border: 1px solid #e2e8f0;
+    padding: 12px 30px;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-right: 10px;
+}
+
+.input-file::file-selector-button:hover {
+    background: #f8fcff;
+}
+
+.input-file::file-selector-button:active {
+    background: #f8fcff;
+    transform: scale(0.99);
+}
+.start-tournament {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60%;
+    height: 55px;
+    font-size: 1.1rem;
 }

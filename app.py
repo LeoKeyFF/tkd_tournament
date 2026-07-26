@@ -1,18 +1,59 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, make_response
 import json
+import os
 
 import category_py
 import database
 
 app = Flask(__name__)
 
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'xlsx', 'xls'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @app.route("/")
 def home():
+    if not os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
+        return redirect(url_for('home_upload'))
+    
     return render_template('main.html')
 
 @app.route("/pj")
 def home_pj():
     return render_template('pj.html')
+
+@app.route("/upload_screen")
+def home_upload():
+    return render_template('upload_page.html')
+
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'redirect': '/upload'})
+    
+    file = request.files['file']
+    
+    if file.filename == '':
+        return jsonify({'success': False, 'redirect': '/upload'})
+    
+    if not allowed_file(file.filename):
+        return jsonify({'success': False, 'redirect': '/upload'})
+    try:
+        file_path = os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')
+        file.save(file_path)
+
+        database.start_tournament()
+        return jsonify({'success': True, 'redirect': '/'})
+    
+    except Exception as e:
+        return jsonify({'success': False, 'redirect': '/upload'})
+    
 
 @app.route("/add_doyang", methods = ['POST'])
 def add_doyang():
@@ -202,5 +243,4 @@ def get_data_judges():
 
 
 if __name__ == "__main__":
-    database.start_tournament()
     app.run(debug=False, host='0.0.0.0', port=5001)

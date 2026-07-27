@@ -273,6 +273,12 @@ def delete_doyang():
     database.delete_doyang(doyang_id)
     return redirect(url_for('home'))
 
+@app.route("/cancel_winner", methods = ['POST'])
+def cancel_winner():
+    data = request.get_json()
+    match_id = data.get('match_id')
+    database.cancel_winner(match_id)
+    return redirect(url_for('home'))
 
 if __name__ == "__main__":
     app.run(debug=False, host='0.0.0.0', port=5001)

@@ -225,16 +225,23 @@ function drawGrid(matches, rounds){
                     class: 'competitor-box'
                 }); 
                 if (match.competitor1id != 0 && match.competitor1id != null 
-                    && match.competitor2id != 0 && match.competitor2id != null 
-                    && match.winner == null){
-                    divCompetitorBox.on('click', function() {
-                        competitor1id = match.competitor1id;
-                        competitor1name = match.competitor1name;
-                        competitor2id = match.competitor2id;
-                        competitor2name = match.competitor2name;
-                        match_id = match.matchId;
-                        openChooseWinner();
-                    })
+                    && match.competitor2id != 0 && match.competitor2id != null ){
+                    if (match.winner == null){
+                        divCompetitorBox.on('click', function() {
+                            competitor1id = match.competitor1id;
+                            competitor1name = match.competitor1name;
+                            competitor2id = match.competitor2id;
+                            competitor2name = match.competitor2name;
+                            match_id = match.matchId;
+                            openChooseWinner();
+                        })                    
+                    }
+                    else {
+                        divCompetitorBox.on('click', function() {
+                            match_id = match.matchId;
+                            openCancelWinner();
+                        })   
+                    }
                 }
             
                 const divRow1 = $('<div>',{
@@ -293,7 +300,7 @@ function closeChooseWinner(w){
 
     const dataToSend = { 
         winner: winner,
-        match_id: match_id,
+        match_id: match_id
     };
 
     $.ajax({
@@ -312,6 +319,52 @@ function closeChooseWinner(w){
             updateMatches()
         }
     });
+}
+
+function openCancelWinner(){
+    const dialog = $("#cancelWinner")[0];
+    dialog.addEventListener('click', function (e) {
+        if (e.target === this) {
+            this.close();
+        }
+    });
+    dialog.showModal(); 
+}
+
+function cancelWinner(){
+    if (confirm('Отмена победы может отменить другие матчи')) {
+        const dialog = $("#cancelWinner")[0];
+        dialog.close();
+
+        const dataToSend = { 
+            match_id: match_id
+        };
+        $.ajax({
+            type: "POST",
+            url: '/cancel_winner',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(dataToSend),
+            dataType: 'json',
+            success: function (response, status, jqXHR) {
+                // updateMatches()
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // Error handling
+            },
+            complete: function (jqXHR, textStatus) {
+                updateMatches()
+            }
+        }); 
+
+    }
+    else {
+        closeCancelWinner()
+    }
+}
+
+function closeCancelWinner(){
+    const dialog = $("#cancelWinner")[0];
+    dialog.close();
 }
 
 function openAllCategories(){

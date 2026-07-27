@@ -490,3 +490,47 @@ def delete_doyang(doyang_id):
 
     connection.commit()
     connection.close()    
+
+
+def cancel_winner(match_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    was_winner = cursor.execute(
+        f"SELECT Winner FROM Matches WHERE MatchID = {match_id}"
+    ).fetchall()[0][0]
+
+    next_match_id = cursor.execute(
+        f"SELECT NextMatchID FROM Matches WHERE MatchID = {match_id}"
+    ).fetchall()[0][0]
+
+    cursor.execute(
+        f"UPDATE Matches SET Winner = NULL WHERE MatchID = {match_id}"
+    )
+
+    cursor.execute(f"""
+        UPDATE Matches 
+        SET 
+            Competitor1ID = 
+                CASE WHEN Competitor1ID = {was_winner}
+                THEN NULL
+                ELSE Competitor1ID 
+                END,
+            Competitor2ID = 
+                CASE WHEN Competitor2ID = {was_winner}
+                THEN NULL
+                ELSE Competitor2ID 
+                END
+        WHERE 
+            MatchID = {next_match_id}
+    """)    
+
+    next_match_winner = cursor.execute(
+        f"SELECT Winner FROM Matches WHERE MatchID = {next_match_id}"
+    ).fetchall()[0][0] if next_match_id != 0 else None
+
+    connection.commit()
+    connection.close()  
+
+    if next_match_winner != None:
+        cancel_winner(next_match_id)

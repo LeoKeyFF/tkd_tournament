@@ -146,7 +146,7 @@ input[type="text"]:focus {
 }
 
 .add-categories {
-    width: 48%;
+    width: 100%;
 }
 
 .back {
@@ -304,10 +304,22 @@ dialog {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 20px;
+    background: #ffffff;
+    color: #0b1e33;
+    border: 1px solid #e2e8f0;
+    padding: 0.6rem 1.6rem;
+    font-size: 1.1rem;
+    font-weight: 400;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 50%;
+    height: 30%;
+    min-width: 600px;
+}
+.dialog-div{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
 }
 
 /* ===== ПУТЬ ===== */
@@ -322,7 +334,7 @@ dialog {
     min-width: 20%;
     max-width: 40%;
     height: 100%;
-    text-align: left;
+    text-align: center;
 }
 
 /* ===== UPLOAD ====== */

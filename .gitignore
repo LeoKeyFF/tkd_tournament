@@ -1,3 +1,5 @@
 .venv/*
 *.xlsx
 *.db
+*.txt
+.DS_Store

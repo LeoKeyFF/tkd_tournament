@@ -8,20 +8,34 @@
     <script src="{{ url_for('static', filename='jquery.js') }}"></script>
 </head>
 <body>
-
+    <script>
+    window.addEventListener("pageshow", function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+    </script>
     <div class="upload-container">
         Загрузка таблицы спротсменов:
         <div class="drop-zone" id="dropZone">
             <label for="file_input">Выберите файл (.xlsx)</label>
             <input class="input-file" type="file" id="file_input" name="file_input" accept=".xlsx" data-button-text="Загрузить файл"/>
         </div>
-
+        <div id="status" style="margin: 10px 0; color: #333;"></div>
+        Год турнира:
+        <input
+            type="text"
+            name="year"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            oninput="this.value = this.value.replace(/\D/g, '')"
+            id="year_input" 
+            class="input-year"
+            placeholder="Введите год турнира"
+        >
         <button id="uploadBtn" onclick="uploadFile()" class="button-secondary start-tournament secondary-clickable">
             Начать турнир
         </button>
-
-        <div id="status" style="margin: 10px 0; color: #333;"></div>
-
     </div>
     <script>
         $('#file_input').on('change', function() {

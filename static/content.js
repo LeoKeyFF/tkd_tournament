@@ -95,7 +95,8 @@ function categoriesContent(ids, names, doyangs, doyangs_list, competitors_amount
                 const pathDoyang = $('<button>', {
                     class: 'button-primary primary-clickable cardpath',
                     text: doyang[1],
-                    id: 'path_card_doyang'
+                    id: 'path_card_doyang',
+                    title: doyang[1]
                 }).on('click', function(){
                     showPage(0)
                 });
@@ -123,7 +124,8 @@ function competitorsContent(ids, names, clubs, categories, categories_list){
             const pathCategory = $('<button>', {
                 class: 'button-primary primary-clickable cardpath',
                 text: category[1],
-                id: 'path_card_category'
+                id: 'path_card_category',
+                title: category[1]
             }).on('click', function(){
                 showPage(1)
             });
@@ -169,6 +171,7 @@ function showPage(page){
     }
     else {
         choosen_categories = [];
+        $("#search_category").val("")
 
         $("#doyangs").css("display", "none");
         $("#categories").css("display", "none");
@@ -376,45 +379,46 @@ function openAllCategories(){
 function allCategories(ids, names, doyangs, doyangs_list){
     $('#categories_list_all').empty();
     for (let i = 0; i < ids.length; i++){
-        const categoryButton = $('<button>', {
-            class: 'button-primary category-button',
-            text: names[i]
-        });
-
-        if (doyangs[i] == 0){
-            categoryButton.addClass('button-primary')
-            categoryButton.addClass('primary-clickable')
-            categoryButton.removeClass('button-secondary')
-
-            categoryButton.on('click', function() {
-                if (choosen_categories.includes(ids[i])){
-                    choosen_categories = choosen_categories.filter(item => item !== ids[i]);
-                }
-                else {
-                    choosen_categories.push(ids[i]);
-                }
-                allCategories(ids, names, doyangs, doyangs_list)
-                // updateDinamicContent()
-            })
-        }
-        else {
-            categoryButton.removeClass('button-primary')
-            categoryButton.removeClass('primary-clickable')
-            categoryButton.addClass('button-secondary')
-
-        }
-
-        if (choosen_categories.includes(ids[i])){
-            categoryButton.addClass('chosen')
-            categoryButton.removeClass('primary-clickable')
-        }
-        else {
-            categoryButton.removeClass('chosen')
+        category_search = $("#search_category").val()
+        if (names[i].toLowerCase().includes(category_search.toLowerCase())){
+            const categoryButton = $('<button>', {
+                class: 'button-primary category-button',
+                text: names[i]
+            });
             if (doyangs[i] == 0){
+                categoryButton.addClass('button-primary')
                 categoryButton.addClass('primary-clickable')
+                categoryButton.removeClass('button-secondary')
+
+                categoryButton.on('click', function() {
+                    if (choosen_categories.includes(ids[i])){
+                        choosen_categories = choosen_categories.filter(item => item !== ids[i]);
+                    }
+                    else {
+                        choosen_categories.push(ids[i]);
+                    }
+                    allCategories(ids, names, doyangs, doyangs_list)
+                })
             }
+            else {
+                categoryButton.removeClass('button-primary')
+                categoryButton.removeClass('primary-clickable')
+                categoryButton.addClass('button-secondary')
+
+            }
+
+            if (choosen_categories.includes(ids[i])){
+                categoryButton.addClass('chosen')
+                categoryButton.removeClass('primary-clickable')
+            }
+            else {
+                categoryButton.removeClass('chosen')
+                if (doyangs[i] == 0){
+                    categoryButton.addClass('primary-clickable')
+                }
+            }
+            $('#categories_list_all').append(categoryButton);
         }
-        $('#categories_list_all').append(categoryButton);
     }
     
 }

@@ -4,8 +4,14 @@ function uploadFile() {
         $('#status').text('Выберите файл');
         return;
     }
+    const year = parseInt($('#year_input').val());
+    if (Number.isNaN(year)) {
+        $('#status').text('Укажите год');
+        return;
+    }
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('year', year);
 
     $.ajax({
         type: "POST",
@@ -14,7 +20,8 @@ function uploadFile() {
         processData: false,
         contentType: false,
         success: function (response, status, jqXHR) {
-            window.location.href = response.redirect;
+            window.location.replace(response.redirect);
+            // window.location.href = response.redirect;
         },
         error: function (jqXHR, textStatus, errorThrown) {
         },

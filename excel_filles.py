@@ -11,6 +11,8 @@ def set_tech_qual(tech_qual_str):
         return -11
 
 def read_cometitors():
+    with open("year.txt", "r", encoding="utf-8") as f:
+        year = int(f.read())
     df = pd.read_excel(
         'uploads/competitors.xlsx',
         engine='openpyxl',
@@ -47,16 +49,26 @@ def read_cometitors():
         qualification = row['спорт квал']
         belt =  set_tech_qual(row['техн квал']) 
         weight = row['весовая кат']
-        sparring = database.get_category_id(2026 - row['дата рожд'].year, weight, belt, gender, 'матсоги') if '+' in row['масоги'] else 0
-        tuly =  database.get_category_id(2026 - row['дата рожд'].year, weight, belt, gender, 'тыль') if '+' in row['туль'] else 0
-        power = 1 if '+' in row['сила'] else 0
-        special_technic = 1 if '+' in row['спец техн'] else 0
-        team_sparring = 1 if '+' in row['ком сп'] else 0
-        team_tuly = 1 if '+' in row['ком тул'] else 0
-        team_power = 1 if '+' in row['ком сил'] else 0
-        team_special_technic = 1 if '+' in row['ком спц'] else 0
-        traditional = 1 if '+' in row['традиц'] else 0
-        is_judge = 1 if '+' in row['судейство'] else 0
+        
+        sparring = database.get_category_id(
+            year - row['дата рожд'].year, weight, belt, gender, 'матсоги'
+            ) if '+' in row['масоги'] else 0
+        
+        tuly =  database.get_category_id(
+            year - row['дата рожд'].year, weight, belt, gender, 'тыль'
+            ) if '+' in row['туль'] else 0
+        
+        power =  database.get_category_id(
+            year - row['дата рожд'].year, weight, belt, gender, 'вирек'
+        ) if '+' in row['сила'] else 0
+
+        special_technic = -1 if '+' in row['спец техн'] else 0
+        team_sparring = -1 if '+' in row['ком сп'] else 0
+        team_tuly = -1 if '+' in row['ком тул'] else 0
+        team_power = -1 if '+' in row['ком сил'] else 0
+        team_special_technic = -1 if '+' in row['ком спц'] else 0
+        traditional = -1 if '+' in row['традиц'] else 0
+        is_judge = -1 if '+' in row['судейство'] else 0
         region = row['регион']
         federal_district = row['фо']
         security = row['ведомство']
@@ -93,7 +105,17 @@ def read_categories():
         engine='openpyxl',
         dtype=datatype
     )
-    df = pd.concat([df_m, df_t], ignore_index=True)
+    df_v = pd.read_excel(
+        'virek_categories.xlsx',
+        engine='openpyxl',
+        dtype=datatype
+    )
+    df_k = pd.read_excel(
+        'kekpa_categories.xlsx',
+        engine='openpyxl',
+        dtype=datatype
+    )
+    df = pd.concat([df_m, df_t, df_v, df_k], ignore_index=True)
     for index, row in df.iterrows():
         name = row['name']
         gender = 'w' if 'female' in row['gender'] else 'm'
@@ -109,4 +131,3 @@ def read_categories():
             name, gender, belt_from, belt_to,
             weight_from, weight_to, age_from, age_to, type
         )
-    

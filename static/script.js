@@ -142,9 +142,9 @@ function updateCategories(callback){
         method: 'GET',
         dataType: 'json',
         success: function (data) {        
+            callback();
             categoriesContent(data.ids, data.names, data.doyangs, data.doyangs_list, data.competitors_amounts);
             allCategories(data.ids, data.names, data.doyangs, data.doyangs_list);
-            callback();
         },
         error: function () {
             console.error('Error fetching data.');
@@ -222,4 +222,38 @@ function deleteDoYang(id){
             }
         }); 
     } 
+}
+
+function openMenu() {
+    const body = $('body');
+    body.toggleClass('menu-open');
+
+    $(document).on('keydown', function(event) {
+        if (event.key === 'Escape' && body.hasClass('menu-open')) {
+            body.toggleClass('menu-open');
+        }
+    });
+};
+
+function deleteTournament(){
+    if (confirm('Полностью очистить турнир?')) {
+        $.ajax({
+            type: "POST",
+            url: '/delete_tournament',
+            contentType: 'application/json; charset=utf-8',
+            success: function (response, status, jqXHR) {
+                window.location.href = response.redirect;
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // Error handling
+            },
+            complete: function (jqXHR, textStatus) {
+            }
+        }); 
+    }
+}
+
+function searchCategory(){
+    updateCategories(function() {
+    })
 }

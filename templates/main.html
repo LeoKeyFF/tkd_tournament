@@ -23,10 +23,24 @@
             setInterval(function() {updateDinamicContent();}, 5000);
         });
     </script>
+<!-- --------------------------------------------------------------- Menu Button:-->
+    <button class="button-primary primary-clickable menu-button" id="menuToggle" onclick="openMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <aside class="side-menu" id="sideMenu">
+        <button class="button-primary primary-clickable reboot" onclick="deleteTournament()">
+            Удалить турнир
+        </button>
+    </aside> 
 
+    <div class="overlay" id="overlay"></div>
+<!-- --------------------------------------------------------------- Path:-->
     <div class="path" id="path">
             <button class="button-primary back primary-clickable" onclick="backPage()">🔙</button>
     </div>
+<!-- --------------------------------------------------------------- Dialogs:-->
     <dialog id="chooseWinner" aria-modal="true" >
         <div class="dialog-div">
             <table class="table-row">
@@ -74,12 +88,22 @@
             </table>
         </div>
     </dialog>
-
+<!-- --------------------------------------------------------------- Main Content:-->
     <div class="doyangs" id="doyangs">
         Площадки:
         <div class="doyangs-list" id="doyangs_list"></div>
-        <input type="text" id="DoYangInput" placeholder="Введите название площадки">
-        <button class="button-secondary add add-doyang" onclick="addDoYang()">+</button>
+        <table class="table-row">
+            <tr>
+                <td class="td-input-doyang">
+                    <input type="text" id="DoYangInput" class="input-doyang" placeholder="Введите название площадки">
+                </td>
+                <td class="td-add-doyang">
+                    <button class="button-secondary add add-doyang" onclick="addDoYang()">+</button>
+                </td>
+            </tr>
+        </table>
+        <!-- <input type="text" id="DoYangInput" placeholder="Введите название площадки">
+        <button class="button-secondary add add-doyang" onclick="addDoYang()">+</button> -->
     </div>
     <div class="categories" id="categories">
         Категории:
@@ -105,6 +129,19 @@
                 </td>
             </tr>
         </table>
+
+        <table class="table-row search-table">
+            <tr>
+                <td colspan="6">
+                    <input type="text" id="search_category" class="input-search" placeholder="Поиск">
+                </td>
+                <td style="text-align: center;">
+                    <button class="button-primary primary-clickable search-button" 
+                    onclick="searchCategory()">🔍</button>
+                </td>
+            </tr>
+        </table>
+
         <div class="categories-list" id="categories_list_all"></div>
     </div>
     

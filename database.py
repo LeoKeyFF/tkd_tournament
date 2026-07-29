@@ -15,9 +15,9 @@ def start_tournament():
     cursor = connection.cursor()
 
     if len(cursor.execute(f"SELECT * FROM Competitors").fetchall()) == 0:
-        print('..........creation!!!! AAAAAAAAAAAAAAAAAAAAAAAAAA..............AAAAAAAAAAAAAAAAAAAAAA')
         connection.commit()
         connection.close()
+        print('..........creation!!!! AAAAAAAAAAAAAAAAAAAAAAAAAA..............AAAAAAAAAAAAAAAAAAAAAA')
 
         excel_filles.read_categories()
         excel_filles.read_cometitors()
@@ -425,12 +425,16 @@ def delete_unused_categories():
         WHERE NOT EXISTS (
             SELECT 1
             FROM Competitors
-            WHERE Competitors.Sparring = Categories.CategoryID OR Competitors.Tuly = Categories.CategoryID
+            WHERE Competitors.Sparring = Categories.CategoryID OR Competitors.Tuly = Categories.CategoryID OR Competitors.Power = Categories.CategoryID 
         )
     """)
 
     connection.commit()
     connection.close()
+                #     OR Competitors.Power = Categories.CategoryID OR Competitors.SpecialTechnic = Categories.CategoryID
+                # OR Competitors.TeamSparring = Categories.CategoryID OR Competitors.TeamTuly = Categories.CategoryID
+                # OR Competitors.TeamPower = Categories.CategoryIDOR Competitors.TeamSpecialTechnic = Categories.CategoryID
+                # OR Competitors.Traditional = Categories.CategoryID
 
 def create_grids():
     connection = sqlite3.connect(database_path)
@@ -534,3 +538,16 @@ def cancel_winner(match_id):
 
     if next_match_winner != None:
         cancel_winner(next_match_id)
+
+def delete_tables():
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    cursor.execute(f"DELETE FROM DoYangs")
+    cursor.execute(f"DELETE FROM Categories")
+    cursor.execute(f"DELETE FROM Competitors")
+    cursor.execute(f"DELETE FROM Matches")
+    cursor.execute(f"DELETE FROM Judges")
+
+    connection.commit()
+    connection.close()

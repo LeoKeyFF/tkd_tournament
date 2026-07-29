@@ -4,6 +4,7 @@ import os
 
 import category_py
 import database
+import excel_filles
 
 app = Flask(__name__)
 
@@ -29,31 +30,56 @@ def home_pj():
 
 @app.route("/upload_screen")
 def home_upload():
+    if os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
+        return redirect(url_for('home'))
     return render_template('upload_page.html')
 
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
-        return jsonify({'success': False, 'redirect': '/upload'})
-    
+        return jsonify({
+            'success': False,
+            'redirect': url_for('upload')
+        })    
     file = request.files['file']
     
     if file.filename == '':
-        return jsonify({'success': False, 'redirect': '/upload'})
-    
+        return jsonify({
+            'success': False,
+            'redirect': url_for('upload')
+        })        
     if not allowed_file(file.filename):
-        return jsonify({'success': False, 'redirect': '/upload'})
+        return jsonify({
+            'success': False,
+            'redirect': url_for('upload')
+        })    
+    if os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
+        return jsonify({
+            'success': False,
+            'redirect': url_for('home')
+        })    
+    
+    year = int(request.form.get("year"))
+
     try:
         file_path = os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')
         file.save(file_path)
 
+        with open("year.txt", "w", encoding="utf-8") as f:
+            f.write(str(year))
+
         database.start_tournament()
-        return jsonify({'success': True, 'redirect': '/'})
+        return jsonify({
+            'success': True,
+            'redirect': url_for('home')
+        })
     
     except Exception as e:
-        return jsonify({'success': False, 'redirect': '/upload'})
-    
+        return jsonify({
+            'success': False,
+            'redirect': url_for('upload')
+        })    
 
 @app.route("/add_doyang", methods = ['POST'])
 def add_doyang():
@@ -279,6 +305,14 @@ def cancel_winner():
     match_id = data.get('match_id')
     database.cancel_winner(match_id)
     return redirect(url_for('home'))
+
+@app.route("/delete_tournament", methods = ['POST'])
+def delete_tournament():
+    database.delete_tables()
+    if os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
+        os.remove(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx'))
+
+    return jsonify({'success': True, 'redirect': '/'})
 
 if __name__ == "__main__":
     app.run(debug=False, host='0.0.0.0', port=5001)

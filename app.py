@@ -40,19 +40,19 @@ def upload_file():
     if 'file' not in request.files:
         return jsonify({
             'success': False,
-            'redirect': url_for('upload')
+            'redirect': url_for('upload_screen')
         })    
     file = request.files['file']
     
     if file.filename == '':
         return jsonify({
             'success': False,
-            'redirect': url_for('upload')
+            'redirect': url_for('upload_screen')
         })        
     if not allowed_file(file.filename):
         return jsonify({
             'success': False,
-            'redirect': url_for('upload')
+            'redirect': url_for('upload_screen')
         })    
     if os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
         return jsonify({
@@ -78,7 +78,7 @@ def upload_file():
     except Exception as e:
         return jsonify({
             'success': False,
-            'redirect': url_for('upload')
+            'redirect': url_for('upload_screen')
         })    
 
 @app.route("/add_doyang", methods = ['POST'])
@@ -88,12 +88,13 @@ def add_doyang():
     database.add_doyang(name)
     return redirect(url_for('home'))
 
-@app.route("/pj/add_judge", methods = ['POST'])
+@app.route("/add_judge", methods = ['POST'])
 def add_judge():
     data = request.get_json()
     login = data.get('login')
-    doyang_id = data.get('doyang_id_current')
-    database.add_judge(login, doyang_id)
+    password = data.get('password')
+    doyang_id = data.get('doyang_id')
+    database.add_judge(login, password, doyang_id)
     return redirect(url_for('home'))
 
 @app.route("/create_grid", methods = ['POST'])
@@ -290,6 +291,34 @@ def get_data_judges():
     }
     return jsonify(data)
 
+@app.route("/get_all_judges", methods = ['GET'])
+def get_all_judges():
+    judges = database.get_all_judges()
+    if len(judges) == 0:
+        data = {
+            'ids': [],
+            'logins': [],
+            'passwords': [],
+            'doyangs': []
+        }
+        return jsonify(data)
+    ids = []
+    logins = []
+    passwords = []
+    doyangs = []
+    for judge in judges:
+        ids.append(judge[0])
+        logins.append(judge[1])
+        passwords.append(judge[2])
+        doyangs.append(judge[3])
+    data = {
+        'ids': ids,
+        'logins': logins,
+        'passwords': passwords,
+        'doyangs': doyangs
+    }
+    return jsonify(data)
+
 #---------------------------------------------------------------------------------------
 
 @app.route("/delete_doyang", methods = ['POST'])
@@ -313,6 +342,20 @@ def delete_tournament():
         os.remove(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx'))
 
     return jsonify({'success': True, 'redirect': '/'})
+
+#---------------------------------------------------------------------------------------
+@app.route("/judges_screen")
+def judges_screen():
+    return render_template('judges_screen.html')
+
+@app.route("/open_judges", methods = ['POST'])
+def open_judges():
+    return jsonify({
+        'success': True,
+        'redirect': url_for('judges_screen')
+    })  
+
+
 
 if __name__ == "__main__":
     app.run(debug=False, host='0.0.0.0', port=5001)

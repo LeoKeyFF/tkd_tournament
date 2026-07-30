@@ -91,7 +91,7 @@ def create_tables():
         f"CREATE TABLE IF NOT EXISTS Judges ( JudgeID INTEGER PRIMARY KEY," 
           "Login varchar(255),"
           "DoYangID INT,"
-        #   "CategoryID INT,"
+          "Password INT,"
           "Competitor1Score INT," 
           "Competitor2Score INT," 
           "Winner INT" 
@@ -242,11 +242,11 @@ def add_matches(category_id):
     for competitor in empty_competitors:
         set_winner(competitor[0], competitor[1])
 
-def add_judge(login, doyang_id):
+def add_judge(login, password, doyang_id):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
 
-    message = f"INSERT INTO Judges (Login, DoYangID) VALUES ('{login}', {doyang_id})"
+    message = f"INSERT INTO Judges (Login, Password, DoYangID) VALUES ('{login}', '{password}', {doyang_id})"
     cursor.execute(message)
 
     connection.commit()
@@ -352,7 +352,15 @@ def get_from_judges(doyang_id):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
 
-    judges = cursor.execute(f"SELECT JudgeID, Login, Competitor1Score, Competitor1Score, Winner FROM Judges WHERE DoYangID = {doyang_id}")
+    judges = cursor.execute(f"""
+        SELECT 
+            JudgeID, Login, Competitor1Score, Competitor1Score, Winner 
+        FROM 
+            Judges 
+        WHERE 
+            DoYangID = {doyang_id}
+    """)
+
     judges = judges.fetchall()
 
     connection.commit()
@@ -551,3 +559,21 @@ def delete_tables():
 
     connection.commit()
     connection.close()
+
+def get_all_judges():
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    judges = cursor.execute(f"""
+        SELECT 
+            JudgeID, Login, Password, DoYangID
+        FROM 
+            Judges 
+    """)
+
+    judges = judges.fetchall()
+
+    connection.commit()
+    connection.close()
+
+    return judges

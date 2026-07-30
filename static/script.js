@@ -257,3 +257,17 @@ function searchCategory(){
     updateCategories(function() {
     })
 }
+
+function opendJudges(){
+    $.ajax({
+        type: "POST",
+        url: '/open_judges',
+        success: function (response, status, jqXHR) {
+            window.location.href = response.redirect;
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+        },
+        complete: function (jqXHR, textStatus) {
+        }
+    });
+}

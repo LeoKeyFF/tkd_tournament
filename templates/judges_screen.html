@@ -1,0 +1,31 @@
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taekwon-Do</title>   
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='judges.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+</head>
+<body>
+<!-- --------------------------------------------------------------- Main Content:-->
+    <div class="judges" id="judges">
+        Судьи:
+        <div class="judges-list" id="judges_list"></div>
+        <table class="table-row">
+            <tr>
+                <td class="td-input-judge">
+                    <input type="text" id="judge_input_login" class="judge-input" placeholder="Введите логин">
+                </td>
+                <td class="td-input-judge">
+                    <input type="text" id="judge_input_password" class="judge-input" placeholder="Введите пароль">
+                </td>
+                <td class="td-add-doyang">
+                    <button class="button-secondary secondary-clickable add add-doyang" onclick="addJudge()">+</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

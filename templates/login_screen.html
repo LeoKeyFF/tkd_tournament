@@ -9,16 +9,29 @@
     <script src="{{ url_for('static', filename='jquery.js') }}"></script>
 </head>
 <body>
-
-    <div id="login_section" class="login-section" style="display:flex; flex-direction: column; justify-content: center;">
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            rolesLoginToChoose($("#choose_role"))
+        });
+    </script>
+    <div id="login_section" class="login-section" 
+        style="display:flex; flex-direction: column; justify-content: center; align-items: center;">
         Вход
         <label for="choose_role">
             Роль:
         </label>
-        <select name="role" id="choose_role" class="select-for-login">
-            <option value="admin">Аминистратор</option>
-            <option value="pj">Президент площадки</option>
-        </select>
+        <select name="role" id="choose_role" class="select-for-login"></select>
+        <label for="login_to_log_in" id="lable_login_to_log_in" style="display: none;">
+            Логин:
+        </label>
+        <input
+            id="login_to_log_in"
+            type="text"
+            class="password-to-log-in"
+            placeholder="Введите логин"
+            required
+            style="display: none;"
+        >
         <label for="password_to_log_in">
             Пароль:
         </label>
@@ -33,6 +46,18 @@
 
         <p id="login_error"></p>
     </div>
+
+    <script>
+        $('#choose_role').on('change', function() {
+            if ($(this).val() === 'admin') {
+                $('#login_to_log_in').hide();
+                $('#lable_login_to_log_in').hide();
+            } else {
+                $('#login_to_log_in').show();
+                $('#lable_login_to_log_in').show();
+            }
+        });
+    </script>
 
 
 </body>

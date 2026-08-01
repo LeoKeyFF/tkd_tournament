@@ -6,6 +6,8 @@ import math
 from competitor import Competitor
 import excel_filles
 
+from werkzeug.security import generate_password_hash
+
 database_path = "database.db"
 
 def start_tournament():
@@ -244,10 +246,21 @@ def add_matches(category_id):
         set_winner(competitor[0], competitor[1])
 
 def add_judge(login, password, doyang_id, role):
+    password = generate_password_hash(password, method="pbkdf2:sha256")
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
 
-    message = f"INSERT INTO Judges (Login, Password, DoYangID, Role) VALUES ('{login}', '{password}', {doyang_id}, '{role}')"
+    login_is_used = cursor.execute(
+        f"SELECT Login FROM Judges WHERE Login = '{login}'"
+    ).fetchall()
+    print(login_is_used)
+    if len(login_is_used) != 0:
+        cursor.execute(f"DELETE FROM Judges WHERE Login = '{login}'")
+
+    message = f"""
+        INSERT INTO Judges (Login, Password, DoYangID, Role) 
+        VALUES ('{login}', '{password}', {doyang_id}, '{role}')
+    """
     cursor.execute(message)
 
     connection.commit()
@@ -567,10 +580,10 @@ def get_all_judges():
 
     judges = cursor.execute(f"""
         SELECT 
-            j.JudgeID, j.Login, j.Role, j.DoYangID, d.Name
+            j.JudgeID, j.Login, j.Role, j.DoYangID, IFNULL(d.Name, "Выберите площадку")
         FROM 
             Judges j
-        JOIN
+        LEFT JOIN
             DoYangs d ON j.DoYangID = d.DoYangID
     """)
 
@@ -608,3 +621,20 @@ def change_judge(judge_id, doyang_id, role_id):
 
     connection.commit()
     connection.close() 
+
+def get_judge_password(login):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    password_role = cursor.execute(f"""
+        SELECT Password, Role FROM Judges WHERE Login = '{login}'
+    """).fetchall()
+
+    connection.commit()
+    connection.close() 
+
+    if len(password_role) > 0:
+        return password_role[0][0], password_role[0][1]
+
+    else:
+        return "", ""

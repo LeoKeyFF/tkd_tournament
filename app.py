@@ -32,8 +32,10 @@ ADMIN_PASSWORD_HASH = os.environ["ADMIN_PASSWORD_HASH"]
 
 ROLE_LEVELS = {
     "user": 0,
-    "pj": 1,
-    "admin": 2
+    "judge": 1,
+    "referee": 1,
+    "pj": 2,
+    "admin": 3
 }
 
 def get_current_role():
@@ -128,6 +130,11 @@ def judges_screen():
 @app.route("/login_screen")
 def login_screen():
     return render_template('login_screen.html')
+
+@app.route("/tkd_counter")
+@role_required("judge")
+def home_tkd_counter():
+    return render_template('tkd_counter.html')
 #----------------------------------------------------------------------------------------
 
 
@@ -161,15 +168,18 @@ def login():
 
     role = data.get("role")
     password = data.get("password", "")
+    login = data.get("login", "")
 
-    if role not in ("pj", "admin"):
+    if role not in ("judge", "admin"):
         return jsonify({
             "success": False,
             "error": "Некорректная роль"
         }), 400
 
-    if role == "pj":
-        password_hash = PJ_PASSWORD_HASH
+    if role == "judge":
+        password_hash, judge_role = database.get_judge_password(login)
+        role = judge_role
+        # password_hash = PJ_PASSWORD_HASH
     else:
         password_hash = ADMIN_PASSWORD_HASH
 
@@ -191,11 +201,17 @@ def login():
             "role": role,
             "redirect": url_for('home_admin')
         })
-    else:
+    elif role == 'pj':
         return jsonify({
             "success": True,
             "role": role,
             "redirect": url_for('home_pj')
+        }) 
+    elif role == 'judge' or role == 'referee':
+        return jsonify({
+            "success": True,
+            "role": role,
+            "redirect": url_for('home_tkd_counter')
         }) 
 
 
@@ -276,9 +292,39 @@ def add_judge():
     password = data.get('password')
     doyang_id = data.get('doyang_id')
     role = data.get('role')
+    
     database.add_judge(login, password, doyang_id, role)
     return jsonify(success=True)
     # return redirect(url_for('home'))
+
+@app.route("/api/read_judges_file", methods = ['POST'])
+@role_required("admin")
+def read_judges_file():
+    if 'file' not in request.files:
+        return jsonify({
+            'success': False
+        })    
+    file = request.files['file']
+    
+    if file.filename == '':
+        return jsonify({
+            'success': False
+        })        
+    if not allowed_file(file.filename):
+        return jsonify({
+            'success': False
+        })    
+    try:
+        excel_filles.read_judges(file)
+        return jsonify({
+            'success': True
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+        })  
+    return jsonify(success=True)
 
 @app.route("/api/create_grid", methods = ['POST'])
 @role_required("admin")

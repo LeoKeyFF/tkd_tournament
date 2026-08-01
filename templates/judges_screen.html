@@ -22,7 +22,7 @@
             }, 5000);
         });
     </script>
-    <div class="judges" id="judges">
+    <div class="judges" id="judges" style="display:flex; flex-direction: column;">
         <p id="debug"></p>
         Судьи:
         <div class="judges-list" id="judges_list"></div>
@@ -36,9 +36,6 @@
                 </td>
                 <td colspan="3">
                     <select name="role" id="choose_role_judge" class="select-for-judge">
-                        <!-- <option value="judge">Судья</option>
-                        <option value="referee">Рефери</option>
-                        <option value="pj">Президент площадки</option> -->
                     </select>
                 </td>
                 <td colspan="3">
@@ -50,6 +47,13 @@
                 </td>
             </tr>
         </table>
+        Загрузить таблицу судей:
+        <div class="drop-zone" id="dropZoneJudge" style="width: 100%;">
+            <label for="file_input_judges">Выберите файл (.xlsx)</label>
+            <input class="input-file" type="file" id="file_input_judges" name="file_input_judges" 
+            accept=".xlsx" data-button-text="Загрузить файл"/>
+        </div>
+        <button class="button-secondary secondary-clickable" onclick="uploadJudges()">Добавить из таблицы</button>
     </div>
 </body>
 </html>

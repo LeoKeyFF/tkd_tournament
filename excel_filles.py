@@ -131,3 +131,20 @@ def read_categories():
             name, gender, belt_from, belt_to,
             weight_from, weight_to, age_from, age_to, type
         )
+
+def read_judges(file):
+    datatype = {
+        'login': str,
+        'password': str
+    }
+    df = pd.read_excel(
+        file,
+        engine='openpyxl',
+        dtype=datatype
+    )
+    for index, row in df.iterrows():
+        login = row['login']
+        password = row['password']
+        print(login, password)
+
+        database.add_judge(login, password, 0, "judge")

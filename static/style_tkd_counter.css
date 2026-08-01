@@ -1,0 +1,75 @@
+body{
+    background: rgba(255, 255, 255);
+    padding: 0;
+    margin: 0;
+}
+
+.score {
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    text-align: center;
+
+    font-size: 30;
+    padding-bottom: 3px;
+    color: white;
+}
+.score.red {
+    background: linear-gradient(rgb(200, 0, 0), rgb(185, 0, 0));
+}
+
+.score.blue {
+    background: linear-gradient(rgb(0, 0, 200), rgb(0, 0, 185))
+}
+
+.button-score{
+    padding: 0px;
+    text-align: center;
+    height: 100%;
+    width: 100%;
+    font-size: 22;
+    color: white;
+    border: 0;
+}
+.button-score.red{
+    background: linear-gradient(rgb(200, 0, 0), rgb(185, 0, 0));
+}
+.button-score.blue{
+    background: linear-gradient(rgb(0, 0, 200), rgb(0, 0, 185))
+}
+.cancel-score{
+    padding: 0px;
+    background: rgb(0, 126, 143) ;
+    text-align: center;
+    height: 100%;
+    width: 100%;
+    align-self: center;
+    /* aspect-ratio: 1; */
+    font-size: 22;
+    color: white;
+    border: 0;
+}
+.tkd-counter-table {
+    height: 100%;
+    width: 100%;
+}
+.tkd-counter-table tr{
+    width: 100%;
+    text-align: center;
+}
+.tkd-counter-table td{
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+}
+.tkd-counter-table th{
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+}
+.tkd-counter-table thead {
+    height: 120px;
+}

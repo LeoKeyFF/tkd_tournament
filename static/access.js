@@ -19,12 +19,19 @@ function checkAccess(role) {
 function logIn(){
     var password = $('#password_to_log_in').val();
     var role = $('#choose_role').val();
+    var login = $('#login_to_log_in').val();
     if (password === ""){
         return
     }
+    if (role != 'admin'){
+        if (login === ''){
+            return
+        }
+    }
     const dataToSend = { 
         password: password,
-        role: role
+        role: role,
+        login: login
     };
     $.ajax({
         type: "POST",
@@ -78,4 +85,20 @@ function roleToName(role){
     else if (role == "referee"){
         return "Рефери"
     }
+}
+
+function rolesLoginToChoose($element){
+    $element.empty();
+    $element.append(
+        $('<option>',{
+            value: 'admin',
+            text: roleToName("admin")
+        })
+    )
+    $element.append(
+        $('<option>',{
+            value: 'judge',
+            text: roleToName("judge")
+        })
+    )
 }

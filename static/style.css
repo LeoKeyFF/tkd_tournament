@@ -72,7 +72,7 @@ body {
     border: 1px solid #e9edf2;
     display: block;
     flex-wrap: wrap;
-    align-items: center;
+    /* align-items: center; */
     gap: 0.75rem 1rem;
 
     font-weight: 600;
@@ -102,7 +102,7 @@ body {
     flex-direction: column;
     gap: 0.5rem;
     width: 100%;
-    order: 1;
+    /* order: 1; */
     border-radius: 0px;
 }
 

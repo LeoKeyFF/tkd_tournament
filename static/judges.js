@@ -208,3 +208,29 @@ function changeJudge(judge_id, doyang_id, role_id){
         }
     });
 }
+
+function uploadJudges() {
+    const file = $('#file_input_judges')[0].files[0];
+    if (!file) {
+        return;
+    }
+    const formData = new FormData();
+    formData.append('file', file);
+
+    $.ajax({
+        type: "POST",
+        url: '/api/read_judges_file',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response, status, jqXHR) {
+            updateJudgesAll(function(){})
+            // window.location.replace(response.redirect);
+            // window.location.href = response.redirect;
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+        },
+        complete: function (jqXHR, textStatus) {
+        }
+    });
+}

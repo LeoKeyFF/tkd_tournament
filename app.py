@@ -96,10 +96,7 @@ def allowed_file(filename):
 #----------------------------------------------------------------------------------------
 
 @app.route("/")
-def home():
-    if not os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
-        return redirect(url_for('home_upload'))
-    
+def home():    
     return render_template('main.html')
 
 @app.route("/pj")
@@ -108,6 +105,9 @@ def home_pj():
 
 @app.route("/admin")
 def home_admin():
+    if get_current_role() != 'admin':
+        return redirect(url_for('login_screen'))
+    
     if not os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
         return redirect(url_for('home_upload'))
     
@@ -117,7 +117,7 @@ def home_admin():
 @role_required("admin")
 def home_upload():
     if os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
-        return redirect(url_for('home'))
+        return redirect(url_for('home_admin'))
     return render_template('upload_page.html')
 
 @app.route("/judges_screen")
@@ -151,7 +151,6 @@ def auth_status():
 
 @app.route("/api/auth/login", methods=["POST"])
 def login():
-    print('ASDFGASSSDSDASAD.  LOGIIIIIIIIIIIIN')
     data = request.get_json(silent=True)
 
     if not data:
@@ -234,7 +233,7 @@ def upload_file():
     if os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
         return jsonify({
             'success': False,
-            'redirect': url_for('home')
+            'redirect': url_for('home_admin')
         })    
     
     year = int(request.form.get("year"))
@@ -249,7 +248,7 @@ def upload_file():
         database.start_tournament()
         return jsonify({
             'success': True,
-            'redirect': url_for('home')
+            'redirect': url_for('home_admin')
         })
     
     except Exception as e:
@@ -276,7 +275,8 @@ def add_judge():
     login = data.get('login')
     password = data.get('password')
     doyang_id = data.get('doyang_id')
-    database.add_judge(login, password, doyang_id)
+    role = data.get('role')
+    database.add_judge(login, password, doyang_id, role)
     return jsonify(success=True)
     # return redirect(url_for('home'))
 
@@ -292,7 +292,6 @@ def create_grid():
 @app.route("/api/set_winner", methods = ['POST'])
 @role_required("pj")
 def set_winner():
-    print('for pjjjjjjjjjjjjjj AAAAAAAAAAAAA')
     data = request.get_json()
     match_id = data.get('match_id')
     winner = data.get('winner')
@@ -489,24 +488,29 @@ def get_all_judges():
         data = {
             'ids': [],
             'logins': [],
-            'passwords': [],
-            'doyangs': []
+            'roles': [],
+            'doyangs': [],
+            'doyangs_names': []
         }
         return jsonify(data)
     ids = []
     logins = []
-    passwords = []
+    roles = []
     doyangs = []
+    doyangs_names = []
     for judge in judges:
         ids.append(judge[0])
         logins.append(judge[1])
-        passwords.append(judge[2])
+        roles.append(judge[2])
         doyangs.append(judge[3])
+        doyangs_names.append(judge[4])
+    print(doyangs_names)
     data = {
         'ids': ids,
         'logins': logins,
-        'passwords': passwords,
-        'doyangs': doyangs
+        'roles': roles,
+        'doyangs': doyangs,
+        'doyangs_names': doyangs_names
     }
     return jsonify(data)
 
@@ -537,7 +541,25 @@ def delete_tournament():
     if os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
         os.remove(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx'))
 
-    return jsonify({'success': True, 'redirect': '/'})
+    return jsonify({'success': True, 'redirect': url_for('home_admin')})
+
+@app.route("/api/delete_judge", methods = ['POST'])
+@role_required("admin")
+def delete_judge():
+    data = request.get_json()
+    id = data.get('id')
+    database.delete_judge(id)
+    return jsonify(success=True)
+
+@app.route("/api/change_judge", methods = ['POST'])
+@role_required("admin")
+def change_judge():
+    data = request.get_json()
+    judge_id = data.get('judge_id')
+    doyang_id = data.get('doyang_id')
+    role_id = data.get('role_id')
+    database.change_judge(judge_id, doyang_id, role_id)
+    return jsonify(success=True)
 
 #---------------------------------------------------------------------------------------
 

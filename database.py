@@ -92,6 +92,7 @@ def create_tables():
           "Login varchar(255),"
           "DoYangID INT,"
           "Password INT,"
+          "Role varchar(255),"
           "Competitor1Score INT," 
           "Competitor2Score INT," 
           "Winner INT" 
@@ -242,11 +243,11 @@ def add_matches(category_id):
     for competitor in empty_competitors:
         set_winner(competitor[0], competitor[1])
 
-def add_judge(login, password, doyang_id):
+def add_judge(login, password, doyang_id, role):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
 
-    message = f"INSERT INTO Judges (Login, Password, DoYangID) VALUES ('{login}', '{password}', {doyang_id})"
+    message = f"INSERT INTO Judges (Login, Password, DoYangID, Role) VALUES ('{login}', '{password}', {doyang_id}, '{role}')"
     cursor.execute(message)
 
     connection.commit()
@@ -566,9 +567,11 @@ def get_all_judges():
 
     judges = cursor.execute(f"""
         SELECT 
-            JudgeID, Login, Password, DoYangID
+            j.JudgeID, j.Login, j.Role, j.DoYangID, d.Name
         FROM 
-            Judges 
+            Judges j
+        JOIN
+            DoYangs d ON j.DoYangID = d.DoYangID
     """)
 
     judges = judges.fetchall()
@@ -577,3 +580,31 @@ def get_all_judges():
     connection.close()
 
     return judges
+
+def delete_judge(id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    cursor.execute(f"""
+        DELETE FROM Judges
+        WHERE 
+            JudgeID = {id}
+    """) 
+
+    connection.commit()
+    connection.close() 
+
+def change_judge(judge_id, doyang_id, role_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    cursor.execute(f"""
+        UPDATE Judges
+        SET
+            DoYangID = {doyang_id}, Role = '{role_id}'
+        WHERE 
+            JudgeID = {judge_id}
+    """) 
+
+    connection.commit()
+    connection.close() 

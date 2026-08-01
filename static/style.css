@@ -454,6 +454,15 @@ dialog {
 .del-button:hover {
   background-color: red;
 }
+.save-button {
+    white-space: nowrap;
+    height: 100%;
+    aspect-ratio: 2/1;
+    padding: 0rem 0rem;
+    margin: 0 auto;
+    font-size: 0.7rem;
+    display: block;
+}
 
 /* ===== Menu ===== */
 .menu-button {
@@ -588,7 +597,6 @@ select {
     padding: 0.6rem 1.6rem;
     font-size: 0.9rem;
     font-weight: 400;
-    width: 60%;
     height: 44px;
 }
 select option {
@@ -598,4 +606,11 @@ select option {
     height: 44px;
     font-size: 0.9rem;
     font-weight: 400;
+}
+
+.select-for-login{
+    width: 60%;
+}
+.select-for-judge{
+    width: 100%;
 }

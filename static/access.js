@@ -64,3 +64,18 @@ function logOut(){
         }
     });
 }
+
+function roleToName(role){
+    if (role == "admin"){
+        return "Админ"
+    }
+    else if (role == "pj"){
+        return "Президент площадки"
+    }
+    else if (role == "judge"){
+        return "Судья"
+    }
+    else if (role == "referee"){
+        return "Рефери"
+    }
+}

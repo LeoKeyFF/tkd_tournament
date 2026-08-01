@@ -17,7 +17,7 @@ function addDoYang(){
         data: JSON.stringify(dataToSend),
         // dataType: 'json',
         success: function (response, status, jqXHR) {
-            updateDoYangs()
+            updateDoYangs(function(){})
         },
         error: function (jqXHR, textStatus, errorThrown) {
         },
@@ -119,13 +119,18 @@ function updateDinamicContent(){
     }
 }
 
-function updateDoYangs(callback){
+function updateDoYangs(callback, role = "user"){
     $.ajax({
         url: '/api/get_data_doyangs',
         method: 'GET',
         dataType: 'json',
         success: function (data) {
             doYangsContent(data.ids, data.names);
+            if (role == "admin"){
+                doyangsToChoose(data.ids, data.names, $("#choose_doyang"));
+                all_doyangs_ids = data.ids;
+                all_doyangs_names = data.names
+            }
             callback();
         },
         error: function () {
@@ -240,7 +245,8 @@ function deleteTournament(){
             url: '/api/delete_tournament',
             contentType: 'application/json; charset=utf-8',
             success: function (response, status, jqXHR) {
-                window.location.href = response.redirect;
+                window.location.replace(response.redirect);
+                // window.location.href = response.redirect;
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 // Error handling

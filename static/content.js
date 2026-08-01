@@ -35,11 +35,13 @@ function doYangsContent(ids, names){
             deleteDoYang(ids[i]);
         })
         td1.append(names[i])
-        td2.append(delButton)
         tr.append(td1)
-        tr.append(td2)
+        if (currentPath === '/admin'){
+            td2.append(delButton)
+            tr.append(td2)
+        }
         doyangButton.append(tr)
-        $('#categories_list').append(doyangButton);
+        // $('#categories_list').append(doyangButton);
         $('#doyangs_list').append(doyangButton);
     }
 }
@@ -79,17 +81,20 @@ function categoriesContent(ids, names, doyangs, doyangs_list, competitors_amount
                 deleteDoYangFromCategory(ids[i]);
             })
             td1.append(names[i])
-            td2.append(competitors_amounts[i])
-            td3.append(delButton)
             tr.append(td1)
-            tr.append(td2)
-            tr.append(td3)
+            if (currentPath === '/admin'){
+                td2.append(competitors_amounts[i])
+                td3.append(delButton)
+
+                tr.append(td2)
+                tr.append(td3)
+            }
             categoryButton.append(tr)
             $('#categories_list').append(categoryButton);
         }
     }
 
-    if (currentPath === '/') {
+    if (currentPath != '/pj') {
         for (let doyang of doyangs_list){
             if (doyang[0] == current_doyang && !$('#path_card_doyang').length){
                 const pathDoyang = $('<button>', {
@@ -228,7 +233,8 @@ function drawGrid(matches, rounds){
                     class: 'competitor-box'
                 }); 
                 if (match.competitor1id != 0 && match.competitor1id != null 
-                    && match.competitor2id != 0 && match.competitor2id != null ){
+                    && match.competitor2id != 0 && match.competitor2id != null 
+                    && (currentPath === '/admin' || currentPath === '/pj')){
                     if (match.winner == null){
                         divCompetitorBox.on('click', function() {
                             competitor1id = match.competitor1id;
@@ -274,9 +280,6 @@ function drawGrid(matches, rounds){
         tbody.append(tr);
     }  
     table.append(tbody);
-    // $("#grid_div").append(
-    //     'Сетка:'
-    // );
     $("#grid_div").append(table);
 }
 

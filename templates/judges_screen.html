@@ -5,21 +5,45 @@
     <title>Taekwon-Do</title>   
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='content.js') }}"></script>
     <script src="{{ url_for('static', filename='judges.js') }}"></script>
     <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='access.js') }}"></script>
 </head>
 <body>
-<!-- --------------------------------------------------------------- Main Content:-->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            checkAccess("admin");
+            updateDoYangs(function(){}, role="admin");
+            rolesJudgesToChoose($('#choose_role_judge'));
+            updateJudgesAll(function(){});
+            setInterval(function() {
+                updateDoYangs(function(){}, role="admin");
+            }, 5000);
+        });
+    </script>
     <div class="judges" id="judges">
+        <p id="debug"></p>
         Судьи:
         <div class="judges-list" id="judges_list"></div>
         <table class="table-row">
             <tr>
-                <td class="td-input-judge">
+                <td class="td-input-judge" colspan="5">
                     <input type="text" id="judge_input_login" class="judge-input" placeholder="Введите логин">
                 </td>
-                <td class="td-input-judge">
+                <td class="td-input-judge" colspan="5">
                     <input type="text" id="judge_input_password" class="judge-input" placeholder="Введите пароль">
+                </td>
+                <td colspan="3">
+                    <select name="role" id="choose_role_judge" class="select-for-judge">
+                        <!-- <option value="judge">Судья</option>
+                        <option value="referee">Рефери</option>
+                        <option value="pj">Президент площадки</option> -->
+                    </select>
+                </td>
+                <td colspan="3">
+                    <select name="doyangs" id="choose_doyang" class="select-for-judge">
+                    </select>
                 </td>
                 <td class="td-add-doyang">
                     <button class="button-secondary secondary-clickable add add-doyang" onclick="addJudge()">+</button>

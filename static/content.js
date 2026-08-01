@@ -308,7 +308,7 @@ function closeChooseWinner(w){
 
     $.ajax({
         type: "POST",
-        url: '/set_winner',
+        url: '/api/set_winner',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(dataToSend),
         dataType: 'json',
@@ -344,7 +344,7 @@ function cancelWinner(){
         };
         $.ajax({
             type: "POST",
-            url: '/cancel_winner',
+            url: '/api/cancel_winner',
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(dataToSend),
             dataType: 'json',

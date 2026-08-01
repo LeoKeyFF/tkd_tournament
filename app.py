@@ -1,13 +1,90 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, make_response
+from flask import Flask, render_template, request, redirect, url_for, jsonify, make_response, session, send_from_directory, abort
+
 import json
 import os
+from functools import wraps
+
+from dotenv import load_dotenv
 
 import category_py
 import database
 import excel_filles
 
+from werkzeug.security import check_password_hash, generate_password_hash
+
+load_dotenv()
+
 app = Flask(__name__)
 
+app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
+
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+
+    # В production должно быть True.
+    # При True сайт должен работать через HTTPS.
+    SESSION_COOKIE_SECURE=False
+)
+
+PJ_PASSWORD_HASH = os.environ["MASTER_PASSWORD_HASH"]
+ADMIN_PASSWORD_HASH = os.environ["ADMIN_PASSWORD_HASH"]
+
+ROLE_LEVELS = {
+    "user": 0,
+    "pj": 1,
+    "admin": 2
+}
+
+def get_current_role():
+    role = session.get("role", "user")
+
+    if role not in ROLE_LEVELS:
+        session.clear()
+        return "user"
+
+    return role
+
+def role_required(required_role):
+    """
+    Декоратор проверки минимально необходимой роли.
+    """
+
+    def decorator(view_function):
+        @wraps(view_function)
+        def wrapped_view(*args, **kwargs):
+            current_role = get_current_role()
+
+            current_level = ROLE_LEVELS[current_role]
+            required_level = ROLE_LEVELS[required_role]
+
+            if current_level < required_level:
+                if current_role == "user":
+                    return redirect(
+                        url_for(
+                            "login",
+                            role=required_role,
+                            next=request.path,
+                        )
+                    )
+                abort(403)
+
+            return view_function(*args, **kwargs)
+
+        return wrapped_view
+
+    return decorator
+
+@app.context_processor
+def inject_current_role():
+    """
+    Делает current_role доступным во всех HTML-шаблонах.
+    """
+    return {
+        "current_role": get_current_role()
+    }
+
+#----------------------------------------------------------------------------------------
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'xlsx', 'xls'}
 
@@ -16,6 +93,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+#----------------------------------------------------------------------------------------
 
 @app.route("/")
 def home():
@@ -28,12 +106,111 @@ def home():
 def home_pj():
     return render_template('pj.html')
 
+@app.route("/admin")
+def home_admin():
+    if not os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
+        return redirect(url_for('home_upload'))
+    
+    return render_template('admin.html')
+
 @app.route("/upload_screen")
+@role_required("admin")
 def home_upload():
     if os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
         return redirect(url_for('home'))
     return render_template('upload_page.html')
 
+@app.route("/judges_screen")
+@role_required("admin")
+def judges_screen():
+    return render_template('judges_screen.html')
+
+@app.route("/login_screen")
+def login_screen():
+    return render_template('login_screen.html')
+#----------------------------------------------------------------------------------------
+
+
+@app.route("/api/auth/status", methods=["GET"])
+def auth_status():
+    role = request.args.get('role')
+    print(role, get_current_role())
+    if role == get_current_role():
+        return jsonify({
+            "success": True,
+            "role": get_current_role()
+        })
+    else:
+        print('error')
+        return jsonify({
+            "success": False,
+            "role": get_current_role(),
+            "redirect": url_for('login_screen')
+        })
+
+
+@app.route("/api/auth/login", methods=["POST"])
+def login():
+    print('ASDFGASSSDSDASAD.  LOGIIIIIIIIIIIIN')
+    data = request.get_json(silent=True)
+
+    if not data:
+        return jsonify({
+            "success": False,
+            "error": "No data"
+        }), 400
+
+    role = data.get("role")
+    password = data.get("password", "")
+
+    if role not in ("pj", "admin"):
+        return jsonify({
+            "success": False,
+            "error": "Некорректная роль"
+        }), 400
+
+    if role == "pj":
+        password_hash = PJ_PASSWORD_HASH
+    else:
+        password_hash = ADMIN_PASSWORD_HASH
+
+    if not check_password_hash(password_hash, password):
+        return jsonify({
+            "success": False,
+            "error": "Неверный пароль"
+        }), 401
+
+    # Удаляем старые данные сессии.
+    session.clear()
+
+    # Сохраняем только роль, а не пароль.
+    session["role"] = role
+    print(role)
+    if role == 'admin':
+        return jsonify({
+            "success": True,
+            "role": role,
+            "redirect": url_for('home_admin')
+        })
+    else:
+        return jsonify({
+            "success": True,
+            "role": role,
+            "redirect": url_for('home_pj')
+        }) 
+
+
+@app.route("/api/auth/logout", methods=["POST"])
+def logout():
+    session.clear()
+
+    return jsonify({
+        "success": True,
+        "redirect": url_for('login_screen')
+    })
+
+
+#----------------------------------------------------------------------------------------
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -81,49 +258,62 @@ def upload_file():
             'redirect': url_for('upload_screen')
         })    
 
-@app.route("/add_doyang", methods = ['POST'])
+#----------------------------------------------------------------------------------------
+
+@app.route("/api/add_doyang", methods = ['POST'])
+@role_required("admin")
 def add_doyang():
     data = request.get_json()
     name = data.get('name')
     database.add_doyang(name)
-    return redirect(url_for('home'))
+    return jsonify(success=True)
+    # return redirect(url_for('home'))
 
-@app.route("/add_judge", methods = ['POST'])
+@app.route("/api/add_judge", methods = ['POST'])
+@role_required("admin")
 def add_judge():
     data = request.get_json()
     login = data.get('login')
     password = data.get('password')
     doyang_id = data.get('doyang_id')
     database.add_judge(login, password, doyang_id)
-    return redirect(url_for('home'))
+    return jsonify(success=True)
+    # return redirect(url_for('home'))
 
-@app.route("/create_grid", methods = ['POST'])
+@app.route("/api/create_grid", methods = ['POST'])
+@role_required("admin")
 def create_grid():
     data = request.get_json()
     category_id = data.get('category_id')
     database.add_matches(category_id)
-    return redirect(url_for('home'))
+    return jsonify(success=True)
+    # return redirect(url_for('home'))
 
-@app.route("/set_winner", methods = ['POST'])
+@app.route("/api/set_winner", methods = ['POST'])
+@role_required("pj")
 def set_winner():
+    print('for pjjjjjjjjjjjjjj AAAAAAAAAAAAA')
     data = request.get_json()
     match_id = data.get('match_id')
     winner = data.get('winner')
     print(match_id, winner)
     database.set_winner(match_id, winner)
-    return redirect(url_for('home'))
+    return jsonify(success=True)
+    # return redirect(url_for('home'))
 
-@app.route("/add_doyang_to_categories", methods = ['POST'])
+@app.route("/api/add_doyang_to_categories", methods = ['POST'])
+@role_required("admin")
 def add_doyang_to_categories():
     data = request.get_json()
     doyang_id = data.get('doyang_id')
     category_ids = data.get('categories')
     print(category_ids)
     database.add_doyang_to_categories(category_ids, doyang_id)
-    return redirect(url_for('home'))
+    return jsonify(success=True)
+    # return redirect(url_for('home'))
 #---------------------------------------------------------------------------------------
 
-@app.route("/get_data_doyangs", methods = ['GET'])
+@app.route("/api/get_data_doyangs", methods = ['GET'])
 def get_data_doyangs():
     doyangs = database.get_from_doyangs()
     if len(doyangs) == 0:
@@ -143,7 +333,7 @@ def get_data_doyangs():
     }
     return jsonify(data)
 
-@app.route("/get_data_categories", methods = ['GET'])
+@app.route("/api/get_data_categories", methods = ['GET'])
 def get_data_categories():
     categories = database.get_from_categories()
     doyangs_list = database.get_from_doyangs()
@@ -184,7 +374,7 @@ def get_data_categories():
     }
     return jsonify(data)
 
-@app.route("/get_data_competitors", methods = ['GET'])
+@app.route("/api/get_data_competitors", methods = ['GET'])
 def get_data_competitors():
     category = request.args.get('category_id')
     competitors = database.get_from_competitors(category)
@@ -236,7 +426,7 @@ def get_data_competitors():
     }
     return jsonify(data)
 
-@app.route("/get_data_matches", methods = ['GET'])
+@app.route("/api/get_data_matches", methods = ['GET'])
 def get_data_matches():
     category_id = request.args.get('category_id')
     matches = database.get_from_matches(category_id)
@@ -291,7 +481,8 @@ def get_data_judges():
     }
     return jsonify(data)
 
-@app.route("/get_all_judges", methods = ['GET'])
+@app.route("/api/get_all_judges", methods = ['GET'])
+@role_required("admin")
 def get_all_judges():
     judges = database.get_all_judges()
     if len(judges) == 0:
@@ -321,21 +512,26 @@ def get_all_judges():
 
 #---------------------------------------------------------------------------------------
 
-@app.route("/delete_doyang", methods = ['POST'])
+@app.route("/api/delete_doyang", methods = ['POST'])
+@role_required("admin")
 def delete_doyang():
     data = request.get_json()
     doyang_id = data.get('doyang_id')
     database.delete_doyang(doyang_id)
-    return redirect(url_for('home'))
+    return jsonify(success=True)
+    # return redirect(url_for('home'))
 
-@app.route("/cancel_winner", methods = ['POST'])
+@app.route("/api/cancel_winner", methods = ['POST'])
+@role_required("pj")
 def cancel_winner():
     data = request.get_json()
     match_id = data.get('match_id')
     database.cancel_winner(match_id)
-    return redirect(url_for('home'))
+    return jsonify(success=True)
+    # return redirect(url_for('home'))
 
-@app.route("/delete_tournament", methods = ['POST'])
+@app.route("/api/delete_tournament", methods = ['POST'])
+@role_required("admin")
 def delete_tournament():
     database.delete_tables()
     if os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
@@ -344,11 +540,9 @@ def delete_tournament():
     return jsonify({'success': True, 'redirect': '/'})
 
 #---------------------------------------------------------------------------------------
-@app.route("/judges_screen")
-def judges_screen():
-    return render_template('judges_screen.html')
 
-@app.route("/open_judges", methods = ['POST'])
+@app.route("/api/open_judges", methods = ['POST'])
+@role_required("admin")
 def open_judges():
     return jsonify({
         'success': True,
@@ -358,4 +552,5 @@ def open_judges():
 
 
 if __name__ == "__main__":
+    print('hash:' + generate_password_hash("123", method="pbkdf2:sha256"))
     app.run(debug=False, host='0.0.0.0', port=5001)

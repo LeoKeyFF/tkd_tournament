@@ -12,7 +12,7 @@ function addDoYang(){
     };
     $.ajax({
         type: "POST",
-        url: '/add_doyang',
+        url: '/api/add_doyang',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(dataToSend),
         // dataType: 'json',
@@ -33,7 +33,7 @@ function addDoYangToCategories(){
     };
     $.ajax({
         type: "POST",
-        url: '/add_doyang_to_categories',
+        url: '/api/add_doyang_to_categories',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(dataToSend),
         // dataType: 'json',
@@ -60,7 +60,7 @@ function deleteDoYangFromCategory(category){
         };
         $.ajax({
             type: "POST",
-            url: '/add_doyang_to_categories',
+            url: '/api/add_doyang_to_categories',
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(dataToSend),
             // dataType: 'json',
@@ -83,7 +83,7 @@ function createGrid(){
     };
     $.ajax({
         type: "POST",
-        url: '/create_grid',
+        url: '/api/create_grid',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(dataToSend),
         // dataType: 'json',
@@ -103,7 +103,7 @@ function updateDinamicContent(){
     
     if (currentPath === '/pj') {
         $.ajax({
-            url: '/pj/get_data_judges',
+            url: '/api/pj/get_data_judges',
             method: 'GET',
             dataType: 'json',
             data: {
@@ -120,25 +120,23 @@ function updateDinamicContent(){
 }
 
 function updateDoYangs(callback){
-    if (currentPath === '/') {
-        $.ajax({
-            url: '/get_data_doyangs',
-            method: 'GET',
-            dataType: 'json',
-            success: function (data) {
-                doYangsContent(data.ids, data.names);
-                callback();
-            },
-            error: function () {
-                console.error('Error fetching data.');
-            }
-        });
-    }
+    $.ajax({
+        url: '/api/get_data_doyangs',
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            doYangsContent(data.ids, data.names);
+            callback();
+        },
+        error: function () {
+            console.error('Error fetching data.');
+        }
+    });
 }
 
 function updateCategories(callback){
     $.ajax({
-        url: '/get_data_categories',
+        url: '/api/get_data_categories',
         method: 'GET',
         dataType: 'json',
         success: function (data) {        
@@ -154,7 +152,7 @@ function updateCategories(callback){
 
 function updateMatches(){
     $.ajax({
-        url: '/get_data_matches',
+        url: '/api/get_data_matches',
         method: 'GET',
         dataType: 'json',
         data: {
@@ -186,7 +184,7 @@ function updateMatches(){
 
 function updateCompetitors(callback){
     $.ajax({
-        url: '/get_data_competitors',
+        url: '/api/get_data_competitors',
         method: 'GET',
         dataType: 'json',
         data: {
@@ -209,7 +207,7 @@ function deleteDoYang(id){
         }
         $.ajax({
             type: "POST",
-            url: '/delete_doyang',
+            url: '/api/delete_doyang',
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(dataToSend),
             success: function (response, status, jqXHR) {
@@ -239,7 +237,7 @@ function deleteTournament(){
     if (confirm('Полностью очистить турнир?')) {
         $.ajax({
             type: "POST",
-            url: '/delete_tournament',
+            url: '/api/delete_tournament',
             contentType: 'application/json; charset=utf-8',
             success: function (response, status, jqXHR) {
                 window.location.href = response.redirect;
@@ -261,7 +259,7 @@ function searchCategory(){
 function opendJudges(){
     $.ajax({
         type: "POST",
-        url: '/open_judges',
+        url: '/api/open_judges',
         success: function (response, status, jqXHR) {
             window.location.href = response.redirect;
         },

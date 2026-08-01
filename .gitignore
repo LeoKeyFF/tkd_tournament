@@ -3,3 +3,4 @@
 *.db
 *.txt
 .DS_Store
+.env

@@ -1,0 +1,39 @@
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taekwon-Do</title>   
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='access.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+</head>
+<body>
+
+    <div id="login_section" class="login-section" style="display:flex; flex-direction: column; justify-content: center;">
+        Вход
+        <label for="choose_role">
+            Роль:
+        </label>
+        <select name="role" id="choose_role">
+            <option value="admin">Аминистратор</option>
+            <option value="pj">Президент площадки</option>
+        </select>
+        <label for="password_to_log_in">
+            Пароль:
+        </label>
+        <input
+            id="password_to_log_in"
+            type="password"
+            class="password-to-log-in"
+            placeholder="Введите пароль"
+            required
+        >
+        <button onclick="logIn()" class="button-secondary secondary-clickable" style="width: 60%;">Войти</button>
+
+        <p id="login_error"></p>
+    </div>
+
+
+</body>
+</html>

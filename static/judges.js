@@ -240,6 +240,7 @@ function judgesContentShowScores(ids, scores1, scores2, winners){
     $("#name_2_match").text(competitor2name)
 
     const table = $("#table_show_match")
+    table.empty()
     for (let i = 0; i < ids.length; i++){
         const tr = $('<tr>', {
         })
@@ -249,7 +250,7 @@ function judgesContentShowScores(ids, scores1, scores2, winners){
             $('<div>',{
                 class: 'score red',
                 style: 'align-items: center;',
-                text: scores1
+                text: scores1[i]
             })
         );
         const td2 = $('<td>', {
@@ -262,7 +263,7 @@ function judgesContentShowScores(ids, scores1, scores2, winners){
             $('<div>',{
                 class: 'score blue',
                 style: 'align-items: center;',
-                text: scores2
+                text: scores2[i]
             })
         );
         tr.append(td1)

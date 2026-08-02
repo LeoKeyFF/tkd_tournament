@@ -10,6 +10,7 @@
     <script src="{{ url_for('static', filename='jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='access.js') }}"></script>
     <script src="{{ url_for('static', filename='match.js') }}"></script>
+    <script src="/static/socket.io.min.js"></script>
 </head>
 <body>
     <script>
@@ -22,6 +23,10 @@
             // competitor1name = params.competitor1name;
             // competitor2id = params.competitor2id;
             // competitor2name = params.competitor2name;
+            const socket = io();
+            socket.on("update_scores_get", function(data) {
+                judgesContentShowScores(data.ids, data.scores1, data.scores2, data.winners);
+            });
             updateJudges();
         });
     </script>

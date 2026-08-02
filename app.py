@@ -14,9 +14,14 @@ import excel_filles
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
+import get_data_judges_logic
+
 load_dotenv()
 
+from flask_socketio import SocketIO
+
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
 
@@ -78,6 +83,21 @@ def role_required(required_role):
         return wrapped_view
 
     return decorator
+#----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
+@socketio.on("update_scores")
+def update_scores(data):
+    login = session.get("login", "")
+    score1 = data.get("score1")
+    score2 = data.get("score2")
+    print("Score 1: " + str(score1) + " Score2: " + str(score2) + " Login: " + str(login))
+    database.add_score(login, score1, score2)
+    doyang = database.get_doyang_of_judge(login)
+    print(get_data_judges_logic.get_data_judges_logic(doyang))
+    socketio.emit("update_scores_get", get_data_judges_logic.get_data_judges_logic(doyang))
+
+#----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 
 @app.context_processor
 def inject_current_role():
@@ -202,6 +222,7 @@ def login():
 
     # Сохраняем только роль, а не пароль.
     session["role"] = role
+    session["login"] = login
     print(role)
     if role == 'admin':
         return jsonify({
@@ -531,37 +552,7 @@ def get_data_matches():
 @app.route("/api/pj/get_data_judges", methods = ['GET'])
 def get_data_judges():
     doyang = request.args.get('doyang_id')
-    judges = database.get_from_judges(doyang)
-    print(doyang)
-    if len(judges) == 0:
-        data = {
-            'ids': [],
-            'logins': [],
-            'scores1': [],
-            'scores2': [],
-            'winners': []
-        }
-        return jsonify(data)
-    ids = []
-    logins = []
-    scores1 = []
-    scores2 = []
-    winners = []
-    for judge in judges:
-        ids.append(judge[0])
-        logins.append(judge[1])
-        scores1.append(judge[2])
-        scores2.append(judge[3])
-        winners.append(judge[4])
-    data = {
-        'ids': ids,
-        'logins': logins,
-        'scores1': scores1,
-        'scores2': scores2, 
-        'winners': winners
-    }
-    print(logins, scores1)
-    return jsonify(data)
+    return jsonify(get_data_judges_logic.get_data_judges_logic(doyang))
 
 @app.route("/api/get_all_judges", methods = ['GET'])
 @role_required("admin")
@@ -676,5 +667,6 @@ def open_judges():
 
 
 if __name__ == "__main__":
-    print('hash:' + generate_password_hash("123", method="pbkdf2:sha256"))
-    app.run(debug=False, host='0.0.0.0', port=5001)
+    # print('hash:' + generate_password_hash("123", method="pbkdf2:sha256"))
+    # app.run(debug=False, host='0.0.0.0', port=5001)
+    socketio.run(app, debug=False, host='0.0.0.0', port=5001)

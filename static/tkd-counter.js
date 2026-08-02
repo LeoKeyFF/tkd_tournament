@@ -20,7 +20,10 @@ function updateScore(competitor, score_change){
         score_blue_history.push(score_blue)
         $('#score2').text(score_blue);
     }
-    
+    socket.emit("update_scores", {
+        score1: score_red,
+        score2: score_blue
+    });
 }
 
 function returnScore(competitor){

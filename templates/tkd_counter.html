@@ -9,8 +9,12 @@
     <script src="{{ url_for('static', filename='tkd-counter.js') }}"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+    <script src="/static/socket.io.min.js"></script>
 </head>
 <body>
+    <script>
+        const socket = io();
+    </script>
     <button class="button-primary primary-clickable menu-button" id="menuToggle" onclick="openMenu()">
         <span></span>
         <span></span>

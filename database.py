@@ -367,7 +367,7 @@ def get_from_judges(doyang_id):
 
     judges = cursor.execute(f"""
         SELECT 
-            JudgeID, Login, Competitor1Score, Competitor1Score, Winner 
+            JudgeID, Login, Competitor1Score, Competitor2Score, Winner 
         FROM 
             Judges 
         WHERE 
@@ -685,3 +685,34 @@ def get_playing_match(doyang_id):
     connection.close() 
 
     return match
+
+def add_score(login, score1, score2):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    cursor.execute(f"""
+        UPDATE Judges 
+        SET 
+            Competitor1Score = {score1},
+            Competitor2Score = {score2}
+        WHERE
+            Login = '{login}'
+    """)
+
+    connection.commit()
+    connection.close() 
+
+def get_doyang_of_judge(login):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    doyang = cursor.execute(f"""
+        SELECT DoYangID
+        FROM Judges
+        WHERE Login = '{login}'
+    """).fetchall()[0][0]
+
+    connection.commit()
+    connection.close() 
+
+    return doyang

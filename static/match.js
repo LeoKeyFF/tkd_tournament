@@ -20,3 +20,23 @@ function convertMatches(matches_){
     
     return matches
 }
+
+function getPlayingMatch(doyang_id){
+    $.ajax({
+        url: '/api/get_playing_match',
+        method: 'GET',
+        dataType: 'json',
+        data: {
+            doyang_id: doyang_id,
+        },
+        success: function (data) {
+            match_id = data.match_id
+            competitor1id = data.competitor_1_id
+            competitor1name = data.competitor_1_name
+            competitor2id = data.competitor_2_id
+            competitor2name = data.competitor_2_name
+        },
+        error: function () {
+        }
+    });
+}

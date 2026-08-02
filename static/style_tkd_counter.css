@@ -57,19 +57,15 @@ body{
     width: 100%;
 }
 .tkd-counter-table tr{
-    width: 100%;
+    /* width: 100%; */
     text-align: center;
 }
-.tkd-counter-table td{
-    width: 100%;
-    justify-content: center;
-    text-align: center;
-}
-.tkd-counter-table th{
+/* .tkd-counter-table td{
     width: 100%;
     justify-content: center;
     text-align: center;
-}
+} */
+
 .tkd-counter-table thead {
     height: 120px;
 }

@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from flask import Flask, render_template, request, redirect, url_for, jsonify, make_response, session, send_from_directory, abort
 
 import json
@@ -135,6 +137,11 @@ def login_screen():
 @role_required("judge")
 def home_tkd_counter():
     return render_template('tkd_counter.html')
+
+@app.route("/home_match")
+@role_required("pj")
+def home_match():
+    return render_template('home_match.html')
 #----------------------------------------------------------------------------------------
 
 
@@ -142,7 +149,8 @@ def home_tkd_counter():
 def auth_status():
     role = request.args.get('role')
     print(role, get_current_role())
-    if role == get_current_role():
+
+    if ROLE_LEVELS[role] <= ROLE_LEVELS[get_current_role()]:
         return jsonify({
             "success": True,
             "role": get_current_role()
@@ -356,6 +364,33 @@ def add_doyang_to_categories():
     database.add_doyang_to_categories(category_ids, doyang_id)
     return jsonify(success=True)
     # return redirect(url_for('home'))
+
+@app.route("/api/play_match", methods = ['POST'])
+@role_required("pj")
+def play_match():
+    data = request.get_json()
+    match_id = data.get('match_id')
+    # competitor1id = data.get('competitor1id')
+    # competitor1name = data.get('competitor1name')
+    # competitor2id = data.get('competitor2id')
+    # competitor2name = data.get('competitor2name')
+
+    doyang_id = database.play_match(match_id)
+    data_to_send = {
+        'doyang_id': doyang_id
+        # ,
+        # 'competitor1id': competitor1id,
+        # 'competitor1name': competitor1name,
+        # 'competitor2id': competitor2id,
+        # 'competitor2name': competitor2name
+    }
+    
+    base_url = url_for('home_match')
+    redirect_url = f"{base_url}?{urlencode(data_to_send)}"
+    return jsonify({
+        'success': True,
+        'redirect': redirect_url
+    })  
 #---------------------------------------------------------------------------------------
 
 @app.route("/api/get_data_doyangs", methods = ['GET'])
@@ -493,10 +528,11 @@ def get_data_matches():
     }
     return jsonify(data)
 
-@app.route("/pj/get_data_judges", methods = ['GET'])
+@app.route("/api/pj/get_data_judges", methods = ['GET'])
 def get_data_judges():
     doyang = request.args.get('doyang_id')
     judges = database.get_from_judges(doyang)
+    print(doyang)
     if len(judges) == 0:
         data = {
             'ids': [],
@@ -524,6 +560,7 @@ def get_data_judges():
         'scores2': scores2, 
         'winners': winners
     }
+    print(logins, scores1)
     return jsonify(data)
 
 @app.route("/api/get_all_judges", methods = ['GET'])
@@ -557,6 +594,25 @@ def get_all_judges():
         'roles': roles,
         'doyangs': doyangs,
         'doyangs_names': doyangs_names
+    }
+    return jsonify(data)
+
+@app.route("/api/get_playing_match", methods = ['GET'])
+def get_playing_match():
+    doyang_id = request.args.get('doyang_id')
+    match = database.get_playing_match(doyang_id)[0]
+    print(match)
+    match_id = match[0]
+    competitor_1_id = match[3]
+    competitor_2_id = match[4]
+    competitor_1_name = match[-2]
+    competitor_2_name = match[-1]
+    data = {
+        'match_id': match_id,
+        'competitor_1_id': competitor_1_id,
+        'competitor_2_id': competitor_2_id,
+        'competitor_1_name': competitor_1_name,
+        'competitor_2_name': competitor_2_name
     }
     return jsonify(data)
 

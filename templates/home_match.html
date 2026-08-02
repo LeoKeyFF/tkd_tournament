@@ -1,0 +1,42 @@
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taekwon-Do</title>   
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_tkd_counter.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='judges.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='access.js') }}"></script>
+    <script src="{{ url_for('static', filename='match.js') }}"></script>
+</head>
+<body>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            checkAccess("pj");
+            const params = getUrlParams();
+            current_doyang = params.doyang_id;
+            getPlayingMatch(current_doyang);
+            // competitor1id = params.competitor1id;
+            // competitor1name = params.competitor1name;
+            // competitor2id = params.competitor2id;
+            // competitor2name = params.competitor2name;
+            updateJudges();
+        });
+    </script>
+    <table class="table-row tkd-counter-table" id="table_show_match">
+        <thead >
+            <tr>
+                <th colspan="10">
+                    <div class="score red" id="name_1_match"></div>
+                </th>
+                <th colspan="10">
+                    <div class="score blue" id="name_2_match"></div>
+                </th>
+            </tr>
+        </thead>
+
+    </table>
+</body>
+</html>

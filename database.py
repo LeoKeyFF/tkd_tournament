@@ -34,8 +34,7 @@ def create_tables():
     cursor.execute(
         f"CREATE TABLE IF NOT EXISTS DoYangs ( DoYangID INTEGER PRIMARY KEY," 
           "Name varchar(255),"
-          "PlayingCategoryID INT"
-          
+          "PlayingMatchID INT"
         ")"
     )
     cursor.execute(
@@ -108,7 +107,7 @@ def add_doyang(name):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
 
-    message = f"INSERT INTO DoYangs (Name, PlayingCategoryID) VALUES ('{name}', 0)"
+    message = f"INSERT INTO DoYangs (Name, PlayingMatchID) VALUES ('{name}', 0)"
     cursor.execute(message)
 
     connection.commit()
@@ -638,3 +637,51 @@ def get_judge_password(login):
 
     else:
         return "", ""
+
+def play_match(match_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    cursor.execute(f"""
+        UPDATE DoYangs
+        SET PlayingMatchID = {match_id}
+        WHERE DoYangID = (
+            SELECT c.DoYangID
+            FROM Matches m
+            JOIN Categories c ON m.CategoryID = c.CategoryID
+            WHERE m.MatchID = {match_id}
+        )
+    """).fetchall()
+
+    doyang = cursor.execute(f"""
+        SELECT c.DoYangID
+        FROM Matches m
+        JOIN Categories c ON m.CategoryID = c.CategoryID
+        WHERE m.MatchID = {match_id}
+    """).fetchall()[0][0]
+
+    connection.commit()
+    connection.close() 
+
+    return doyang
+
+def get_playing_match(doyang_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    match = cursor.execute(f"""
+        SELECT 
+            m.*,
+            c1.Name AS Competitor1Name,
+            c2.Name AS Competitor2Name
+        FROM DoYangs d
+        JOIN Matches m ON d.PlayingMatchID = m.MatchID
+        LEFT JOIN Competitors c1 ON m.Competitor1ID = c1.CompetitorID
+        LEFT JOIN Competitors c2 ON m.Competitor2ID = c2.CompetitorID
+        WHERE d.DoYangID = {doyang_id}
+    """).fetchall()
+
+    connection.commit()
+    connection.close() 
+
+    return match

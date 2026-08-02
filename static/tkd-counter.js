@@ -41,17 +41,6 @@ function returnScore(competitor){
 
 }
 
-// function openMenu() {
-//     const body = $('body');
-//     body.toggleClass('menu-open');
-
-//     $(document).on('keydown', function(event) {
-//         if (event.key === 'Escape' && body.hasClass('menu-open')) {
-//             body.toggleClass('menu-open');
-//         }
-//     });
-// };
-
 function cleenScore(){
     score_blue = 24
     score_red = 24

@@ -234,3 +234,50 @@ function uploadJudges() {
         }
     });
 }
+
+function judgesContentShowScores(ids, scores1, scores2, winners){
+    $("#name_1_match").text(competitor1name)
+    $("#name_2_match").text(competitor2name)
+
+    const table = $("#table_show_match")
+    for (let i = 0; i < ids.length; i++){
+        const tr = $('<tr>', {
+        })
+        const td1 = $('<td>', {
+            colspan: 9
+        }).append(
+            $('<div>',{
+                class: 'score red',
+                style: 'align-items: center;',
+                text: scores1
+            })
+        );
+        const td2 = $('<td>', {
+            colspan: 2,
+            text: i+1
+        })
+        const td3 = $('<td>', {
+            colspan: 9
+        }).append(
+            $('<div>',{
+                class: 'score blue',
+                style: 'align-items: center;',
+                text: scores2
+            })
+        );
+        tr.append(td1)
+        tr.append(td2)
+        tr.append(td3)
+        table.append(tr)
+    }
+}
+
+
+function getUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    const result = {};
+    for (const [key, value] of params) {
+        result[key] = value;
+    }
+    return result;
+}

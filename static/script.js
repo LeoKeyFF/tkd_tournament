@@ -100,23 +100,6 @@ function createGrid(){
 
 function updateDinamicContent(){
     updateMatches()
-    
-    if (currentPath === '/pj') {
-        $.ajax({
-            url: '/api/pj/get_data_judges',
-            method: 'GET',
-            dataType: 'json',
-            data: {
-                doyang_id: current_doyang,
-            },
-            success: function (data) {        
-                judgesContent(data.ids, data.logins, data.scores1, data.scores2, data.winners)
-            },
-            error: function () {
-                console.error('Error fetching data.');
-            }
-        });        
-    }
 }
 
 function updateDoYangs(callback, role = "user"){
@@ -205,6 +188,24 @@ function updateCompetitors(callback){
     });
 }
 
+function updateJudges(){
+    $.ajax({
+        url: '/api/pj/get_data_judges',
+        method: 'GET',
+        dataType: 'json',
+        data: {
+            doyang_id: current_doyang,
+        },
+        success: function (data) {        
+            judgesContent(data.ids, data.logins, data.scores1, data.scores2, data.winners)
+            judgesContentShowScores(data.ids, data.scores1, data.scores2, data.winners)
+        },
+        error: function () {
+            console.error('Error fetching data.');
+        }
+    });         
+}
+
 function deleteDoYang(id){
     if (confirm('Удалить площадку?')) {
         const dataToSend = {
@@ -266,6 +267,33 @@ function opendJudges(){
     $.ajax({
         type: "POST",
         url: '/api/open_judges',
+        success: function (response, status, jqXHR) {
+            window.location.href = response.redirect;
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+        },
+        complete: function (jqXHR, textStatus) {
+        }
+    });
+}
+
+function playMatch(){
+    const dialog = $("#chooseWinner")[0];
+    dialog.close();
+
+    const dataToSend = {
+        match_id: match_id
+        // ,
+        // competitor1id: competitor1id,
+        // competitor1name: competitor1name,
+        // competitor2id: competitor2id,
+        // competitor2name: competitor2name,
+    }
+    $.ajax({
+        type: "POST",
+        url: '/api/play_match',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(dataToSend),
         success: function (response, status, jqXHR) {
             window.location.href = response.redirect;
         },

@@ -199,6 +199,12 @@ function updateJudges(){
         success: function (data) {        
             judgesContent(data.ids, data.logins, data.scores1, data.scores2, data.winners)
             judgesContentShowScores(data.ids, data.scores1, data.scores2, data.winners)
+            score1_total = 0
+            score2_total = 0
+            for (let i = 0; i < data.ids.length; i++){
+                score1_total += parseFloat(data.scores1[i]) || 0
+                score2_total +=  parseFloat(data.scores2[i]) || 0
+            }
         },
         error: function () {
             console.error('Error fetching data.');
@@ -302,4 +308,8 @@ function playMatch(){
         complete: function (jqXHR, textStatus) {
         }
     });
+}
+
+function pageBack(){
+    window.history.back();
 }

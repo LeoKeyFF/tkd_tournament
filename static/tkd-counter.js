@@ -20,10 +20,7 @@ function updateScore(competitor, score_change){
         score_blue_history.push(score_blue)
         $('#score2').text(score_blue);
     }
-    socket.emit("update_scores", {
-        score1: score_red,
-        score2: score_blue
-    });
+    socketUpdate()
 }
 
 function returnScore(competitor){
@@ -41,6 +38,7 @@ function returnScore(competitor){
             $('#score2').text(score_blue);
         }
     }
+    socketUpdate()
 
 }
 
@@ -55,4 +53,13 @@ function cleenScore(){
     $('#score2').text(score_blue);
 
     $('body').toggleClass('menu-open');
+
+    socketUpdate()
+}
+
+function socketUpdate(){
+    socket.emit("update_scores", {
+        score1: score_red,
+        score2: score_blue
+    });
 }

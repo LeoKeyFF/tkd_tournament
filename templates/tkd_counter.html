@@ -13,6 +13,7 @@
 </head>
 <body>
     <script>
+        checkAccess("judge");
         const socket = io();
     </script>
     <button class="button-primary primary-clickable menu-button" id="menuToggle" onclick="openMenu()">
@@ -23,6 +24,9 @@
     <aside class="side-menu" id="sideMenu">
         <button class="button-primary primary-clickable reboot" onclick="cleenScore()">
             Сбросить
+        </button>
+        <button class="button-primary primary-clickable reboot" onclick="logOut()">
+            Выйти
         </button>
     </aside> 
 

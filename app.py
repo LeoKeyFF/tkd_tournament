@@ -18,7 +18,7 @@ import get_data_judges_logic
 
 load_dotenv()
 
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, join_room
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -54,6 +54,11 @@ def get_current_role():
 
     return role
 
+def get_current_login():
+    login = session.get("login", "")
+
+    return login
+
 def role_required(required_role):
     """
     Декоратор проверки минимально необходимой роли.
@@ -85,6 +90,17 @@ def role_required(required_role):
     return decorator
 #----------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------
+@socketio.on("join_doyang")
+def join_doyang(data):
+    try:
+        doyang_id = int(data.get("doyang_id"))
+    except (TypeError, ValueError):
+        return
+
+    room_name = f"doyang_{doyang_id}"
+
+    join_room(room_name)
+
 @socketio.on("update_scores")
 def update_scores(data):
     login = session.get("login", "")
@@ -94,7 +110,11 @@ def update_scores(data):
     database.add_score(login, score1, score2)
     doyang = database.get_doyang_of_judge(login)
     print(get_data_judges_logic.get_data_judges_logic(doyang))
-    socketio.emit("update_scores_get", get_data_judges_logic.get_data_judges_logic(doyang))
+    socketio.emit(
+        "update_scores_get", 
+        get_data_judges_logic.get_data_judges_logic(doyang),
+        to=f"doyang_{doyang}"
+        )
 
 #----------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------
@@ -129,6 +149,7 @@ def home_pj():
 
 @app.route("/admin")
 def home_admin():
+    print(get_current_role())
     if get_current_role() != 'admin':
         return redirect(url_for('login_screen'))
     
@@ -154,7 +175,7 @@ def login_screen():
     return render_template('login_screen.html')
 
 @app.route("/tkd_counter")
-@role_required("judge")
+# @role_required("judge")
 def home_tkd_counter():
     return render_template('tkd_counter.html')
 
@@ -170,6 +191,14 @@ def auth_status():
     role = request.args.get('role')
     print(role, get_current_role())
 
+    # if get_current_login() == "" and role != "admin" and role == "pj":
+    #     print('error')
+    #     return jsonify({
+    #         "success": False,
+    #         "role": get_current_role(),
+    #         "redirect": url_for('login_screen')
+    #     })
+    
     if ROLE_LEVELS[role] <= ROLE_LEVELS[get_current_role()]:
         return jsonify({
             "success": True,
@@ -186,6 +215,7 @@ def auth_status():
 
 @app.route("/api/auth/login", methods=["POST"])
 def login():
+    print('HI U Hi')
     data = request.get_json(silent=True)
 
     if not data:
@@ -197,7 +227,7 @@ def login():
     role = data.get("role")
     password = data.get("password", "")
     login = data.get("login", "")
-
+    print(role)
     if role not in ("judge", "admin"):
         return jsonify({
             "success": False,
@@ -223,7 +253,6 @@ def login():
     # Сохраняем только роль, а не пароль.
     session["role"] = role
     session["login"] = login
-    print(role)
     if role == 'admin':
         return jsonify({
             "success": True,
@@ -664,7 +693,12 @@ def open_judges():
         'redirect': url_for('judges_screen')
     })  
 
-
+@app.route("/page_back", methods = ['POST'])
+def page_back():
+    return jsonify({
+        'success': True,
+        'redirect': request.referrer
+    })  
 
 if __name__ == "__main__":
     # print('hash:' + generate_password_hash("123", method="pbkdf2:sha256"))

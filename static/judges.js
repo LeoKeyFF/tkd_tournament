@@ -240,7 +240,8 @@ function judgesContentShowScores(ids, scores1, scores2, winners){
     $("#name_2_match").text(competitor2name)
 
     const table = $("#table_show_match")
-    table.empty()
+    const tbody = table.find("tbody");
+    tbody.empty()
     for (let i = 0; i < ids.length; i++){
         const tr = $('<tr>', {
         })
@@ -269,10 +270,9 @@ function judgesContentShowScores(ids, scores1, scores2, winners){
         tr.append(td1)
         tr.append(td2)
         tr.append(td3)
-        table.append(tr)
+        tbody.append(tr)
     }
 }
-
 
 function getUrlParams() {
     const params = new URLSearchParams(window.location.search);

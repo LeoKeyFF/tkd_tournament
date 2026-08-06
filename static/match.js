@@ -1,3 +1,6 @@
+let score1_total = 0.0
+let score2_total = 0.0
+
 class Match {
     constructor(category, round, competitor1id, competitor1name, competitor2id, competitor2name, winner, matchId, row){
         this.category = category;
@@ -37,6 +40,35 @@ function getPlayingMatch(doyang_id){
             competitor2name = data.competitor_2_name
         },
         error: function () {
+        }
+    });
+}
+
+function endMatch(){
+    let winner
+    if (score1_total > score2_total)
+        winner = competitor1id;
+    else
+        winner = competitor2id;
+
+    const dataToSend = { 
+        winner: winner,
+        match_id: match_id
+    };
+    $.ajax({
+        type: "POST",
+        url: '/api/set_winner',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(dataToSend),
+        dataType: 'json',
+        success: function (response, status, jqXHR) {
+            updateMatches();
+            pageBack();
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            // Error handling
+        },
+        complete: function (jqXHR, textStatus) {
         }
     });
 }

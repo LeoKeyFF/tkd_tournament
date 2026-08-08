@@ -367,14 +367,27 @@ def get_from_judges(doyang_id):
 
     judges = cursor.execute(f"""
         SELECT 
-            JudgeID, Login, Competitor1Score, Competitor2Score, Winner 
+            j.JudgeID, j.Login, j.Competitor1Score, j.Competitor2Score, j.Winner
         FROM 
-            Judges 
+            Judges j
+        JOIN
+            DoYangs d ON j.DoYangID = d.DoYangID
+        JOIN
+            Matches m ON d.PlayingMatchID = m.MatchID
+        JOIN
+            Categories c ON m.CategoryID = c.CategoryID
         WHERE 
-            DoYangID = {doyang_id}
+            j.DoYangID = {doyang_id}
+        AND (
+            (c.Type = 'тыль' AND j.Role IN ('referee', 'judge'))
+            OR 
+            (c.Type = 'матсоги' AND j.Role = 'judge')
+        )
     """)
 
     judges = judges.fetchall()
+
+    print(judges)
 
     connection.commit()
     connection.close()
@@ -681,12 +694,21 @@ def get_playing_match(doyang_id):
         WHERE d.DoYangID = {doyang_id}
     """).fetchall()
 
+    type = cursor.execute(f"""
+        SELECT c.Type
+        FROM Matches m
+        JOIN Categories c ON m.CategoryID = c.CategoryID
+        WHERE m.MatchID = {match[0][0]}
+    """).fetchall()[0][0]
+
+    print(type)
+
     connection.commit()
     connection.close() 
 
-    return match
+    return match, type
 
-def add_score(login, score1, score2):
+def add_score(login, score1, score2, winner):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
 
@@ -694,7 +716,8 @@ def add_score(login, score1, score2):
         UPDATE Judges 
         SET 
             Competitor1Score = {score1},
-            Competitor2Score = {score2}
+            Competitor2Score = {score2},
+            Winner = {winner}
         WHERE
             Login = '{login}'
     """)
@@ -716,3 +739,16 @@ def get_doyang_of_judge(login):
     connection.close() 
 
     return doyang
+
+def end_match(match_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    cursor.execute(f"""
+        UPDATE DoYangs
+        SET PlayingMatchID = 0
+        WHERE PlayingMatchID = {match_id}
+    """)
+
+    connection.commit()
+    connection.close() 

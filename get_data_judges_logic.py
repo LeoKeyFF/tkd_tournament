@@ -14,7 +14,7 @@ def get_data_judges_logic(doyang):
             'scores2': [],
             'winners': []
         }
-        return jsonify(data)
+        return data
     ids = []
     logins = []
     scores1 = []

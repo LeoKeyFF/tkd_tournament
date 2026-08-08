@@ -198,13 +198,8 @@ function updateJudges(){
         },
         success: function (data) {        
             judgesContent(data.ids, data.logins, data.scores1, data.scores2, data.winners)
-            judgesContentShowScores(data.ids, data.scores1, data.scores2, data.winners)
-            score1_total = 0
-            score2_total = 0
-            for (let i = 0; i < data.ids.length; i++){
-                score1_total += parseFloat(data.scores1[i]) || 0
-                score2_total +=  parseFloat(data.scores2[i]) || 0
-            }
+            judgesContentShowScores(data.ids, data.logins, data.scores1, data.scores2, data.winners)
+            countWinner(data.winners)
         },
         error: function () {
             console.error('Error fetching data.');
@@ -295,15 +290,25 @@ function playMatch(){
         // competitor2id: competitor2id,
         // competitor2name: competitor2name,
     }
+    const newTab = window.open('', '_blank');
+    if (newTab) {
+        newTab.document.write('<h1>Загрузка...</h1>');
+    }
     $.ajax({
         type: "POST",
         url: '/api/play_match',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(dataToSend),
         success: function (response, status, jqXHR) {
-            window.location.href = response.redirect;
+            if (newTab) {
+                newTab.location.href = response.redirect; 
+            }
+            // window.location.href = response.redirect;
         },
         error: function (jqXHR, textStatus, errorThrown) {
+            if (newTab) {
+                newTab.close(); 
+            }
         },
         complete: function (jqXHR, textStatus) {
         }

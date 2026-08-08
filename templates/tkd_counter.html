@@ -25,6 +25,9 @@
         <button class="button-primary primary-clickable reboot" onclick="cleenScore()">
             Сбросить
         </button>
+        <button class="button-primary primary-clickable reboot" id="change_counter" onclick="changeCounter()">
+            Матсоги
+        </button>
         <button class="button-primary primary-clickable reboot" onclick="logOut()">
             Выйти
         </button>
@@ -45,26 +48,26 @@
         </thead>
         <tr>
             <td>
-                <button class="button-score red" onclick="updateScore(1, -24)">0</button>
+                <button class="button-score red" onclick="updateScore(1, -24)" id="score_1_1">0</button>
             </td>
             <td>
-                <button class="button-score blue" onclick="updateScore(2, -24)">0</button>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <button class="button-score red" onclick="updateScore(1, -0.5)">-0.5</button>
-            </td>
-            <td>
-                <button class="button-score blue" onclick="updateScore(2, -0.5)">-0.5</button>
+                <button class="button-score blue" onclick="updateScore(2, -24)" id="score_2_1">0</button>
             </td>
         </tr>
         <tr>
             <td>
-                <button class="button-score red" onclick="updateScore(1, -0.3)">-0.3</button>
+                <button class="button-score red" onclick="updateScore(1, -0.5)" id="score_1_2">-0.5</button>
             </td>
             <td>
-                <button class="button-score blue" onclick="updateScore(2, -0.3)">-0.3</button>
+                <button class="button-score blue" onclick="updateScore(2, -0.5)" id="score_2_2">-0.5</button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button class="button-score red" onclick="updateScore(1, -0.3)" id="score_1_3">-0.3</button>
+            </td>
+            <td>
+                <button class="button-score blue" onclick="updateScore(2, -0.3)" id="score_2_3">-0.3</button>
             </td>
         </tr>
         <tr>

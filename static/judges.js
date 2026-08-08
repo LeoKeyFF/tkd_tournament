@@ -235,10 +235,7 @@ function uploadJudges() {
     });
 }
 
-function judgesContentShowScores(ids, scores1, scores2, winners){
-    $("#name_1_match").text(competitor1name)
-    $("#name_2_match").text(competitor2name)
-
+function judgesContentShowScores(ids, logins, scores1, scores2, winners){
     const table = $("#table_show_match")
     const tbody = table.find("tbody");
     tbody.empty()
@@ -256,7 +253,7 @@ function judgesContentShowScores(ids, scores1, scores2, winners){
         );
         const td2 = $('<td>', {
             colspan: 2,
-            text: i+1
+            text: logins[i]
         })
         const td3 = $('<td>', {
             colspan: 9

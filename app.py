@@ -106,15 +106,27 @@ def update_scores(data):
     login = session.get("login", "")
     score1 = data.get("score1")
     score2 = data.get("score2")
-    print("Score 1: " + str(score1) + " Score2: " + str(score2) + " Login: " + str(login))
-    database.add_score(login, score1, score2)
+    if score1 > score2:
+        winner = 1
+    elif score1 < score2:
+        winner = 2
+    else:
+        winner = 0
+    database.add_score(login, score1, score2, winner)
     doyang = database.get_doyang_of_judge(login)
-    print(get_data_judges_logic.get_data_judges_logic(doyang))
     socketio.emit(
         "update_scores_get", 
         get_data_judges_logic.get_data_judges_logic(doyang),
         to=f"doyang_{doyang}"
-        )
+    )
+
+@socketio.on("connect")
+def handle_connect():
+    print("SOCKET: подключился")
+
+@socketio.on("disconnect")
+def handle_disconnect():
+    print("SOCKET: отключился")
 
 #----------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------
@@ -441,6 +453,16 @@ def play_match():
         'success': True,
         'redirect': redirect_url
     })  
+
+@app.route("/api/end_match", methods = ['POST'])
+@role_required("pj")
+def end_match():
+    data = request.get_json()
+    match_id = data.get('match_id')
+    database.end_match(match_id)
+    return jsonify({
+        'success': True
+    })  
 #---------------------------------------------------------------------------------------
 
 @app.route("/api/get_data_doyangs", methods = ['GET'])
@@ -620,8 +642,9 @@ def get_all_judges():
 @app.route("/api/get_playing_match", methods = ['GET'])
 def get_playing_match():
     doyang_id = request.args.get('doyang_id')
-    match = database.get_playing_match(doyang_id)[0]
+    match, type = database.get_playing_match(doyang_id)
     print(match)
+    match = match[0]
     match_id = match[0]
     competitor_1_id = match[3]
     competitor_2_id = match[4]
@@ -632,7 +655,8 @@ def get_playing_match():
         'competitor_1_id': competitor_1_id,
         'competitor_2_id': competitor_2_id,
         'competitor_1_name': competitor_1_name,
-        'competitor_2_name': competitor_2_name
+        'competitor_2_name': competitor_2_name,
+        'type': type
     }
     return jsonify(data)
 

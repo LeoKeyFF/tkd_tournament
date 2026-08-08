@@ -26,15 +26,15 @@
                 });
             });
             socket.on("update_scores_get", function(data) {
-                judgesContentShowScores(data.ids, data.scores1, data.scores2, data.winners);
-                score1_total = 0
-                score2_total = 0
-                for (let i = 0; i < data.ids.length; i++){
-                    score1_total += parseFloat(data.scores1[i]) || 0
-                    score2_total +=  parseFloat(data.scores2[i]) || 0
-                }
+                judgesContentShowScores(data.ids, data.logins, data.scores1, data.scores2, data.winners);
+                countWinner(data.winners);
             });
             updateJudges();
+        });
+        window.addEventListener("pageshow", function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
         });
     </script>
     <table class="table-row tkd-counter-table" id="table_show_match">

@@ -1,5 +1,6 @@
-let score1_total = 0.0
-let score2_total = 0.0
+let winner1_total = 0
+let winner2_total = 0
+let type_match = ''
 
 class Match {
     constructor(category, round, competitor1id, competitor1name, competitor2id, competitor2name, winner, matchId, row){
@@ -38,6 +39,10 @@ function getPlayingMatch(doyang_id){
             competitor1name = data.competitor_1_name
             competitor2id = data.competitor_2_id
             competitor2name = data.competitor_2_name
+            type_match = data.type
+
+            $("#name_1_match").text(competitor1name)
+            $("#name_2_match").text(competitor2name)
         },
         error: function () {
         }
@@ -45,11 +50,50 @@ function getPlayingMatch(doyang_id){
 }
 
 function endMatch(){
+    const dataToSendEnd = { 
+        match_id: match_id
+    };
+    $.ajax({
+        type: "POST",
+        url: '/api/end_match',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(dataToSendEnd),
+        dataType: 'json',
+        success: function (response, status, jqXHR) {
+            endMatchLogic()
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+        },
+        complete: function (jqXHR, textStatus) {
+        }
+    });
+}
+
+function countWinner(winners){
+    winner1_total = 0
+    winner2_total = 0
+    for (let i = 0; i < winners.length; i++){
+        if (winners[i] == 1){
+            winner1_total += 1
+        }
+        else if(winners[i] == 2){
+            winner2_total += 1
+        }
+    }
+}
+
+function endMatchLogic(){
     let winner
-    if (score1_total > score2_total)
+    if (winner1_total > winner2_total){
         winner = competitor1id;
-    else
+    }
+    else if (winner1_total < winner2_total){
         winner = competitor2id;
+    }
+    else{
+        pageBack();
+        return;
+    }
 
     const dataToSend = { 
         winner: winner,
@@ -62,7 +106,6 @@ function endMatch(){
         data: JSON.stringify(dataToSend),
         dataType: 'json',
         success: function (response, status, jqXHR) {
-            updateMatches();
             pageBack();
         },
         error: function (jqXHR, textStatus, errorThrown) {

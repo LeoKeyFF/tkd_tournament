@@ -187,6 +187,9 @@ function showPage(page){
 }
 
 function backPage(){
+    if (currentPath == '/pj' && current_page <= 1) {
+        return
+    }
     if (current_page > 0){
         showPage(current_page - 1)
     }

@@ -279,3 +279,17 @@ function getUrlParams() {
     }
     return result;
 }
+
+function getDoYangOfJudge(){
+    $.ajax({
+        url: '/api/get_doyang_of_judge',
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            current_doyang = data.doyang
+        },
+        error: function () {
+            console.error('Error fetching data.');
+        }
+    });
+}

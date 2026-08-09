@@ -8,35 +8,161 @@
     <script src="{{ url_for('static', filename='content.js') }}"></script>
     <script src="{{ url_for('static', filename='match.js') }}"></script>
     <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='judges.js') }}"></script>
+    {% if user == 'admin' or user == 'pj' %}
+        <script src="{{ url_for('static', filename='access.js') }}"></script>
+    {% endif %}
 </head>
 <body>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            showPage(0);
-            updateDoYangs(function(){
+            if (currentPath === '/admin'){
+                checkAccess("admin");
+
                 showPage(0);
-            });
-            updateCategories();
-            updateCompetitors();
+                updateDoYangs(function(){
+                    showPage(0);
+                });
+            }
+            else if (currentPath === '/pj'){
+                checkAccess("pj");
+                getDoYangOfJudge();
+
+                showPage(1);
+                updateCategories(function(){
+                    showPage(1);
+                });
+            }
+            else {
+                showPage(0);
+                updateDoYangs(function(){
+                    showPage(0);
+                });
+            }
+
+            updateCategories(function(){});
+            updateCompetitors(function(){});
             updateMatches();
             updateDinamicContent();
             setInterval(function() {updateDinamicContent();}, 5000);
         });
+        window.addEventListener("pageshow", function (event) {
+            if (event.persisted) {
+                updateMatches();
+            }
+        });
     </script>
+<!-- --------------------------------------------------------------- Menu Button:-->
+    {% if user == 'admin' or user == 'pj' %}
+        <button class="button-primary primary-clickable menu-button" id="menuToggle" onclick="openMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <aside class="side-menu" id="sideMenu">
+            <button class="button-primary primary-clickable reboot" onclick="logOut()">
+                Выйти
+            </button>
+            {% if user == 'admin' %}
+                <button class="button-primary primary-clickable reboot" onclick="opendJudges()">
+                    Управление судьями
+                </button>
+                <button class="button-primary primary-clickable reboot" onclick="deleteTournament()">
+                    Удалить турнир
+                </button>
+            {% endif %}
+        </aside> 
+        <div class="overlay" id="overlay"></div>
 
+    <!-- --------------------------------------------------------------- Dialogs:-->
+        <dialog id="chooseWinner" aria-modal="true" >
+            <div class="dialog-div">
+                <table class="table-row">
+                    <tr>
+                        <td colspan="2" style="text-align: center; font-size: 1.1rem; font-weight: 600;">Победитель:</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button class="button-secondary secondary-clickable" style="width: 100%;" 
+                            type="button" onclick="closeChooseWinner(0)">
+                                <p id ="dialogCompetitor1"></p>
+                            </button>
+                        </td>
+                        <td>
+                            <button class="button-secondary secondary-clickable" style="width: 100%;" 
+                            type="button" onclick="closeChooseWinner(1)" >
+                                <p id ="dialogCompetitor2"></p>
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+                <hr class="dotted-divider">
+                <button class="button-secondary secondary-clickable" style="width: 100%;" 
+                type="button" onclick="playMatch()">
+                    Запустить матч
+                </button>
+            </div>
+
+        </dialog>
+
+        <dialog id="cancelWinner" aria-modal="true" >
+            <div class="dialog-div">
+                <table class="table-row">
+                    <tr>
+                        <td colspan="2" style="text-align: center; font-size: 1.1rem; font-weight: 600;">Отменить победу?</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button class="button-secondary secondary-clickable" style="width: 100%;" 
+                            type="button" onclick="closeCancelWinner()">
+                                Нет
+                            </button>
+                        </td>
+                        <td>
+                            <button class="button-secondary secondary-clickable" style="width: 100%;" 
+                            type="button" onclick="cancelWinner()" >
+                                Да
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </dialog>
+
+    {% endif %}
 <!-- --------------------------------------------------------------- Path:-->
+    
     <div class="path" id="path">
             <button class="button-primary back primary-clickable" onclick="backPage()">🔙</button>
     </div>
 
 <!-- --------------------------------------------------------------- Main Content:-->
-    <div class="doyangs" id="doyangs">
-        Площадки:
-        <div class="doyangs-list" id="doyangs_list"></div>
-    </div>
+    {% if user != '' %}
+        <div class="doyangs" id="doyangs">
+            Площадки:
+            <div class="doyangs-list" id="doyangs_list"></div>
+            {% if user == 'admin' %}
+                <table class="table-row">
+                    <tr>
+                        <td class="td-input-doyang">
+                            <input type="text" id="DoYangInput" class="input-doyang" placeholder="Введите название площадки">
+                        </td>
+                        <td class="td-add-doyang">
+                            <button class="button-secondary add add-doyang" onclick="addDoYang()">+</button>
+                        </td>
+                    </tr>
+                </table>
+            {% endif %}
+        </div>
+    {% endif %}
     <div class="categories" id="categories">
         Категории:
         <div class="categories-list" id="categories_list"></div>
+        {% if user == 'admin' %}
+            <button class="button-secondary add open-add-categories secondary-clickable" onclick="openAllCategories()">
+                +
+            </button>
+        {% endif %}
     </div>
     <div class="competitors" id="competitors">
         Сетка:
@@ -44,6 +170,32 @@
         Соперники:
         <div class="competitors-list" id="competitors_list"></div>
     </div>
-    
+    {% if user == 'admin' %}
+        <div class="add-categories-screen" id="add_categories">
+            <table class="table-row">
+                <tr>
+                    <td>
+                        <button class="button-primary add add-categories primary-clickable" onclick="showPage(1)">Отмена</button> 
+                    </td>
+                    <td>
+                        <button class="button-primary add add-categories primary-clickable" 
+                        onclick="addDoYangToCategories()">Добавить</button>
+                    </td>
+                </tr>
+            </table>
+            <table class="table-row search-table">
+                <tr>
+                    <td colspan="6">
+                        <input type="text" id="search_category" class="input-search" placeholder="Поиск">
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="button-primary primary-clickable search-button" 
+                        onclick="searchCategory()">🔍</button>
+                    </td>
+                </tr>
+            </table>
+            <div class="categories-list" id="categories_list_all"></div>
+        </div>
+    {% endif %}
 </body>
 </html>

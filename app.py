@@ -103,7 +103,7 @@ def join_doyang(data):
 
 @socketio.on("update_scores")
 def update_scores(data):
-    login = session.get("login", "")
+    login = get_current_login()
     score1 = data.get("score1")
     score2 = data.get("score2")
     if score1 > score2:
@@ -153,11 +153,11 @@ def allowed_file(filename):
 
 @app.route("/")
 def home():    
-    return render_template('main.html')
+    return render_template('main.html', user='user')
 
 @app.route("/pj")
 def home_pj():
-    return render_template('pj.html')
+    return render_template('main.html', user='pj')
 
 @app.route("/admin")
 def home_admin():
@@ -168,7 +168,7 @@ def home_admin():
     if not os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
         return redirect(url_for('home_upload'))
     
-    return render_template('admin.html')
+    return render_template('main.html', user='admin')
 
 @app.route("/upload_screen")
 @role_required("admin")
@@ -187,7 +187,6 @@ def login_screen():
     return render_template('login_screen.html')
 
 @app.route("/tkd_counter")
-# @role_required("judge")
 def home_tkd_counter():
     return render_template('tkd_counter.html')
 
@@ -203,14 +202,6 @@ def auth_status():
     role = request.args.get('role')
     print(role, get_current_role())
 
-    # if get_current_login() == "" and role != "admin" and role == "pj":
-    #     print('error')
-    #     return jsonify({
-    #         "success": False,
-    #         "role": get_current_role(),
-    #         "redirect": url_for('login_screen')
-    #     })
-    
     if ROLE_LEVELS[role] <= ROLE_LEVELS[get_current_role()]:
         return jsonify({
             "success": True,
@@ -723,6 +714,17 @@ def page_back():
         'success': True,
         'redirect': request.referrer
     })  
+
+@app.route("/api/get_doyang_of_judge", methods = ['GET'])
+@role_required("judge")
+def get_doyang_of_judge():
+    login = get_current_login()
+    doyang = database.get_doyang_of_judge(login)
+    print('the doyang' + str(doyang))
+    data = {
+        'doyang': doyang
+    }
+    return jsonify(data)
 
 if __name__ == "__main__":
     # print('hash:' + generate_password_hash("123", method="pbkdf2:sha256"))

@@ -694,12 +694,15 @@ def get_playing_match(doyang_id):
         WHERE d.DoYangID = {doyang_id}
     """).fetchall()
 
-    type = cursor.execute(f"""
-        SELECT c.Type
-        FROM Matches m
-        JOIN Categories c ON m.CategoryID = c.CategoryID
-        WHERE m.MatchID = {match[0][0]}
-    """).fetchall()[0][0]
+    if (len(match) > 0):
+        type = cursor.execute(f"""
+            SELECT c.Type
+            FROM Matches m
+            JOIN Categories c ON m.CategoryID = c.CategoryID
+            WHERE m.MatchID = {match[0][0]}
+        """).fetchall()[0][0]
+    else:
+        type = ''
 
     print(type)
 

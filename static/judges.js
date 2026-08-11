@@ -33,16 +33,16 @@ function addJudge(){
     });
 }
 
-function judgesContent(ids, logins, scores1, scores2, winners){
-    $('#judges_list').empty();
-    for (let i = 0; i < ids.length; i++){
-        const judgeDiv = $('<div>', {
-            class: 'judge-div',
-            text: logins[i] + ' | ' + scores1[i] + ' | ' + scores2[i] + ' | ' + winners[i] 
-        });
-        $('#judges_list').append(judgeDiv);
-    }
-}
+// function judgesContent(ids, logins, scores1, scores2, winners){
+//     $('#judges_list').empty();
+//     for (let i = 0; i < ids.length; i++){
+//         const judgeDiv = $('<div>', {
+//             class: 'judge-div',
+//             text: logins[i] + ' | ' + scores1[i] + ' | ' + scores2[i] + ' | ' + winners[i] 
+//         });
+//         $('#judges_list').append(judgeDiv);
+//     }
+// }
 
 function updateJudgesAll(callback){
     $.ajax({
@@ -225,8 +225,6 @@ function uploadJudges() {
         contentType: false,
         success: function (response, status, jqXHR) {
             updateJudgesAll(function(){})
-            // window.location.replace(response.redirect);
-            // window.location.href = response.redirect;
         },
         error: function (jqXHR, textStatus, errorThrown) {
         },
@@ -292,4 +290,65 @@ function getDoYangOfJudge(){
             console.error('Error fetching data.');
         }
     });
+}
+
+function judgesContentPublic(ids, winners){
+    const table = $("#table_show_match_public")
+    const tbody = table.find("tbody");
+    tbody.empty()
+    for (let i = 0; i < ids.length; i++){
+        const tr = $('<tr>', {
+        })
+        const td1 = $('<td>', {
+            colspan: 5
+        }).append(
+            $('<div>',{
+                style: 'align-items: center; font-size: 2rem',
+                text: winners[i] == 1 ? '1' : '0'
+            })
+        );
+        const td2 = $('<td>', {
+            colspan: 2,
+        }).append(
+            $('<div>',{
+                style: 'align-items: center; font-size: 1.5rem',
+                text: `Судья ${i + 1}`
+            })
+        );
+        const td3 = $('<td>', {
+            colspan: 5
+        }).append(
+            $('<div>',{
+                style: 'align-items: center; font-size: 2rem',
+                text: winners[i] == 2 ? '1' : '0'
+            })
+        );
+        tr.append(td1)
+        tr.append(td2)
+        tr.append(td3)
+        tbody.append(tr)
+    }
+    const tr_all = $('<tr>', {
+    })
+    const td_all_1 = $('<td>', {
+        colspan: 6
+    }).append(
+        $('<div>',{
+            class: 'score red',
+            style: 'align-items: center;',
+            text: winner1_total
+        })
+    );
+    const td_all_2 = $('<td>', {
+        colspan: 6
+    }).append(
+        $('<div>',{
+            class: 'score blue',
+            style: 'align-items: center;',
+            text: winner2_total
+        })
+    );
+    tr_all.append(td_all_1)
+    tr_all.append(td_all_2)
+    tbody.append(tr_all)
 }

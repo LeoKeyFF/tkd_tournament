@@ -18,7 +18,7 @@ import get_data_judges_logic
 
 load_dotenv()
 
-from flask_socketio import SocketIO, join_room
+from flask_socketio import SocketIO, close_room, join_room
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -97,6 +97,13 @@ def join_doyang(data):
     except (TypeError, ValueError):
         return
 
+    match, type = database.get_playing_match(doyang_id)
+    if len(match) == 0:
+        match = [[0]]
+    if match[0][0] == 0:
+        print('No playing match here :))')
+        return
+    
     room_name = f"doyang_{doyang_id}"
 
     join_room(room_name)
@@ -119,6 +126,27 @@ def update_scores(data):
         get_data_judges_logic.get_data_judges_logic(doyang),
         to=f"doyang_{doyang}"
     )
+
+@socketio.on("close_doyang")
+def close_doyang(data):
+    print('closing...')
+    try:
+        doyang_id = int(data.get("doyang_id"))
+    except (TypeError, ValueError):
+        return
+
+    match, type = database.get_playing_match(doyang_id)
+    if len(match) == 0:
+        match = [[0]]
+    if match[0][0] == 0:
+        print('No playing match here :))')
+        return
+    
+    room_name = f"doyang_{doyang_id}"
+
+    close_room(room_name)
+    print('closed')
+
 
 @socketio.on("connect")
 def handle_connect():
@@ -194,6 +222,11 @@ def home_tkd_counter():
 @role_required("pj")
 def home_match():
     return render_template('home_match.html')
+
+@app.route("/show_match")
+@role_required("pj")
+def show_match():
+    return render_template('show_public_match.html')
 #----------------------------------------------------------------------------------------
 
 
@@ -201,14 +234,19 @@ def home_match():
 def auth_status():
     role = request.args.get('role')
     print(role, get_current_role())
-
+    print(get_current_login())
+    if get_current_login() == '' and role != 'admin':
+        return jsonify({
+            "success": False,
+            "role": get_current_role(),
+            "redirect": url_for('login_screen')
+        })
     if ROLE_LEVELS[role] <= ROLE_LEVELS[get_current_role()]:
         return jsonify({
             "success": True,
             "role": get_current_role()
         })
     else:
-        print('error')
         return jsonify({
             "success": False,
             "role": get_current_role(),
@@ -445,6 +483,22 @@ def play_match():
         'redirect': redirect_url
     })  
 
+@app.route("/api/show_match_public", methods = ['POST'])
+@role_required("pj")
+def show_match_public():
+    data = request.get_json()
+    doyang_id = data.get('doyang_id')
+    data_to_send = {
+        'doyang_id': doyang_id
+    }
+    
+    base_url = url_for('show_match')
+    redirect_url = f"{base_url}?{urlencode(data_to_send)}"
+    return jsonify({
+        'success': True,
+        'redirect': redirect_url
+    })  
+
 @app.route("/api/end_match", methods = ['POST'])
 @role_required("pj")
 def end_match():
@@ -634,13 +688,19 @@ def get_all_judges():
 def get_playing_match():
     doyang_id = request.args.get('doyang_id')
     match, type = database.get_playing_match(doyang_id)
-    print(match)
-    match = match[0]
-    match_id = match[0]
-    competitor_1_id = match[3]
-    competitor_2_id = match[4]
-    competitor_1_name = match[-2]
-    competitor_2_name = match[-1]
+    if len(match) == 0:
+        match_id = 0
+        competitor_1_id = 0
+        competitor_2_id = 0
+        competitor_1_name = ''
+        competitor_2_name = ''
+    else:
+        match = match[0]
+        match_id = match[0]
+        competitor_1_id = match[3]
+        competitor_2_id = match[4]
+        competitor_1_name = match[-2]
+        competitor_2_name = match[-1]
     data = {
         'match_id': match_id,
         'competitor_1_id': competitor_1_id,
@@ -719,6 +779,10 @@ def page_back():
 @role_required("judge")
 def get_doyang_of_judge():
     login = get_current_login()
+    if login == '':
+        return jsonify({
+            'doyang': 0
+        })
     doyang = database.get_doyang_of_judge(login)
     print('the doyang' + str(doyang))
     data = {

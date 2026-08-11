@@ -50,6 +50,9 @@ function getPlayingMatch(doyang_id){
 }
 
 function endMatch(){
+    socket.emit("close_doyang", {
+        doyang_id: current_doyang
+    });
     const dataToSendEnd = { 
         match_id: match_id
     };
@@ -106,10 +109,39 @@ function endMatchLogic(){
         data: JSON.stringify(dataToSend),
         dataType: 'json',
         success: function (response, status, jqXHR) {
-            pageBack();
+            window.close()
         },
         error: function (jqXHR, textStatus, errorThrown) {
             // Error handling
+        },
+        complete: function (jqXHR, textStatus) {
+        }
+    });
+}
+
+function showMatchPublic(){
+    const dataToSend = {
+        doyang_id: current_doyang
+    }
+    const newTabPublic = window.open('about:blank', '_blank');
+    this.window.focus();
+    if (newTabPublic) {
+        newTabPublic.document.write('<h1>Загрузка...</h1>');
+    }     
+    $.ajax({
+        type: "POST",
+        url: '/api/show_match_public',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(dataToSend),
+        success: function (response, status, jqXHR) {
+            if (newTabPublic) {
+                newTabPublic.location.href = response.redirect; 
+            } 
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            if (newTabPublic) {
+                newTabPublic.close(); 
+            }      
         },
         complete: function (jqXHR, textStatus) {
         }

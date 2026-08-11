@@ -9,11 +9,8 @@
     <script src="{{ url_for('static', filename='judges.js') }}"></script>
     <script src="{{ url_for('static', filename='jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='access.js') }}"></script>
-    <script src="/static/socket.io.min.js"></script>
-    <script>
-        const socket = io();
-    </script>
     <script src="{{ url_for('static', filename='match.js') }}"></script>
+    <script src="/static/socket.io.min.js"></script>
 </head>
 <body>
     <script>
@@ -22,15 +19,15 @@
             const params = getUrlParams();
             current_doyang = params.doyang_id;
             getPlayingMatch(current_doyang);
-            // const socket = io();
+            const socket = io();
             socket.on("connect", function () {
                 socket.emit("join_doyang", {
                     doyang_id: current_doyang
                 });
             });
             socket.on("update_scores_get", function(data) {
-                judgesContentShowScores(data.ids, data.logins, data.scores1, data.scores2, data.winners);
                 countWinner(data.winners);
+                judgesContentPublic(data.ids, data.winners);
             });
             updateJudges();
         });
@@ -40,13 +37,13 @@
             }
         });
     </script>
-    <table class="table-row tkd-counter-table" id="table_show_match">
+    <table class="table-row tkd-counter-table" id="table_show_match_public">
         <thead>
             <tr>
-                <th colspan="10">
+                <th colspan="6">
                     <div class="score red" id="name_1_match"></div>
                 </th>
-                <th colspan="10">
+                <th colspan="6">
                     <div class="score blue" id="name_2_match"></div>
                 </th>
             </tr>
@@ -54,11 +51,5 @@
         <tbody>
         </tbody>
     </table>
-    <button class="button-primary primary-clickable" style="width: 100%;" onclick="showMatchPublic()">
-        Открыть просмотр
-    </button>
-    <button class="button-primary primary-clickable" style="width: 100%;" onclick="endMatch()">
-        Завершить
-    </button>
 </body>
 </html>

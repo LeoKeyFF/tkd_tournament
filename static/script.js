@@ -197,9 +197,12 @@ function updateJudges(){
             doyang_id: current_doyang,
         },
         success: function (data) {        
-            judgesContent(data.ids, data.logins, data.scores1, data.scores2, data.winners)
+            // judgesContent(data.ids, data.logins, data.scores1, data.scores2, data.winners)
             judgesContentShowScores(data.ids, data.logins, data.scores1, data.scores2, data.winners)
             countWinner(data.winners)
+            if (currentPath === '/show_match'){
+                judgesContentPublic(data.ids, data.winners)
+            }
         },
         error: function () {
             console.error('Error fetching data.');
@@ -290,25 +293,25 @@ function playMatch(){
         // competitor2id: competitor2id,
         // competitor2name: competitor2name,
     }
-    const newTab = window.open('', '_blank');
-    if (newTab) {
-        newTab.document.write('<h1>Загрузка...</h1>');
-    }
+    const newTabScores = window.open('about:blank', '_blank');
+    if (newTabScores) {
+        newTabScores.document.write('<h1>Загрузка...</h1>');
+    }       
     $.ajax({
         type: "POST",
         url: '/api/play_match',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(dataToSend),
         success: function (response, status, jqXHR) {
-            if (newTab) {
-                newTab.location.href = response.redirect; 
+            if (newTabScores) {
+                newTabScores.location.href = response.redirect; 
             }
-            // window.location.href = response.redirect;
+            
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            if (newTab) {
-                newTab.close(); 
-            }
+            if (newTabScores) {
+                newTabScores.close(); 
+            }      
         },
         complete: function (jqXHR, textStatus) {
         }

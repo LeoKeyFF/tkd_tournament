@@ -233,14 +233,20 @@ def show_match():
 @app.route("/api/auth/status", methods=["GET"])
 def auth_status():
     role = request.args.get('role')
-    print(role, get_current_role())
-    print(get_current_login())
-    if get_current_login() == '' and role != 'admin':
+    # print(role, get_current_role())
+    login_current = get_current_login()
+    if login_current == '' and role != 'admin':
         return jsonify({
             "success": False,
             "role": get_current_role(),
             "redirect": url_for('login_screen')
         })
+    if login_current != '':
+        password_hash, judge_role = database.get_judge_password(login_current)
+        if get_current_role() != judge_role:
+            print(get_current_role(), judge_role)
+            session['role'] = judge_role
+
     if ROLE_LEVELS[role] <= ROLE_LEVELS[get_current_role()]:
         return jsonify({
             "success": True,
@@ -288,10 +294,8 @@ def login():
             "error": "Неверный пароль"
         }), 401
 
-    # Удаляем старые данные сессии.
     session.clear()
 
-    # Сохраняем только роль, а не пароль.
     session["role"] = role
     session["login"] = login
     if role == 'admin':
@@ -312,7 +316,11 @@ def login():
             "role": role,
             "redirect": url_for('home_tkd_counter')
         }) 
-
+    else:
+        return jsonify({
+            "success": False,
+            "error": "Нет доступа"
+        }), 401
 
 @app.route("/api/auth/logout", methods=["POST"])
 def logout():

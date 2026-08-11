@@ -85,6 +85,9 @@ function roleToName(role){
     else if (role == "referee"){
         return "Рефери"
     }
+    else if (role == "user_judge"){
+        return "При участниках"
+    }
 }
 
 function rolesLoginToChoose($element){

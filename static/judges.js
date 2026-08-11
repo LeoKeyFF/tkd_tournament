@@ -100,6 +100,13 @@ function judgesAll(ids, logins, roles, doyangs, doyangs_names){
             class: 'select-for-judge'
         });
         doyangsToChoose(all_doyangs_ids, all_doyangs_names, doyangSelect)
+
+        if (doyangSelect.find('option[value="' + doyangs[i] + '"]').length === 0) {
+            doyangSelect.append($('<option>', {
+                value: doyangs[i],
+                text: 'Выберите площадку'
+            }));
+        }
         doyangSelect.val(doyangs[i])
 
         const rolesSelect = $('<select>',{
@@ -145,6 +152,12 @@ function doyangsToChoose(ids, names, $element){
 
 function rolesJudgesToChoose($element){
     $element.empty();
+    $element.append(
+        $('<option>',{
+            value: 'user',
+            text: roleToName("user_judge")
+        })
+    )
     $element.append(
         $('<option>',{
             value: 'judge',

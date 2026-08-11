@@ -22,7 +22,8 @@ function doYangsContent(ids, names){
         });
         const td1 = $('<td>', {
             colspan: 6,
-            class: 'table-row-name'
+            class: 'table-row-name',
+            style: 'white-space: nowrap; overflow: hidden; text-overflow: ellipsis;',
         });
         const td2 = $('<td>', {
             class: 'table-row-del'
@@ -65,7 +66,8 @@ function categoriesContent(ids, names, doyangs, doyangs_list, competitors_amount
             });
             const td1 = $('<td>', {
                 colspan: 5,
-                class: 'table-row-name'
+                class: 'table-row-name',
+                style: 'white-space: nowrap; overflow: hidden; text-overflow: ellipsis;',
             });
             const td2 = $('<td>', {
                 class: 'table-row-amount'
@@ -385,7 +387,8 @@ function openAllCategories(){
 function allCategories(ids, names, doyangs, doyangs_list){
     $('#categories_list_all').empty();
     for (let i = 0; i < ids.length; i++){
-        category_search = $("#search_category").val()
+        category_search = $("#search_category").val() ?? '';
+        console.log(category_search)
         if (names[i].toLowerCase().includes(category_search.toLowerCase())){
             const categoryButton = $('<button>', {
                 class: 'button-primary category-button',

@@ -360,15 +360,18 @@ def upload_file():
         })    
     
     year = int(request.form.get("year"))
-
+    month = int(request.form.get("month"))
+    day = int(request.form.get("day"))
+    name = ''
     try:
         file_path = os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')
         file.save(file_path)
 
-        with open("year.txt", "w", encoding="utf-8") as f:
-            f.write(str(year))
+        # with open("year.txt", "w", encoding="utf-8") as f:
+        #     f.write(str(year))
 
-        database.start_tournament()
+        database.start_tournament(name, year, month, day)
+        
         return jsonify({
             'success': True,
             'redirect': url_for('home_admin')

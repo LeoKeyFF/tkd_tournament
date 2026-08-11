@@ -4,14 +4,23 @@ function uploadFile() {
         $('#status').text('Выберите файл');
         return;
     }
-    const year = parseInt($('#year_input').val());
-    if (Number.isNaN(year)) {
-        $('#status').text('Укажите год');
-        return;
-    }
+    // const year = parseInt($('#year_input').val());
+    // if (Number.isNaN(year)) {
+    //     $('#status').text('Укажите год');
+    //     return;
+    // }
+
+    const dateValue = $('#year_input').val();
+    var parts = dateValue.split('-');
+    
+    var year  = parts[0]; // "2026"
+    var month = parts[1]; // "08" (с ведущим нулем)
+    var day   = parts[2]; // "11" (с ведущим нулем)
     const formData = new FormData();
     formData.append('file', file);
     formData.append('year', year);
+    formData.append('month', month);
+    formData.append('day', day);
 
     $.ajax({
         type: "POST",

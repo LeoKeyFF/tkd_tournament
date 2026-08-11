@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 import database
+from datetime import date
 
 def set_tech_qual(tech_qual_str):
     if 'гып' in tech_qual_str or 'гуп' in tech_qual_str:
@@ -11,8 +12,14 @@ def set_tech_qual(tech_qual_str):
         return -11
 
 def read_cometitors():
-    with open("year.txt", "r", encoding="utf-8") as f:
-        year = int(f.read())
+    # with open("year.txt", "r", encoding="utf-8") as f:
+    #     year = int(f.read())
+
+    date = database.get_date()
+    year = int(date[0][1])
+    month = int(date[0][2])
+    day = int(date[0][3])
+
     df = pd.read_excel(
         'uploads/competitors.xlsx',
         engine='openpyxl',
@@ -49,17 +56,23 @@ def read_cometitors():
         qualification = row['спорт квал']
         belt =  set_tech_qual(row['техн квал']) 
         weight = row['весовая кат']
+
+        age = count_age(
+            year, month, day, 
+            row['дата рожд'].year, row['дата рожд'].month ,row['дата рожд'].day
+        )
         
         sparring = database.get_category_id(
-            year - row['дата рожд'].year, weight, belt, gender, 'матсоги'
-            ) if '+' in row['масоги'] else 0
+            age,
+            weight, belt, gender, 'матсоги'
+        ) if '+' in row['масоги'] else 0
         
         tuly =  database.get_category_id(
-            year - row['дата рожд'].year, weight, belt, gender, 'тыль'
+            age, weight, belt, gender, 'тыль'
             ) if '+' in row['туль'] else 0
         
         power =  database.get_category_id(
-            year - row['дата рожд'].year, weight, belt, gender, 'вирек'
+            age, weight, belt, gender, 'вирек'
         ) if '+' in row['сила'] else 0
 
         special_technic = -1 if '+' in row['спец техн'] else 0
@@ -148,3 +161,9 @@ def read_judges(file):
         print(login, password)
 
         database.add_judge(login, password, 0, "judge")
+
+def count_age(year, month, day, birth_year, birth_month, bith_day):
+    if (birth_month, bith_day) <= (month, day):
+        return year - birth_year
+    else:
+        return year - birth_year - 1

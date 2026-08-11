@@ -10,8 +10,9 @@ from werkzeug.security import generate_password_hash
 
 database_path = "database.db"
 
-def start_tournament():
+def start_tournament(name, year, month, day):
     create_tables()
+    add_date(name, year, month, day)
 
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
@@ -97,6 +98,15 @@ def create_tables():
           "Competitor1Score INT," 
           "Competitor2Score INT," 
           "Winner INT" 
+        ")"
+    )
+
+    cursor.execute(
+        f"CREATE TABLE IF NOT EXISTS Tournaments ( ID INTEGER PRIMARY KEY," 
+          "Name varchar(255),"
+          "Year INT,"
+          "Month INT,"
+          "Day INT"
         ")"
     )
     
@@ -755,3 +765,33 @@ def end_match(match_id):
 
     connection.commit()
     connection.close() 
+
+def add_date(name, year, month, day):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    cursor.execute(f"""
+        INSERT INTO 
+            Tournaments (Name, Year, Month, Day) 
+        VALUES ('{name}', {year}, {month}, {day})
+    """)
+
+    connection.commit()
+    connection.close()  
+
+
+def get_date():
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    date = cursor.execute(f"""
+        SELECT 
+            Name, Year, Month, Day 
+        FROM
+            Tournaments
+    """).fetchall()
+
+    connection.commit()
+    connection.close()  
+
+    return date

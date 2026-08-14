@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taekwon-Do</title>   
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='category.js') }}"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="{{ url_for('static', filename='content.js') }}"></script>
     <script src="{{ url_for('static', filename='match.js') }}"></script>
@@ -156,7 +157,21 @@
         </div>
     {% endif %}
     <div class="categories" id="categories">
-        Категории:
+        <table class="table-row">
+            <tr>
+                <td style="font-weight: 600; font-size: 1.1rem; color: #1e293b; letter-spacing: 0.3px">
+                    Категории:
+                </td>
+                <td style="text-align: end">
+                    <label for="sort_categories">cортеровать по </label>
+                    <select name="sort" id="sort_categories">
+                        <option value="index">номеру</option>
+                        <option value="type">типу</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        
         <div class="categories-list" id="categories_list"></div>
         {% if user == 'admin' %}
             <button class="button-secondary add open-add-categories secondary-clickable" onclick="openAllCategories()">
@@ -197,5 +212,16 @@
             <div class="categories-list" id="categories_list_all"></div>
         </div>
     {% endif %}
+
+    <script>
+        $('#sort_categories').on('change', function() {
+            if ($(this).val() === 'index') {
+                sort_categories_by = 'index'
+            } else {
+                sort_categories_by = 'type'
+            }
+            updateCategories(function(){})
+        });
+    </script>
 </body>
 </html>

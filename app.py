@@ -552,12 +552,16 @@ def get_data_categories():
             'names': [],
             'doyangs': [],
             'doyangs_list': doyangs_list,
-            'competitors_amounts': []
+            'competitors_amounts': [],
+            'indexes': [],
+            'indexes_names': []
         }
         return jsonify(data)
     ids = []
     names = []
     doyangs = []
+    indexes = []
+    indexes_names = []
     for category in categories:
         ids.append(category[0])
         names.append(
@@ -569,16 +573,22 @@ def get_data_categories():
                 weight_to=category[5],
                 age_from=category[6],
                 age_to=category[7],
-                type=category[8]
+                type=category[8],
+                doyang=category[9],
+                index=category[10] 
             )
         )
         doyangs.append(category[9])
+        indexes.append(category[10])
+        indexes_names.append(category_py.index_to_name(doyang=category[9], index=category[10]))
     data = {
         'ids': ids,
         'names': names,
         'doyangs': doyangs, 
         'doyangs_list': doyangs_list,
-        'competitors_amounts': competitors_amounts
+        'competitors_amounts': competitors_amounts,
+        'indexes': indexes,
+        'indexes_names': indexes_names
     }
     return jsonify(data)
 
@@ -600,7 +610,10 @@ def get_data_competitors():
                 weight_to=category_initial[5],
                 age_from=category_initial[6],
                 age_to=category_initial[7],
-                type=category_initial[8]
+                type=category_initial[8],
+                doyang=category_initial[9],
+                index=category_initial[10],
+                with_index=True
             )
         )
         category.append(category_initial[9])

@@ -129,8 +129,20 @@ function updateCategories(callback){
         dataType: 'json',
         success: function (data) {        
             callback();
-            categoriesContent(data.ids, data.names, data.doyangs, data.doyangs_list, data.competitors_amounts);
-            allCategories(data.ids, data.names, data.doyangs, data.doyangs_list);
+            categories_with_index_name = []
+            for (let i = 0; i < data.ids.length; i++){
+                categories_with_index_name.push(new Category(data.ids[i], data.indexes_names[i] + data.names[i], 
+                    data.doyangs[i], data.competitors_amounts[i], data.indexes[i]))
+            }
+            categoriesContent(categories_with_index_name, data.doyangs_list);
+
+
+            categories_without_index_name = []
+            for (let i = 0; i < data.ids.length; i++){
+                categories_without_index_name.push(new Category(data.ids[i],data.names[i], data.doyangs[i], 
+                    data.competitors_amounts[i], data.indexes[i]))
+            }
+            allCategories(categories_without_index_name);
         },
         error: function () {
             console.error('Error fetching data.');

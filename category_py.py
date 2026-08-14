@@ -1,9 +1,13 @@
-def category_name(name, belt_from, belt_to, weight_from, weight_to, age_from, age_to, type):
+def category_name(name, belt_from, belt_to, weight_from, weight_to, age_from, age_to, type, doyang, index, with_index = False):
     belt_range = belt_range_to_name(belt_from, belt_to)
     weight_range = weight_range_to_name(weight_from, weight_to)
     age_range = age_range_to_name(age_from, age_to)
+    if with_index:
+        index = index_to_name(doyang, index)
+    else:
+        index = ''
 
-    return name + ' ' + age_range + ' ' + belt_range + weight_range + ' (' + type + ')'
+    return index + name + ' ' + age_range + ' ' + belt_range + weight_range + ' (' + type + ')'
 
 
 def belt_range_to_name(belt_from, belt_to):
@@ -46,3 +50,12 @@ def age_range_to_name(age_from, age_to):
         return str(age_from) + ' лет и старше'
     else:
         return str(age_from) + '-' + str(age_to) + ' лет'
+
+def index_to_name(doyang, index):
+    zeros = 3
+    length = len(str(index))
+    index_with_zeros = ''
+    for zero in range(zeros - length):
+        index_with_zeros += '0'
+    index_with_zeros += str(index)
+    return str(doyang) + '.' + index_with_zeros + ' '

@@ -6,6 +6,8 @@ let match_id = 0
 
 let choosen_categories = []
 
+let sort_categories_by = 'index'
+
 function doYangsContent(ids, names){
     $('#doyangs_list').empty();
     for (let i = 0; i < ids.length; i++){
@@ -47,15 +49,18 @@ function doYangsContent(ids, names){
     }
 }
 
-function categoriesContent(ids, names, doyangs, doyangs_list, competitors_amounts){
+function categoriesContent(categories, doyangs_list){
     $('#categories_list').empty();
-    for (let i = 0; i < ids.length; i++){
-        if (doyangs[i] == current_doyang){
+    if (sort_categories_by == 'index'){
+        categories = categories.sort((a, b) => a.index - b.index)
+    }
+    for (let category of categories){
+        if (category.doyang == current_doyang){
             const categoryButton = $('<table>', {
                 class: 'button-secondary category-button secondary-clickable table-row'
             }).on('click', function() {
                 $(this).toggleClass('active');
-                current_category = ids[i];
+                current_category = category.id;
                 updateMatches()
                 updateCompetitors(function() {
                     showPage(2)
@@ -80,12 +85,12 @@ function categoriesContent(ids, names, doyangs, doyangs_list, competitors_amount
                 text: '🗑️'
             }).on('click', function(){
                 event.stopPropagation();
-                deleteDoYangFromCategory(ids[i]);
+                deleteDoYangFromCategory(category.id);
             })
-            td1.append(names[i])
+            td1.append(category.name)
             tr.append(td1)
             if (currentPath === '/admin'){
-                td2.append(competitors_amounts[i])
+                td2.append(category.competitor_amount)
                 td3.append(delButton)
 
                 tr.append(td2)
@@ -384,29 +389,29 @@ function openAllCategories(){
     });
 }
 
-function allCategories(ids, names, doyangs, doyangs_list){
+function allCategories(categories){
     $('#categories_list_all').empty();
-    for (let i = 0; i < ids.length; i++){
+    for (let category of categories){
         category_search = $("#search_category").val() ?? '';
         console.log(category_search)
-        if (names[i].toLowerCase().includes(category_search.toLowerCase())){
+        if (category.name.toLowerCase().includes(category_search.toLowerCase())){
             const categoryButton = $('<button>', {
                 class: 'button-primary category-button',
-                text: names[i]
+                text: category.name
             });
-            if (doyangs[i] == 0){
+            if (category.doyang == 0){
                 categoryButton.addClass('button-primary')
                 categoryButton.addClass('primary-clickable')
                 categoryButton.removeClass('button-secondary')
 
                 categoryButton.on('click', function() {
-                    if (choosen_categories.includes(ids[i])){
-                        choosen_categories = choosen_categories.filter(item => item !== ids[i]);
+                    if (choosen_categories.includes(category.id)){
+                        choosen_categories = choosen_categories.filter(item => item !== category.id);
                     }
                     else {
-                        choosen_categories.push(ids[i]);
+                        choosen_categories.push(category.id);
                     }
-                    allCategories(ids, names, doyangs, doyangs_list)
+                    allCategories(categories)
                 })
             }
             else {
@@ -416,13 +421,13 @@ function allCategories(ids, names, doyangs, doyangs_list){
 
             }
 
-            if (choosen_categories.includes(ids[i])){
+            if (choosen_categories.includes(category.id)){
                 categoryButton.addClass('chosen')
                 categoryButton.removeClass('primary-clickable')
             }
             else {
                 categoryButton.removeClass('chosen')
-                if (doyangs[i] == 0){
+                if (category.doyang == 0){
                     categoryButton.addClass('primary-clickable')
                 }
             }

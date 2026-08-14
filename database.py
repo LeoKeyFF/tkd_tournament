@@ -49,7 +49,8 @@ def create_tables():
           "AgeFrom INT,"
           "AgeTo INT,"
           "Type varchar(255),"
-          "DoYangID INT"
+          "DoYangID INT,"
+          "IndexNumber INT "
         ")"
     )
     cursor.execute(
@@ -279,11 +280,23 @@ def add_doyang_to_categories(category_ids, doyang_id):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
 
+    index_max = cursor.execute(f"""
+        SELECT MAX(IndexNumber) FROM Categories WHERE DoYangID = {doyang_id}
+    """).fetchall()
+    print(index_max)
+    if index_max[0][0] != None:
+        index_max = index_max[0][0]
+    else:
+        index_max = 0
+
+    counter = 0
     for category in category_ids:
+        counter += 1
         cursor.execute(f"""
             UPDATE Categories
             SET 
-                DoYangID = {doyang_id}
+                DoYangID = {doyang_id},
+                IndexNumber = {index_max + counter}
             WHERE 
                 CategoryID = {category}
         """)   
@@ -309,7 +322,10 @@ def get_from_categories():
     cursor = connection.cursor()
 
     categories = cursor.execute(f"""
-        SELECT CategoryID, Name, BeltFrom, BeltTo, WeightFrom, WeightTo, AgeFrom, AgeTo, Type, DoYangID FROM Categories
+        SELECT 
+            CategoryID, Name, BeltFrom, BeltTo, WeightFrom, WeightTo, AgeFrom, AgeTo, Type, DoYangID, IndexNumber 
+        FROM 
+            Categories
     """)
     categories = categories.fetchall()
 

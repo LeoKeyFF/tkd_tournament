@@ -49,7 +49,6 @@ def read_cometitors():
     )
 
     for index, row in df.iterrows():
-        print(row['дата рожд'].year)
         name = row['ФИО']
         gender = 'm' if 'м' in row['пол'].lower() else 'w'
         birth_date = row['дата рожд'].strftime('%Y-%m-%d')
@@ -158,7 +157,6 @@ def read_judges(file):
     for index, row in df.iterrows():
         login = row['login']
         password = row['password']
-        print(login, password)
 
         database.add_judge(login, password, 0, "judge")
 

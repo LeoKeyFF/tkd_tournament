@@ -20,7 +20,6 @@ def start_tournament(name, year, month, day):
     if len(cursor.execute(f"SELECT * FROM Competitors").fetchall()) == 0:
         connection.commit()
         connection.close()
-        print('..........creation!!!! AAAAAAAAAAAAAAAAAAAAAAAAAA..............AAAAAAAAAAAAAAAAAAAAAA')
 
         excel_filles.read_categories()
         excel_filles.read_cometitors()
@@ -188,8 +187,6 @@ def add_matches(category_id):
                 break
             competitors.insert(i + 1, Competitor(0, '', '', category_id))
 
-    print(competitors)
-
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
     
@@ -283,7 +280,6 @@ def add_doyang_to_categories(category_ids, doyang_id):
     index_max = cursor.execute(f"""
         SELECT MAX(IndexNumber) FROM Categories WHERE DoYangID = {doyang_id}
     """).fetchall()
-    print(index_max)
     if index_max[0][0] != None:
         index_max = index_max[0][0]
     else:
@@ -412,8 +408,6 @@ def get_from_judges(doyang_id):
     """)
 
     judges = judges.fetchall()
-
-    print(judges)
 
     connection.commit()
     connection.close()
@@ -608,6 +602,7 @@ def delete_tables():
     cursor.execute(f"DELETE FROM Competitors")
     cursor.execute(f"DELETE FROM Matches")
     cursor.execute(f"DELETE FROM Judges")
+    cursor.execute(f"DELETE FROM Tournaments")
 
     connection.commit()
     connection.close()
@@ -729,8 +724,6 @@ def get_playing_match(doyang_id):
         """).fetchall()[0][0]
     else:
         type = ''
-
-    print(type)
 
     connection.commit()
     connection.close() 

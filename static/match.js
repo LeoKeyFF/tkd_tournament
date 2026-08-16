@@ -2,6 +2,8 @@ let winner1_total = 0
 let winner2_total = 0
 let type_match = ''
 
+let public_full_screen = false
+
 class Match {
     constructor(category, round, competitor1id, competitor1name, competitor2id, competitor2name, winner, matchId, row){
         this.category = category;
@@ -146,4 +148,20 @@ function showMatchPublic(){
         complete: function (jqXHR, textStatus) {
         }
     });
+}
+
+function matchFullScreen(){
+    // public_full_screen = !(public_full_screen)
+    // if (!public_full_screen){
+    //     document.documentElement.requestFullscreen();
+    //     $('#full_screen_button').hide()
+    // }
+    // document.documentElement.requestFullscreen();
+    // $('#full_screen_button').hide()
+
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else {
+        document.exitFullscreen();
+    }
 }

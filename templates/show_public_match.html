@@ -37,6 +37,18 @@
             }
         });
     </script>
+    <script>
+        document.addEventListener("fullscreenchange", function(){
+            public_full_screen = !(public_full_screen)
+            console.log(public_full_screen)
+            if (public_full_screen){
+                $('#full_screen_button').text('Свернуть')
+            }
+            else{
+                $('#full_screen_button').text('На весь экран')  
+            }
+        });
+    </script>
     <table class="table-row tkd-counter-table" id="table_show_match_public">
         <thead>
             <tr>
@@ -51,5 +63,9 @@
         <tbody>
         </tbody>
     </table>
+    <button class="button-primary primary-clickable" style="width: 100%;" id="full_screen_button" 
+        onclick="matchFullScreen()">
+        На весь экран
+    </button>
 </body>
 </html>

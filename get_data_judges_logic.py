@@ -5,7 +5,6 @@ import database
 
 def get_data_judges_logic(doyang):
     judges = database.get_from_judges(doyang)
-    print(doyang)
     if len(judges) == 0:
         data = {
             'ids': [],

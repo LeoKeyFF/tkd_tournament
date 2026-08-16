@@ -34,7 +34,6 @@ app.config.update(
     SESSION_COOKIE_SECURE=False
 )
 
-PJ_PASSWORD_HASH = os.environ["MASTER_PASSWORD_HASH"]
 ADMIN_PASSWORD_HASH = os.environ["ADMIN_PASSWORD_HASH"]
 
 ROLE_LEVELS = {
@@ -60,10 +59,6 @@ def get_current_login():
     return login
 
 def role_required(required_role):
-    """
-    Декоратор проверки минимально необходимой роли.
-    """
-
     def decorator(view_function):
         @wraps(view_function)
         def wrapped_view(*args, **kwargs):
@@ -101,7 +96,6 @@ def join_doyang(data):
     if len(match) == 0:
         match = [[0]]
     if match[0][0] == 0:
-        print('No playing match here :))')
         return
     
     room_name = f"doyang_{doyang_id}"
@@ -129,7 +123,6 @@ def update_scores(data):
 
 @socketio.on("close_doyang")
 def close_doyang(data):
-    print('closing...')
     try:
         doyang_id = int(data.get("doyang_id"))
     except (TypeError, ValueError):
@@ -139,31 +132,26 @@ def close_doyang(data):
     if len(match) == 0:
         match = [[0]]
     if match[0][0] == 0:
-        print('No playing match here :))')
         return
     
     room_name = f"doyang_{doyang_id}"
 
     close_room(room_name)
-    print('closed')
 
 
-@socketio.on("connect")
-def handle_connect():
-    print("SOCKET: подключился")
+# @socketio.on("connect")
+# def handle_connect():
+#     print('socket connect')
 
-@socketio.on("disconnect")
-def handle_disconnect():
-    print("SOCKET: отключился")
+# @socketio.on("disconnect")
+# def handle_disconnect():
+#     print('socket disconnect')
 
 #----------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------
 
 @app.context_processor
 def inject_current_role():
-    """
-    Делает current_role доступным во всех HTML-шаблонах.
-    """
     return {
         "current_role": get_current_role()
     }
@@ -189,7 +177,6 @@ def home_pj():
 
 @app.route("/admin")
 def home_admin():
-    print(get_current_role())
     if get_current_role() != 'admin':
         return redirect(url_for('login_screen'))
     
@@ -233,7 +220,6 @@ def show_match():
 @app.route("/api/auth/status", methods=["GET"])
 def auth_status():
     role = request.args.get('role')
-    # print(role, get_current_role())
     login_current = get_current_login()
     if login_current == '' and role != 'admin':
         return jsonify({
@@ -244,7 +230,6 @@ def auth_status():
     if login_current != '':
         password_hash, judge_role = database.get_judge_password(login_current)
         if get_current_role() != judge_role:
-            print(get_current_role(), judge_role)
             session['role'] = judge_role
 
     if ROLE_LEVELS[role] <= ROLE_LEVELS[get_current_role()]:
@@ -262,7 +247,6 @@ def auth_status():
 
 @app.route("/api/auth/login", methods=["POST"])
 def login():
-    print('HI U Hi')
     data = request.get_json(silent=True)
 
     if not data:
@@ -274,7 +258,6 @@ def login():
     role = data.get("role")
     password = data.get("password", "")
     login = data.get("login", "")
-    print(role)
     if role not in ("judge", "admin"):
         return jsonify({
             "success": False,
@@ -284,7 +267,6 @@ def login():
     if role == "judge":
         password_hash, judge_role = database.get_judge_password(login)
         role = judge_role
-        # password_hash = PJ_PASSWORD_HASH
     else:
         password_hash = ADMIN_PASSWORD_HASH
 
@@ -367,9 +349,6 @@ def upload_file():
         file_path = os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')
         file.save(file_path)
 
-        # with open("year.txt", "w", encoding="utf-8") as f:
-        #     f.write(str(year))
-
         database.start_tournament(name, year, month, day)
         
         return jsonify({
@@ -392,7 +371,6 @@ def add_doyang():
     name = data.get('name')
     database.add_doyang(name)
     return jsonify(success=True)
-    # return redirect(url_for('home'))
 
 @app.route("/api/add_judge", methods = ['POST'])
 @role_required("admin")
@@ -405,7 +383,6 @@ def add_judge():
     
     database.add_judge(login, password, doyang_id, role)
     return jsonify(success=True)
-    # return redirect(url_for('home'))
 
 @app.route("/api/read_judges_file", methods = ['POST'])
 @role_required("admin")
@@ -443,7 +420,6 @@ def create_grid():
     category_id = data.get('category_id')
     database.add_matches(category_id)
     return jsonify(success=True)
-    # return redirect(url_for('home'))
 
 @app.route("/api/set_winner", methods = ['POST'])
 @role_required("pj")
@@ -451,10 +427,8 @@ def set_winner():
     data = request.get_json()
     match_id = data.get('match_id')
     winner = data.get('winner')
-    print(match_id, winner)
     database.set_winner(match_id, winner)
     return jsonify(success=True)
-    # return redirect(url_for('home'))
 
 @app.route("/api/add_doyang_to_categories", methods = ['POST'])
 @role_required("admin")
@@ -462,29 +436,18 @@ def add_doyang_to_categories():
     data = request.get_json()
     doyang_id = data.get('doyang_id')
     category_ids = data.get('categories')
-    print(category_ids)
     database.add_doyang_to_categories(category_ids, doyang_id)
     return jsonify(success=True)
-    # return redirect(url_for('home'))
 
 @app.route("/api/play_match", methods = ['POST'])
 @role_required("pj")
 def play_match():
     data = request.get_json()
     match_id = data.get('match_id')
-    # competitor1id = data.get('competitor1id')
-    # competitor1name = data.get('competitor1name')
-    # competitor2id = data.get('competitor2id')
-    # competitor2name = data.get('competitor2name')
 
     doyang_id = database.play_match(match_id)
     data_to_send = {
         'doyang_id': doyang_id
-        # ,
-        # 'competitor1id': competitor1id,
-        # 'competitor1name': competitor1name,
-        # 'competitor2id': competitor2id,
-        # 'competitor2name': competitor2name
     }
     
     base_url = url_for('home_match')
@@ -698,7 +661,6 @@ def get_all_judges():
         roles.append(judge[2])
         doyangs.append(judge[3])
         doyangs_names.append(judge[4])
-    print(doyangs_names)
     data = {
         'ids': ids,
         'logins': logins,
@@ -744,7 +706,6 @@ def delete_doyang():
     doyang_id = data.get('doyang_id')
     database.delete_doyang(doyang_id)
     return jsonify(success=True)
-    # return redirect(url_for('home'))
 
 @app.route("/api/cancel_winner", methods = ['POST'])
 @role_required("pj")
@@ -753,7 +714,6 @@ def cancel_winner():
     match_id = data.get('match_id')
     database.cancel_winner(match_id)
     return jsonify(success=True)
-    # return redirect(url_for('home'))
 
 @app.route("/api/delete_tournament", methods = ['POST'])
 @role_required("admin")
@@ -808,7 +768,6 @@ def get_doyang_of_judge():
             'doyang': 0
         })
     doyang = database.get_doyang_of_judge(login)
-    print('the doyang' + str(doyang))
     data = {
         'doyang': doyang
     }

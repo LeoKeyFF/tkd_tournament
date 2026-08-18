@@ -29,6 +29,9 @@
                 countWinner(data.winners);
                 judgesContentPublic(data.ids, data.winners);
             });
+            socket.on("new_is_started", function() {
+                window.location.reload();
+            });
             updateJudges();
         });
         window.addEventListener("pageshow", function (event) {

@@ -28,7 +28,7 @@ def read_cometitors():
             'пол': str,
             'спорт квал': str,
             'техн квал': str,
-            'весовая кат': float,
+            'весовая кат': str,
             'масоги': str,
             'туль': str,
             'сила': str,
@@ -55,6 +55,7 @@ def read_cometitors():
         qualification = row['спорт квал']
         belt =  set_tech_qual(row['техн квал']) 
         weight = row['весовая кат']
+        weight = float(str(weight).replace(",", "."))
 
         age = count_age(
             year, month, day, 

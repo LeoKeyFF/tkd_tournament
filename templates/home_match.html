@@ -23,6 +23,9 @@
             current_doyang = params.doyang_id;
             getPlayingMatch(current_doyang);
             // const socket = io();
+            socket.emit("start_new", {
+                doyang_id: current_doyang
+            });
             socket.on("connect", function () {
                 socket.emit("join_doyang", {
                     doyang_id: current_doyang

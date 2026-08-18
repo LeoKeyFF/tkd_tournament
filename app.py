@@ -6,7 +6,7 @@ import json
 import os
 from functools import wraps
 
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 import category_py
 import database
@@ -16,7 +16,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 import get_data_judges_logic
 
-load_dotenv()
+# load_dotenv()
 
 from flask_socketio import SocketIO, close_room, join_room
 
@@ -98,9 +98,11 @@ def join_doyang(data):
     if match[0][0] == 0:
         return
     
-    room_name = f"doyang_{doyang_id}"
+    room_name_for_data = f"doyang_{doyang_id}"
+    room_name_general = f"doyang_general_{doyang_id}"
 
-    join_room(room_name)
+    join_room(room_name_for_data)
+    join_room(room_name_general)
 
 @socketio.on("update_scores")
 def update_scores(data):
@@ -138,6 +140,17 @@ def close_doyang(data):
 
     close_room(room_name)
 
+@socketio.on("start_new")
+def start_new(data):
+    try:
+        doyang_id = int(data.get("doyang_id"))
+    except (TypeError, ValueError):
+        return
+    
+    socketio.emit(
+        "new_is_started", 
+        to=f"doyang_general_{doyang_id}"
+    )
 
 # @socketio.on("connect")
 # def handle_connect():
@@ -168,7 +181,9 @@ def allowed_file(filename):
 #----------------------------------------------------------------------------------------
 
 @app.route("/")
-def home():    
+def home(): 
+    if not os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
+        return redirect(url_for('home_admin'))
     return render_template('main.html', user='user')
 
 @app.route("/pj")
@@ -776,4 +791,10 @@ def get_doyang_of_judge():
 if __name__ == "__main__":
     # print('hash:' + generate_password_hash("123", method="pbkdf2:sha256"))
     # app.run(debug=False, host='0.0.0.0', port=5001)
-    socketio.run(app, debug=False, host='0.0.0.0', port=5001)
+    socketio.run(
+        app, 
+        debug=False, 
+        host='0.0.0.0', 
+        port=5001,
+        allow_unsafe_werkzeug=True
+    )

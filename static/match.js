@@ -96,7 +96,8 @@ function endMatchLogic(){
         winner = competitor2id;
     }
     else{
-        pageBack();
+        window.close();
+        // pageBack();
         return;
     }
 

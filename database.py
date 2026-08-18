@@ -2,13 +2,15 @@ import json
 import random
 import sqlite3
 import math
+import os
 
 from competitor import Competitor
 import excel_filles
 
 from werkzeug.security import generate_password_hash
 
-database_path = "database.db"
+database_path = os.environ["DATABASE_PATH"]
+# database_path = "database.db"
 
 def start_tournament(name, year, month, day):
     create_tables()

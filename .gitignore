@@ -7,3 +7,5 @@
 *.sql
 Dockerfile
 *.yml
+*.tar
+*.zip

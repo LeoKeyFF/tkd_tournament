@@ -764,6 +764,21 @@ def get_doyang_of_judge(login):
 
     return doyang
 
+def get_score_of_judge(login):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    scores = cursor.execute(f"""
+        SELECT Competitor1Score, Competitor2Score
+        FROM Judges
+        WHERE Login = '{login}'
+    """).fetchall()
+
+    connection.commit()
+    connection.close() 
+
+    return scores
+
 def end_match(match_id):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()

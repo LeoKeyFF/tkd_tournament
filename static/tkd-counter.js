@@ -120,3 +120,20 @@ function changeCounter(){
     }
     cleenScore()
 }
+
+function getScore(){
+    $.ajax({
+        url: '/api/get_score_of_judge',
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {        
+            score_red = data.score1
+            $('#score1').text(score_red);
+            score_blue = data.score2
+            $('#score2').text(score_blue);
+        },
+        error: function () {
+            console.error('Error fetching data.');
+        }
+    });  
+}

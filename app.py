@@ -712,6 +712,17 @@ def get_playing_match():
     }
     return jsonify(data)
 
+@app.route("/api/get_score_of_judge", methods = ['GET'])
+@role_required("judge")
+def get_score_of_judge():
+    login = get_current_login()
+    scores = database.get_score_of_judge(login)
+    data = {
+        'score1': scores[0][0],
+        'score2': scores[0][1]
+    }
+    return jsonify(data)
+
 #---------------------------------------------------------------------------------------
 
 @app.route("/api/delete_doyang", methods = ['POST'])

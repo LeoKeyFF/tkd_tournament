@@ -18,7 +18,6 @@
             checkAccess("pj", function(){
                 const params = getUrlParams();
                 current_doyang = params.doyang_id;
-                getPlayingMatch(current_doyang);
                 const socket = io();
                 socket.on("connect", function () {
                     socket.emit("join_doyang", {
@@ -26,12 +25,14 @@
                         need_data:1
                     });
                 });
-                socket.on("update_scores_get", function(data) {
-                    countWinner(data.winners);
-                    judgesContentPublic(data.ids, data.winners);
-                });
                 socket.on("new_is_started", function() {
                     window.location.reload();
+                });
+                getPlayingMatch(current_doyang, function(){
+                    socket.on("update_scores_get", function(data) {
+                        countWinner(data.winners);
+                        judgesContentPublic(data.ids, data.scores1, data.scores2, data.winners);
+                    });
                 });
                 updateJudges();
             });
@@ -58,11 +59,12 @@
     <table class="table-row tkd-counter-table" id="table_show_match_public">
         <thead>
             <tr>
+                <!-- it is reversed for viewers because the screen is turned to the public  -->
                 <th colspan="6">
-                    <div class="score red" id="name_1_match"></div>
+                    <div class="score blue" id="name_2_match" style="font-size: 4rem;"></div>
                 </th>
                 <th colspan="6">
-                    <div class="score blue" id="name_2_match"></div>
+                    <div class="score red" id="name_1_match" style="font-size: 4rem;"></div>
                 </th>
             </tr>
         </thead>

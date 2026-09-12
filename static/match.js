@@ -27,7 +27,7 @@ function convertMatches(matches_){
     return matches
 }
 
-function getPlayingMatch(doyang_id){
+function getPlayingMatch(doyang_id, callback){
     $.ajax({
         url: '/api/get_playing_match',
         method: 'GET',
@@ -45,6 +45,8 @@ function getPlayingMatch(doyang_id){
 
             $("#name_1_match").text(competitor1name)
             $("#name_2_match").text(competitor2name)
+
+            callback();
         },
         error: function () {
         }
@@ -165,4 +167,90 @@ function matchFullScreen(){
     } else {
         document.exitFullscreen();
     }
+}
+
+
+function judgesContentPublic(ids, scores1, scores2, winners){
+    const table = $("#table_show_match_public")
+    const tbody = table.find("tbody");
+    tbody.empty()
+    for (let i = 0; i < ids.length; i++){
+        const tr = $('<tr>', {
+        })
+        const td1 = $('<td>', {
+            colspan: 5
+        })
+        if (type_match == 'tuly'){
+            td1.append(
+                $('<div>',{
+                    style: 'align-items: center; font-size: 6rem',
+                    text: winners[i] == 1 ? '1' : '0'
+                })
+            );
+        } else if(type_match == 'sparring'){
+            td1.append(
+                $('<div>',{
+                    style: 'align-items: center; font-size: 6rem',
+                    text: scores1[i]
+                })
+            );
+        }
+
+        const td2 = $('<td>', {
+            colspan: 2,
+        }).append(
+            $('<div>',{
+                style: 'align-items: center; font-size: 2rem',
+                text: `Судья ${i + 1}`
+            })
+        );
+        const td3 = $('<td>', {
+            colspan: 5
+        })
+        if (type_match == 'tuly'){
+            td3.append(
+                $('<div>',{
+                    style: 'align-items: center; font-size: 6rem',
+                    text: winners[i] == 2 ? '1' : '0'
+                })
+            );
+        } else if(type_match == 'sparring'){
+            td3.append(
+                $('<div>',{
+                    style: 'align-items: center; font-size: 6rem',
+                    text: scores2[i]
+                })
+            );
+        }
+
+        
+        tr.append(td3) //it is reversed for viewers because the screen is turned to the public 
+        tr.append(td2)
+        tr.append(td1)
+
+        tbody.append(tr)
+    }
+    const tr_all = $('<tr>', {
+    })
+    const td_all_1 = $('<td>', {
+        colspan: 6
+    }).append(
+        $('<div>',{
+            class: 'score red',
+            style: 'align-items: center; font-size: 6rem',
+            text: winner1_total
+        })
+    );
+    const td_all_2 = $('<td>', {
+        colspan: 6
+    }).append(
+        $('<div>',{
+            class: 'score blue',
+            style: 'align-items: center; font-size: 6rem',
+            text: winner2_total
+        })
+    );
+    tr_all.append(td_all_2) //it is reversed for viewers because the screen is turned to the public 
+    tr_all.append(td_all_1)
+    tbody.append(tr_all)
 }

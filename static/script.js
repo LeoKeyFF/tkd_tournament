@@ -213,7 +213,7 @@ function updateJudges(){
             judgesContentShowScores(data.ids, data.logins, data.scores1, data.scores2, data.winners)
             countWinner(data.winners)
             if (currentPath === '/show_match'){
-                judgesContentPublic(data.ids, data.winners)
+                judgesContentPublic(data.ids, data.scores1, data.scores2, data.winners)
             }
         },
         error: function () {

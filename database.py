@@ -9,8 +9,8 @@ import excel_filles
 
 from werkzeug.security import generate_password_hash
 
-database_path = os.environ["DATABASE_PATH"]
-# database_path = "database.db"
+# database_path = os.environ["DATABASE_PATH"]
+database_path = "database.db"
 
 def start_tournament(name, year, month, day):
     create_tables()
@@ -727,8 +727,14 @@ def get_playing_match(doyang_id):
     else:
         type = ''
 
+    if type == 'тыль':
+        type = 'tuly'
+    elif type == 'матсоги':
+        type = 'sparring'
+
     connection.commit()
     connection.close() 
+    print(type)
 
     return match, type
 
@@ -764,12 +770,12 @@ def get_doyang_of_judge(login):
 
     return doyang
 
-def get_score_of_judge(login):
+def get_data_of_judge(login):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
 
-    scores = cursor.execute(f"""
-        SELECT Competitor1Score, Competitor2Score
+    data = cursor.execute(f"""
+        SELECT Competitor1Score, Competitor2Score, DoYangID, Role
         FROM Judges
         WHERE Login = '{login}'
     """).fetchall()
@@ -777,7 +783,7 @@ def get_score_of_judge(login):
     connection.commit()
     connection.close() 
 
-    return scores
+    return data
 
 def end_match(match_id):
     connection = sqlite3.connect(database_path)

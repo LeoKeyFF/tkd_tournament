@@ -1,4 +1,4 @@
-function checkAccess(role) {
+function checkAccess(role, callback) {
     $.ajax({
         url: "/api/auth/status",
         method: "GET",
@@ -8,7 +8,8 @@ function checkAccess(role) {
         },
         success: function (response) {
             if (response.success) {
-                $("#access_role").text(response.role);
+                callback();
+                // $("#access_role").text(response.role);
             } else {
                 window.location.replace(response.redirect);
             }

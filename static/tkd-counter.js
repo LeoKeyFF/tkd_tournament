@@ -5,6 +5,8 @@ let score_red_history = [24]
 let score_blue_history = [24]
 
 let counter_type = 'tuly'
+let doyang = 0
+let role = 'judge'
 
 function updateScore(competitor, score_change){
     if (competitor == 1){
@@ -63,7 +65,7 @@ function cleenScore(){
     $('#score1').text(score_red);
     $('#score2').text(score_blue);
 
-    $('body').toggleClass('menu-open');
+    $('body').removeClass('menu-open');
 
     socketUpdate()
 }
@@ -76,9 +78,8 @@ function socketUpdate(){
 }
 
 function changeCounter(){
-    if (counter_type == 'tuly'){
-        counter_type = 'sparring'
-        $('#change_counter').text('Тыль')
+    console.log(counter_type)
+    if (counter_type == 'sparring'){
         $('#score_1_1').text('+3')
         $('#score_1_1').attr('onclick', 'updateScore(1, +3)')
 
@@ -98,8 +99,6 @@ function changeCounter(){
         $('#score_2_3').attr('onclick', 'updateScore(2, +1)')
     }
     else {
-        counter_type = 'tuly'
-        $('#change_counter').text('Матсоги')
         $('#score_1_1').text('0')
         $('#score_1_1').attr('onclick', 'updateScore(1, -24)')
 
@@ -118,12 +117,12 @@ function changeCounter(){
         $('#score_2_3').text('-0.3')
         $('#score_2_3').attr('onclick', 'updateScore(2, -0.3)')
     }
-    cleenScore()
+    // cleenScore()
 }
 
-function getScore(){
+function getData(callback){
     $.ajax({
-        url: '/api/get_score_of_judge',
+        url: '/api/get_data_of_judge',
         method: 'GET',
         dataType: 'json',
         success: function (data) {        
@@ -131,9 +130,30 @@ function getScore(){
             $('#score1').text(score_red);
             score_blue = data.score2
             $('#score2').text(score_blue);
+            doyang = data.doyang
+            console.log(data, score_red, score_blue)
+            role = data.role
+            callback();
         },
         error: function () {
             console.error('Error fetching data.');
         }
     });  
+}
+
+function getPlayingMatchCounter(doyang_id, callback){
+    $.ajax({
+        url: '/api/get_playing_match',
+        method: 'GET',
+        dataType: 'json',
+        data: {
+            doyang_id: doyang_id,
+        },
+        success: function (data) {
+            counter_type = data.type
+            callback();
+        },
+        error: function () {
+        }
+    });
 }

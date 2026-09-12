@@ -6,7 +6,7 @@ import json
 import os
 from functools import wraps
 
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 
 import category_py
 import database
@@ -16,7 +16,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 import get_data_judges_logic
 
-# load_dotenv()
+load_dotenv()
 
 from flask_socketio import SocketIO, close_room, join_room
 
@@ -89,6 +89,7 @@ def role_required(required_role):
 def join_doyang(data):
     try:
         doyang_id = int(data.get("doyang_id"))
+        need_data = bool(data.get("need_data"))
     except (TypeError, ValueError):
         return
 
@@ -100,9 +101,10 @@ def join_doyang(data):
     
     room_name_for_data = f"doyang_{doyang_id}"
     room_name_general = f"doyang_general_{doyang_id}"
-
-    join_room(room_name_for_data)
+    if need_data:
+        join_room(room_name_for_data)
     join_room(room_name_general)
+
 
 @socketio.on("update_scores")
 def update_scores(data):
@@ -712,14 +714,17 @@ def get_playing_match():
     }
     return jsonify(data)
 
-@app.route("/api/get_score_of_judge", methods = ['GET'])
+@app.route("/api/get_data_of_judge", methods = ['GET'])
 @role_required("judge")
-def get_score_of_judge():
+def get_data_of_judge():
     login = get_current_login()
-    scores = database.get_score_of_judge(login)
+    data_of_judge = database.get_data_of_judge(login)
+    print(data_of_judge[0][2])
     data = {
-        'score1': scores[0][0],
-        'score2': scores[0][1]
+        'score1': data_of_judge[0][0],
+        'score2': data_of_judge[0][1],
+        'doyang': data_of_judge[0][2],
+        'role': data_of_judge[0][3]
     }
     return jsonify(data)
 

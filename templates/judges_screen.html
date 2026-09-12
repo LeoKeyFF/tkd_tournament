@@ -13,13 +13,14 @@
 <body>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            checkAccess("admin");
-            updateDoYangs(function(){}, role="admin");
-            rolesJudgesToChoose($('#choose_role_judge'));
-            updateJudgesAll(function(){});
-            setInterval(function() {
+            checkAccess("admin", function(){
                 updateDoYangs(function(){}, role="admin");
-            }, 5000);
+                rolesJudgesToChoose($('#choose_role_judge'));
+                updateJudgesAll(function(){});
+                setInterval(function() {
+                    updateDoYangs(function(){}, role="admin");
+                }, 5000);
+            });
         });
     </script>
     <div class="judges" id="judges" style="display:flex; flex-direction: column;">

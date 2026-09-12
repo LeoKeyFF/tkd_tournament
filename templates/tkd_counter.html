@@ -5,17 +5,45 @@
     <title>Taekwon-Do</title>   
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style_tkd_counter.css') }}">
-    <script src="{{ url_for('static', filename='access.js') }}"></script>
-    <script src="{{ url_for('static', filename='tkd-counter.js') }}"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='socket.io.min.js') }}"></script>
     <script src="{{ url_for('static', filename='jquery.js') }}"></script>
-    <script src="/static/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+    </script>
+    <script src="{{ url_for('static', filename='tkd-counter.js') }}"></script>
+    <script src="{{ url_for('static', filename='access.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        getData(function(){
+            socket.on("connect", function () {
+                socket.emit("join_doyang", {
+                    doyang_id: doyang,
+                    need_data: 0
+                });
+            });
+            socket.on("new_is_started", function() {
+                getData(function(){
+                    getPlayingMatchCounter(doyang, function(){
+                        changeCounter();
+                        console.log(doyang);
+                        cleenScore();
+                    })
+                });
+            });
+        });
+    </script>
 </head>
 <body>
     <script>
-        checkAccess("judge");
-        const socket = io();
-        getScore();
+        document.addEventListener("DOMContentLoaded", function() {
+            checkAccess("judge", function(){
+                getData(function(){
+                    getPlayingMatchCounter(doyang, function(){
+                        changeCounter();
+                    })
+                });
+            });
+        });
     </script>
     <button class="button-primary primary-clickable menu-button" id="menuToggle" onclick="openMenu()">
         <span></span>
@@ -26,9 +54,9 @@
         <button class="button-primary primary-clickable reboot" onclick="cleenScore()">
             Сбросить
         </button>
-        <button class="button-primary primary-clickable reboot" id="change_counter" onclick="changeCounter()">
+        <!-- <button class="button-primary primary-clickable reboot" id="change_counter" onclick="changeCounter()">
             Матсоги
-        </button>
+        </button> -->
         <button class="button-primary primary-clickable reboot" onclick="logOut()">
             Выйти
         </button>

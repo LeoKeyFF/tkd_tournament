@@ -18,20 +18,20 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             if (currentPath === '/admin'){
-                checkAccess("admin");
-
-                showPage(0);
-                updateDoYangs(function(){
+                checkAccess("admin", function(){
                     showPage(0);
+                    updateDoYangs(function(){
+                        showPage(0);
+                    });
                 });
             }
             else if (currentPath === '/pj'){
-                checkAccess("pj");
-                getDoYangOfJudge();
-
-                showPage(1);
-                updateCategories(function(){
+                checkAccess("pj", function(){
+                    getDoYangOfJudge();
                     showPage(1);
+                    updateCategories(function(){
+                        showPage(1);
+                    });
                 });
             }
             else {

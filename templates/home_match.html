@@ -18,24 +18,26 @@
 <body>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            checkAccess("pj");
-            const params = getUrlParams();
-            current_doyang = params.doyang_id;
-            getPlayingMatch(current_doyang);
-            // const socket = io();
-            socket.emit("start_new", {
-                doyang_id: current_doyang
-            });
-            socket.on("connect", function () {
-                socket.emit("join_doyang", {
+            checkAccess("pj", function(){
+                const params = getUrlParams();
+                current_doyang = params.doyang_id;
+                getPlayingMatch(current_doyang);
+                // const socket = io();
+                socket.emit("start_new", {
                     doyang_id: current_doyang
                 });
+                socket.on("connect", function () {
+                    socket.emit("join_doyang", {
+                        doyang_id: current_doyang,
+                        need_data: 1
+                    });
+                });
+                socket.on("update_scores_get", function(data) {
+                    judgesContentShowScores(data.ids, data.logins, data.scores1, data.scores2, data.winners);
+                    countWinner(data.winners);
+                });
+                updateJudges();            
             });
-            socket.on("update_scores_get", function(data) {
-                judgesContentShowScores(data.ids, data.logins, data.scores1, data.scores2, data.winners);
-                countWinner(data.winners);
-            });
-            updateJudges();
         });
         window.addEventListener("pageshow", function (event) {
             if (event.persisted) {

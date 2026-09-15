@@ -210,8 +210,11 @@ function updateJudges(){
         },
         success: function (data) {        
             // judgesContent(data.ids, data.logins, data.scores1, data.scores2, data.winners)
-            judgesContentShowScores(data.ids, data.logins, data.scores1, data.scores2, data.winners)
+            judgesContentShowScores(data.ids, data.logins, data.scores1,
+                 data.scores2, data.winners, data.scores1main, data.scores2main)
             countWinner(data.winners)
+            countWinnerOfAllPlays(data.scores1, data.scores2, data.scores1main, data.scores2main)
+
             if (currentPath === '/show_match'){
                 judgesContentPublic(data.ids, data.scores1, data.scores2, data.winners)
             }

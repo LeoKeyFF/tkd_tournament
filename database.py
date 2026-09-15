@@ -87,7 +87,8 @@ def create_tables():
           "Competitor1ID INT," 
           "Competitor2ID INT," 
           "Winner INT," 
-          "NextMatchID INT"
+          "NextMatchID INT,"
+          "PlayNumber INT"
         ")"
     )
 
@@ -99,7 +100,9 @@ def create_tables():
           "Role varchar(255),"
           "Competitor1Score INT," 
           "Competitor2Score INT," 
-          "Winner INT" 
+          "Winner INT,"
+          "Competitor1ScoreCurrent INT," 
+          "Competitor2ScoreCurrent INT"  
         ")"
     )
 
@@ -391,7 +394,7 @@ def get_from_judges(doyang_id):
 
     judges = cursor.execute(f"""
         SELECT 
-            j.JudgeID, j.Login, j.Competitor1Score, j.Competitor2Score, j.Winner
+            j.JudgeID, j.Login, j.Competitor1ScoreCurrent, j.Competitor2ScoreCurrent, j.Winner, j.Competitor1Score, j.Competitor2Score
         FROM 
             Judges j
         JOIN
@@ -687,7 +690,16 @@ def play_match(match_id):
             JOIN Categories c ON m.CategoryID = c.CategoryID
             WHERE m.MatchID = {match_id}
         )
-    """).fetchall()
+    """)
+
+    cursor.execute(f"""
+        UPDATE 
+            Matches
+        SET 
+            PlayNumber = 1
+        WHERE 
+            MatchID = {match_id}
+    """)
 
     doyang = cursor.execute(f"""
         SELECT c.DoYangID
@@ -745,8 +757,8 @@ def add_score(login, score1, score2, winner):
     cursor.execute(f"""
         UPDATE Judges 
         SET 
-            Competitor1Score = {score1},
-            Competitor2Score = {score2},
+            Competitor1ScoreCurrent = {score1},
+            Competitor2ScoreCurrent = {score2},
             Winner = {winner}
         WHERE
             Login = '{login}'
@@ -775,7 +787,7 @@ def get_data_of_judge(login):
     cursor = connection.cursor()
 
     data = cursor.execute(f"""
-        SELECT Competitor1Score, Competitor2Score, DoYangID, Role
+        SELECT Competitor1ScoreCurrent, Competitor2ScoreCurrent, DoYangID, Role
         FROM Judges
         WHERE Login = '{login}'
     """).fetchall()
@@ -827,3 +839,99 @@ def get_date():
     connection.close()  
 
     return date
+
+def new_play_number(match_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    cursor.execute(f"""
+        UPDATE 
+            Matches
+        SET 
+            PlayNumber = PlayNumber + 1
+        WHERE 
+            MatchID = {match_id}
+    """)
+
+    connection.commit()
+    connection.close()  
+
+def add_current_score_to_main(match_id, type_match, winner):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    if (type_match == 'tuly'):
+        cursor.execute(f"""
+            UPDATE 
+                Judges
+            SET 
+                Competitor1Score = IFNULL(Competitor1Score, 0) + Competitor1ScoreCurrent,
+                Competitor2Score = IFNULL(Competitor2Score, 0) + Competitor2ScoreCurrent
+            FROM 
+                Categories
+            JOIN 
+                 Matches ON Categories.CategoryID = Matches.CategoryID
+            WHERE 
+                Judges.DoYangID = Categories.DoYangID
+            AND 
+                Matches.MatchID = {match_id}
+        """)
+    else:
+        if winner == 1:
+            cursor.execute(f"""
+                UPDATE 
+                    Judges
+                SET 
+                    Competitor1Score = Competitor1Score + 1
+                FROM 
+                    Judges
+                JOIN 
+                    Categories ON Judges.DoYangID = Categories.DoYangID
+                JOIN 
+                    Matches ON Categories.CategoryID = Matches.CategoryID
+                WHERE 
+                    Matches.MatchID = {match_id}
+            """)
+        elif winner == 2:
+            cursor.execute(f"""
+                UPDATE 
+                    Judges
+                SET 
+                    Competitor2Score = Competitor2Score + 1
+                FROM 
+                    Judges
+                JOIN 
+                    Categories ON Judges.DoYangID = Categories.DoYangID
+                JOIN 
+                    Matches ON Categories.CategoryID = Matches.CategoryID
+                WHERE 
+                    Matches.MatchID = {match_id}
+            """)
+
+    connection.commit()
+    connection.close()  
+
+def clean_score(match_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    print('hello there')
+
+    cursor.execute(f"""
+        UPDATE 
+            Judges
+        SET 
+            Competitor1Score = 0,
+            Competitor2Score = 0
+        FROM 
+            Categories
+        JOIN 
+                Matches ON Categories.CategoryID = Matches.CategoryID
+        WHERE 
+            Judges.DoYangID = Categories.DoYangID
+        AND 
+            Matches.MatchID = {match_id}
+    """)
+
+    connection.commit()
+    connection.close()   

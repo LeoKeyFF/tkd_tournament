@@ -246,7 +246,7 @@ function uploadJudges() {
     });
 }
 
-function judgesContentShowScores(ids, logins, scores1, scores2, winners){
+function judgesContentShowScores(ids, logins, scores1, scores2, winners, scores1main, scores2main){
     const table = $("#table_show_match")
     const tbody = table.find("tbody");
     tbody.empty()

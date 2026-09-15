@@ -697,6 +697,7 @@ def get_playing_match():
         competitor_2_id = 0
         competitor_1_name = ''
         competitor_2_name = ''
+        play_number = 0
     else:
         match = match[0]
         match_id = match[0]
@@ -704,13 +705,16 @@ def get_playing_match():
         competitor_2_id = match[4]
         competitor_1_name = match[-2]
         competitor_2_name = match[-1]
+        play_number = match[7]
+        print('round play' + str(play_number))
     data = {
         'match_id': match_id,
         'competitor_1_id': competitor_1_id,
         'competitor_2_id': competitor_2_id,
         'competitor_1_name': competitor_1_name,
         'competitor_2_name': competitor_2_name,
-        'type': type
+        'type': type,
+        'play_number': play_number
     }
     return jsonify(data)
 
@@ -803,6 +807,35 @@ def get_doyang_of_judge():
         'doyang': doyang
     }
     return jsonify(data)
+
+@app.route("/api/pj/new_play_number", methods = ['POST'])
+@role_required("pj")
+def new_play_number():
+    data = request.get_json()
+    match_id = data.get('match_id')
+    type_match = data.get('type_match')
+    winner = data.get('winner')
+    database.new_play_number(match_id)
+    database.add_current_score_to_main(match_id, type_match, winner)
+    return jsonify(success=True)
+
+@app.route("/api/pj/add_current_score_to_main", methods = ['POST'])
+@role_required("pj")
+def add_current_score_to_main():
+    data = request.get_json()
+    match_id = data.get('match_id')
+    type_match = data.get('type_match')
+    winner = data.get('winner')
+    database.add_current_score_to_main(match_id, type_match, winner)
+    return jsonify(success=True)
+
+@app.route("/api/pj/clean_score", methods = ['POST'])
+@role_required("pj")
+def clean_score():
+    data = request.get_json()
+    match_id = data.get('match_id')
+    database.clean_score(match_id)
+    return jsonify(success=True)
 
 if __name__ == "__main__":
     # print('hash:' + generate_password_hash("123", method="pbkdf2:sha256"))

@@ -4,6 +4,13 @@ let type_match = ''
 
 let public_full_screen = false
 
+let scores1main = []
+let scores2main = []
+
+let globalWinner = 0
+
+let play_number = 0
+
 class Match {
     constructor(category, round, competitor1id, competitor1name, competitor2id, competitor2name, winner, matchId, row){
         this.category = category;
@@ -42,9 +49,12 @@ function getPlayingMatch(doyang_id, callback){
             competitor2id = data.competitor_2_id
             competitor2name = data.competitor_2_name
             type_match = data.type
+            play_number = data.play_number
 
             $("#name_1_match").text(competitor1name)
             $("#name_2_match").text(competitor2name)
+
+            $("#play_number").text(play_number)
 
             callback();
         },
@@ -60,6 +70,25 @@ function endMatch(){
     const dataToSendEnd = { 
         match_id: match_id
     };
+    const dataToSendUpdateScore = { 
+        match_id: match_id,
+        type_match: type_match,
+        winner: countWinnerLogic()
+    };
+    $.ajax({
+        type: "POST",
+        url: '/api/pj/add_current_score_to_main',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(dataToSendUpdateScore),
+        dataType: 'json',
+        success: function (response, status, jqXHR) {
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            // Error handling
+        },
+        complete: function (jqXHR, textStatus) {
+        }
+    });
     $.ajax({
         type: "POST",
         url: '/api/end_match',
@@ -89,7 +118,7 @@ function countWinner(winners){
     }
 }
 
-function endMatchLogic(){
+function countWinnerLogic(){
     let winner
     if (winner1_total > winner2_total){
         winner = competitor1id;
@@ -98,13 +127,85 @@ function endMatchLogic(){
         winner = competitor2id;
     }
     else{
+        winner = 0
+    }
+    return winner
+
+}
+
+function countWinner(winners){
+    winner1_total = 0
+    winner2_total = 0
+    for (let i = 0; i < winners.length; i++){
+        if (winners[i] == 1){
+            winner1_total += 1
+        }
+        else if(winners[i] == 2){
+            winner2_total += 1
+        }
+    }
+}
+
+function countWinnerOfAllPlays(scores1, scores2, scores1main, scores2main){
+    let s1 = []
+    let s2 = []
+    let wins = []
+    console.log(scores1main, scores1, scores1+scores1main)
+    for (let i = 0; i < scores1.length; i++){
+        s1.push(scores1main[i] + scores1[i])
+        s2.push(scores2main[i] + scores2[i])
+        if (scores1main[i] + scores1[i] > scores2main[i] + scores2[i]){
+            wins.push(1)
+        } else if (scores1main[i] + scores1[i] < scores2main[i] + scores2[i]){
+            wins.push(2)
+        } else {
+            wins.push(0)
+        }
+    }
+    let winner1 = 0
+    let winner2 = 0
+    for (let i = 0; i < wins.length; i++){
+        if (wins[i] == 1){
+            winner1 += 1
+        }
+        else if(wins[i] == 2){
+            winner2 += 1
+        }
+    }
+    if (winner1 > winner2){
+        globalWinner = competitor1id;
+    }
+    else if (winner1 < winner2){
+        globalWinner = competitor2id;
+    }
+    else{
+        globalWinner = 0
+    }
+}
+
+function endMatchLogic(){
+    // let winner
+    // if (winner1_total > winner2_total){
+    //     winner = competitor1id;
+    // }
+    // else if (winner1_total < winner2_total){
+    //     winner = competitor2id;
+    // }
+    // else{
+    //     window.close();
+    //     // pageBack();
+    //     return;
+    // }
+
+    let winner = countWinnerLogic()
+    if (winner == 0){
         window.close();
         // pageBack();
         return;
     }
 
     const dataToSend = { 
-        winner: winner,
+        winner: globalWinner, //winner
         match_id: match_id
     };
     $.ajax({
@@ -115,6 +216,23 @@ function endMatchLogic(){
         dataType: 'json',
         success: function (response, status, jqXHR) {
             window.close()
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            // Error handling
+        },
+        complete: function (jqXHR, textStatus) {
+        }
+    });
+        const dataToSendCleanScore = { 
+        match_id: match_id
+    };
+    $.ajax({
+        type: "POST",
+        url: '/api/pj/clean_score',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(dataToSendCleanScore),
+        dataType: 'json',
+        success: function (response, status, jqXHR) {
         },
         error: function (jqXHR, textStatus, errorThrown) {
             // Error handling
@@ -253,4 +371,31 @@ function judgesContentPublic(ids, scores1, scores2, winners){
     tr_all.append(td_all_2) //it is reversed for viewers because the screen is turned to the public 
     tr_all.append(td_all_1)
     tbody.append(tr_all)
+}
+
+function newPlayNumber(){
+    const dataToSend = { 
+        match_id: match_id,
+        type_match: type_match,
+        winner: countWinnerLogic()
+    };
+    $.ajax({
+        type: "POST",
+        url: '/api/pj/new_play_number',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(dataToSend),
+        dataType: 'json',
+        success: function (response, status, jqXHR) {
+            socket.emit("start_new", {
+                doyang_id: current_doyang
+            });
+            getPlayingMatch(current_doyang, function(){
+            });
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            // Error handling
+        },
+        complete: function (jqXHR, textStatus) {
+        }
+    });
 }

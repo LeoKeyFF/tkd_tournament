@@ -150,7 +150,6 @@ function countWinnerOfAllPlays(scores1, scores2, scores1main, scores2main){
     let s1 = []
     let s2 = []
     let wins = []
-    console.log(scores1main, scores1, scores1+scores1main)
     for (let i = 0; i < scores1.length; i++){
         s1.push(scores1main[i] + scores1[i])
         s2.push(scores2main[i] + scores2[i])
@@ -173,12 +172,15 @@ function countWinnerOfAllPlays(scores1, scores2, scores1main, scores2main){
         }
     }
     if (winner1 > winner2){
+        $("#the_winner_is").text('Побеждает: ' + competitor1name)
         globalWinner = competitor1id;
     }
     else if (winner1 < winner2){
+        $("#the_winner_is").text('Побеждает: ' + competitor2name)
         globalWinner = competitor2id;
     }
     else{
+        $("#the_winner_is").text('Ничья')
         globalWinner = 0
     }
 }
@@ -197,12 +199,12 @@ function endMatchLogic(){
     //     return;
     // }
 
-    let winner = countWinnerLogic()
-    if (winner == 0){
-        window.close();
-        // pageBack();
-        return;
-    }
+    // let winner = countWinnerLogic()
+    // if (winner == 0){
+    //     window.close();
+    //     // pageBack();
+    //     return;
+    // }
 
     const dataToSend = { 
         winner: globalWinner, //winner

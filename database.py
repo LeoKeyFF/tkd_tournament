@@ -102,7 +102,11 @@ def create_tables():
           "Competitor2Score INT," 
           "Winner INT,"
           "Competitor1ScoreCurrent INT," 
-          "Competitor2ScoreCurrent INT"  
+          "Competitor2ScoreCurrent INT,"
+          "Competitor1Caution INT," 
+          "Competitor2Caution INT,"
+          "Competitor1Warning INT," 
+          "Competitor2Warning INT"  
         ")"
     )
 
@@ -394,7 +398,9 @@ def get_from_judges(doyang_id):
 
     judges = cursor.execute(f"""
         SELECT 
-            j.JudgeID, j.Login, j.Competitor1ScoreCurrent, j.Competitor2ScoreCurrent, j.Winner, j.Competitor1Score, j.Competitor2Score
+            j.JudgeID, j.Login, j.Competitor1ScoreCurrent, j.Competitor2ScoreCurrent, 
+            j.Winner, j.Competitor1Score, j.Competitor2Score,
+            j.Competitor1Caution, j.Competitor2Caution, j.Competitor1Warning, j.Competitor2Warning
         FROM 
             Judges j
         JOIN
@@ -922,11 +928,16 @@ def clean_score(match_id):
             Judges
         SET 
             Competitor1Score = 0,
-            Competitor2Score = 0
+            Competitor2Score = 0,
+            Competitor1Caution = 0,
+            Competitor2Caution = 0,
+            Competitor1Warning = 0,
+            Competitor2Warning = 0,
+            Winner = 0
         FROM 
             Categories
         JOIN 
-                Matches ON Categories.CategoryID = Matches.CategoryID
+            Matches ON Categories.CategoryID = Matches.CategoryID
         WHERE 
             Judges.DoYangID = Categories.DoYangID
         AND 
@@ -935,3 +946,81 @@ def clean_score(match_id):
 
     connection.commit()
     connection.close()   
+
+def set_foul(doyang, caution1, caution2, warning1, warning2):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    scores = cursor.execute(f"""
+        SELECT 
+            JudgeID, Competitor1ScoreCurrent, Competitor2ScoreCurrent
+        FROM 
+            Judges
+        WHERE 
+            DoYangID = {doyang}
+    """).fetchall()
+
+    print(scores)
+
+    cursor.execute(f"""
+        UPDATE 
+            Judges
+        SET 
+            Competitor1Caution = IFNULL(Competitor1Caution, 0) + {caution1},
+            Competitor2Caution = IFNULL(Competitor2Caution, 0) + {caution2},
+            Competitor1Warning = IFNULL(Competitor1Warning, 0) + {warning1},
+            Competitor2Warning = IFNULL(Competitor2Warning, 0) + {warning2}
+        WHERE 
+            DoYangID = {doyang}
+    """)
+    connection.commit()
+
+    for score in scores:
+        winner = calculate_winner(score1=score[1], score2=score[2], doyang=doyang)
+        cursor.execute(f"""
+            UPDATE 
+                Judges
+            SET 
+                Winner = {winner}
+            WHERE 
+                JudgeID = {score[0]}
+        """)   
+
+    connection.commit()
+    connection.close()    
+
+def get_fouls(doyang):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    fouls = cursor.execute(f"""
+        SELECT 
+            Competitor1Caution,
+            Competitor2Caution,
+            Competitor1Warning,
+            Competitor2Warning
+        FROM 
+            Judges
+        WHERE 
+            DoYangID = {doyang};
+    """).fetchall()[0]
+
+    connection.commit()
+    connection.close()    
+
+    return fouls
+
+def calculate_winner(score1, score2, doyang):
+    if score1 == None and score2 == None:
+        return 0
+    fouls = get_fouls(doyang)
+    s1 = score1 - int((0 if fouls[0] is None else fouls[0] )/ 3) - (0 if fouls[2] is None else fouls[2])
+    s2 = score2 - int((0 if fouls[1] is None else fouls[1] )/ 3) - (0 if fouls[3] is  None else fouls[3])
+    print(s2, int((0 if fouls[1] is None else fouls[1] )/ 3), (0 if fouls[3] is  None else fouls[3]))
+    if s1  > s2 :
+        winner = 1
+    elif s1  < s2:
+        winner = 2
+    else:
+        winner = 0
+    return winner

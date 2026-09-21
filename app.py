@@ -111,14 +111,18 @@ def update_scores(data):
     login = get_current_login()
     score1 = data.get("score1")
     score2 = data.get("score2")
-    if score1 > score2:
-        winner = 1
-    elif score1 < score2:
-        winner = 2
-    else:
-        winner = 0
-    database.add_score(login, score1, score2, winner)
     doyang = database.get_doyang_of_judge(login)
+    winner = database.calculate_winner(score1, score2, doyang)
+    # fouls = database.get_fouls(doyang)
+    # s1 = score1 - int((0 if fouls[0] is None else fouls[0] )/ 3) - (0 if fouls[2] is None else fouls[2])
+    # s2 = score2 - int((0 if fouls[1] is None else fouls[1] )/ 3) - (0 if fouls[3] is  None else fouls[3])
+    # if s1  > s2 :
+    #     winner = 1
+    # elif s1  < s2:
+    #     winner = 2
+    # else:
+    #     winner = 0
+    database.add_score(login, score1, score2, winner)
     socketio.emit(
         "update_scores_get", 
         get_data_judges_logic.get_data_judges_logic(doyang),
@@ -832,10 +836,38 @@ def add_current_score_to_main():
 @app.route("/api/pj/clean_score", methods = ['POST'])
 @role_required("pj")
 def clean_score():
+    print('clinning :)')
     data = request.get_json()
     match_id = data.get('match_id')
     database.clean_score(match_id)
     return jsonify(success=True)
+
+@app.route("/api/pj/set_foul", methods = ['POST'])
+@role_required("pj")
+def set_foul():
+    data = request.get_json()
+    doyang = data.get('doyang')
+    caution1 = data.get('caution1')
+    warning1 = data.get('warning1')
+    caution2 = data.get('caution2')
+    warning2 = data.get('warning2')
+    database.set_foul(doyang, caution1, caution2, warning1, warning2)
+
+    return jsonify(success=True)
+
+@app.route("/api/pj/get_fouls", methods = ['GET'])
+@role_required("pj")
+def get_fouls():
+    doyang = request.args.get('doyang')
+    fouls = database.get_fouls(doyang)
+    data = {
+        'caution1': fouls[0],
+        'caution2': fouls[1],
+        'warning1': fouls[2],
+        'warning2': fouls[3]
+    }
+    return jsonify(data)
+
 
 if __name__ == "__main__":
     # print('hash:' + generate_password_hash("123", method="pbkdf2:sha256"))

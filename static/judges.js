@@ -246,41 +246,100 @@ function uploadJudges() {
     });
 }
 
-function judgesContentShowScores(ids, logins, scores1, scores2, winners, scores1main, scores2main){
-    const table = $("#table_show_match")
-    const tbody = table.find("tbody");
-    tbody.empty()
-    for (let i = 0; i < ids.length; i++){
-        const tr = $('<tr>', {
-        })
-        const td1 = $('<td>', {
-            colspan: 9
-        }).append(
-            $('<div>',{
-                class: 'score red',
-                style: 'align-items: center;',
-                text: scores1[i]
-            })
-        );
-        const td2 = $('<td>', {
-            colspan: 2,
-            text: logins[i]
-        })
-        const td3 = $('<td>', {
-            colspan: 9
-        }).append(
-            $('<div>',{
-                class: 'score blue',
-                style: 'align-items: center;',
-                text: scores2[i]
-            })
-        );
-        tr.append(td1)
-        tr.append(td2)
-        tr.append(td3)
-        tbody.append(tr)
-    }
-}
+// function judgesContentShowScores(ids, logins, scores1, scores2, winners, scores1main, scores2main,
+//     cautions1, cautions2, warnings1, warnings2
+// ){
+//     const table = $("#table_show_match")
+//     const tbody = table.find("tbody");
+//     tbody.empty()
+//     for (let i = 0; i < ids.length; i++){
+//         const tr = $('<tr>', {
+//         })
+//         const td1 = $('<td>', {
+//             colspan: 9
+//         }).append(
+//             $('<div>',{
+//                 class: 'score red',
+//                 style: 'align-items: center;',
+//                 text: scores1[i]
+//             })
+//         );
+//         const td2 = $('<td>', {
+//             colspan: 2,
+//             text: logins[i]
+//         })
+//         const td3 = $('<td>', {
+//             colspan: 9
+//         }).append(
+//             $('<div>',{
+//                 class: 'score blue',
+//                 style: 'align-items: center;',
+//                 text: scores2[i]
+//             })
+//         );
+//         tr.append(td1)
+//         tr.append(td2)
+//         tr.append(td3)
+//         tbody.append(tr)
+//     }
+//     const tr_cautions = $('<tr>', {
+//     })
+//     const td1_caution = $('<td>', {
+//         colspan: 10
+//     }).append(
+//         $('<div>',{
+//             class: 'score red',
+//             style: 'align-items: center;',
+//             text: cautions1[0],
+//             id: 'caution1'
+//         })
+//     ).on('click', function() {
+//         $(this).toggleClass('active');
+//         current_doyang = ids[i];
+//         updateCategories(function(){
+//             showPage(1);
+//         });
+//     });
+//     const td2_caution = $('<td>', {
+//         colspan: 10
+//     }).append(
+//         $('<div>',{
+//             class: 'score red',
+//             style: 'align-items: center;',
+//             text: cautions2[0],
+//             id: 'caution2'
+//         })
+//     );
+//     tr_cautions.append(td1_caution)
+//     tr_cautions.append(td2_caution)
+
+//     const tr_warnings = $('<tr>', {
+//     })
+//     const td1_warning = $('<td>', {
+//         colspan: 10
+//     }).append(
+//         $('<div>',{
+//             class: 'score red',
+//             style: 'align-items: center;',
+//             text: warnings1[0],
+//             id: 'warning1'
+//         })
+//     );
+//     const td2_warning = $('<td>', {
+//         colspan: 10
+//     }).append(
+//         $('<div>',{
+//             class: 'score red',
+//             style: 'align-items: center;',
+//             text: warnings2[0],
+//             id: 'warning2'
+//         })
+//     );
+//     tr_warnings.append(td1_warning)
+//     tr_warnings.append(td2_warning)
+//     tbody.append(tr_cautions)
+//     tbody.append(tr_warnings)
+// }
 
 function getUrlParams() {
     const params = new URLSearchParams(window.location.search);

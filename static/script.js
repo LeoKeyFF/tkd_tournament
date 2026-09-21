@@ -211,7 +211,8 @@ function updateJudges(){
         success: function (data) {        
             // judgesContent(data.ids, data.logins, data.scores1, data.scores2, data.winners)
             judgesContentShowScores(data.ids, data.logins, data.scores1,
-                 data.scores2, data.winners, data.scores1main, data.scores2main)
+                 data.scores2, data.winners, data.scores1main, data.scores2main,
+                data.cautions1, data.cautions2, data.warnings1, data.warnings2)
             countWinner(data.winners)
             countWinnerOfAllPlays(data.scores1, data.scores2, data.scores1main, data.scores2main)
 

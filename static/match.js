@@ -134,7 +134,15 @@ function countWinnerLogic(){
     else{
         winner = 0
     }
-    return winner
+    if (winner == competitor1id){
+        return 1
+    }
+    else if (winner == competitor2id){
+        return 2
+    }
+    else{
+        return 0
+    }
 
 }
 
@@ -158,7 +166,7 @@ function countWinnerOfAllPlays(scores1, scores2, scores1main, scores2main){
     console.log('2 wins')
     for (let i = 0; i < scores1.length; i++){
         if (type_match == 'sparring'){
-            if (countWinnerLogic() == competitor1id){
+            if (countWinnerLogic() == 1){
                 console.log('1 wins')
                 s1.push(scores1main[i] + 1)
                 s2.push(scores2main[i])
@@ -169,7 +177,7 @@ function countWinnerOfAllPlays(scores1, scores2, scores1main, scores2main){
                 } else {
                     wins.push(0)
                 } 
-            } else if(countWinnerLogic() == competitor2id){
+            } else if(countWinnerLogic() == 2){
                 console.log('2 wins')
                 s1.push(scores1main[i])
                 s2.push(scores2main[i] + 1)

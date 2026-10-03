@@ -628,6 +628,9 @@ select option {
 .select-for-judge{
     width: 100%;
 }
+.is-finished {
+    border: 1px solid #08b719;
+}
 
 @media (max-width: 480px) {
     body {

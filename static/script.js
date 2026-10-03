@@ -132,7 +132,7 @@ function updateCategories(callback){
             categories_with_index_name = []
             for (let i = 0; i < data.ids.length; i++){
                 categories_with_index_name.push(new Category(data.ids[i], data.indexes_names[i] + data.names[i], 
-                    data.doyangs[i], data.competitors_amounts[i], data.indexes[i]))
+                    data.doyangs[i], data.competitors_amounts[i], data.indexes[i], data.is_finisheds[i]))
             }
             categoriesContent(categories_with_index_name, data.doyangs_list);
 
@@ -288,7 +288,7 @@ function opendJudges(){
         type: "POST",
         url: '/api/open_judges',
         success: function (response, status, jqXHR) {
-            window.location.href = response.redirect;
+            window.location.replace(response.redirect);        
         },
         error: function (jqXHR, textStatus, errorThrown) {
         },
@@ -336,4 +336,20 @@ function playMatch(){
 
 function pageBack(){
     window.history.back();
+}
+
+function backToAdminPage(){
+    $.ajax({
+        type: "POST",
+        url: '/api/back_to_admin',
+        contentType: 'application/json; charset=utf-8',
+        success: function (response, status, jqXHR) {
+            window.location.replace(response.redirect);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            // Error handling
+        },
+        complete: function (jqXHR, textStatus) {
+        }
+    }); 
 }

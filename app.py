@@ -538,7 +538,8 @@ def get_data_categories():
             'doyangs_list': doyangs_list,
             'competitors_amounts': [],
             'indexes': [],
-            'indexes_names': []
+            'indexes_names': [],
+            'is_finisheds': []
         }
         return jsonify(data)
     ids = []
@@ -546,6 +547,7 @@ def get_data_categories():
     doyangs = []
     indexes = []
     indexes_names = []
+    is_finisheds = []
     for category in categories:
         ids.append(category[0])
         names.append(
@@ -565,6 +567,7 @@ def get_data_categories():
         doyangs.append(category[9])
         indexes.append(category[10])
         indexes_names.append(category_py.index_to_name(doyang=category[9], index=category[10]))
+        is_finisheds.append(category[11] if category[11] != None else 0)
     data = {
         'ids': ids,
         'names': names,
@@ -572,7 +575,8 @@ def get_data_categories():
         'doyangs_list': doyangs_list,
         'competitors_amounts': competitors_amounts,
         'indexes': indexes,
-        'indexes_names': indexes_names
+        'indexes_names': indexes_names,
+        'is_finisheds': is_finisheds
     }
     return jsonify(data)
 
@@ -867,6 +871,14 @@ def get_fouls():
         'warning2': fouls[3]
     }
     return jsonify(data)
+
+@app.route("/api/back_to_admin", methods = ['POST'])
+@role_required("admin")
+def back_to_admin():
+    return jsonify({
+        'success': True,
+        'redirect': url_for('home_admin')
+    })
 
 
 if __name__ == "__main__":

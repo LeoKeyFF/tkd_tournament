@@ -51,7 +51,8 @@ def create_tables():
           "AgeTo INT,"
           "Type varchar(255),"
           "DoYangID INT,"
-          "IndexNumber INT "
+          "IndexNumber INT, "
+          "IsFinished"
         ")"
     )
     cursor.execute(
@@ -328,7 +329,7 @@ def get_from_categories():
 
     categories = cursor.execute(f"""
         SELECT 
-            CategoryID, Name, BeltFrom, BeltTo, WeightFrom, WeightTo, AgeFrom, AgeTo, Type, DoYangID, IndexNumber 
+            CategoryID, Name, BeltFrom, BeltTo, WeightFrom, WeightTo, AgeFrom, AgeTo, Type, DoYangID, IndexNumber, IsFinished
         FROM 
             Categories
     """)
@@ -453,6 +454,23 @@ def set_winner(match_id, winner):
         WHERE 
             MatchID = {next_match_id}
     """)    
+
+    if next_match_id == 0:
+            print('it is final!')
+            cursor.execute(f"""
+                UPDATE Categories 
+                SET 
+                    IsFinished = 1
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM 
+                        Matches
+                    WHERE
+                        Matches.CategoryID = Categories.CategoryID
+                    AND
+                        Matches.MatchID = {match_id}
+                )
+            """)  
 
     connection.commit()
     connection.close()

@@ -66,6 +66,9 @@ function categoriesContent(categories, doyangs_list){
                     showPage(2)
                 });
             });
+            if (category.is_finished == 1){
+                categoryButton.addClass('is-finished')
+            }
 
             const tr = $('<tr>', {
             });
@@ -89,7 +92,7 @@ function categoriesContent(categories, doyangs_list){
             })
             td1.append(category.name)
             tr.append(td1)
-            if (currentPath === '/admin'){
+            if (currentPath === '/admin' || currentPath === '/pj'){
                 td2.append(category.competitor_amount)
                 td3.append(delButton)
 
@@ -173,6 +176,7 @@ function showPage(page){
         $('#path_card_category').remove();
 
         current_category = 0;
+        updateCategories(function(){});
     }
     else if (page == 2){
         $("#doyangs").css("display", "none");

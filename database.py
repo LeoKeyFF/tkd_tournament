@@ -116,7 +116,8 @@ def create_tables():
           "Name varchar(255),"
           "Year INT,"
           "Month INT,"
-          "Day INT"
+          "Day INT,"
+          "Confirmed INT"
         ")"
     )
     
@@ -1054,3 +1055,33 @@ def calculate_winner(score1, score2, doyang):
     else:
         winner = 0
     return winner
+
+def tournament_confirmed():
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    confirm = cursor.execute(f"""
+        SELECT 
+            Confirmed
+        FROM 
+            Tournaments
+    """).fetchall()[0][0]
+
+    connection.commit()
+    connection.close()    
+    return True if confirm == 1 else False
+
+def confirm_tournament():
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    cursor.execute(f"""
+        UPDATE 
+            Tournaments
+        SET 
+            Confirmed = 1
+            
+    """)
+
+    connection.commit()
+    connection.close()    

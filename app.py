@@ -1,6 +1,8 @@
+import csv
+import io
 from urllib.parse import urlencode
 
-from flask import Flask, render_template, request, redirect, url_for, jsonify, make_response, session, send_from_directory, abort
+from flask import Flask, Response, render_template, request, redirect, url_for, jsonify, make_response, session, send_from_directory, abort
 
 import json
 import os
@@ -203,6 +205,9 @@ def home_admin():
     
     if not os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
         return redirect(url_for('home_upload'))
+
+    if not database.tournament_confirmed():
+        return redirect(url_for('confirm_tournament_screen'))
     
     return render_template('main.html', user='admin')
 
@@ -235,6 +240,12 @@ def home_match():
 @role_required("pj")
 def show_match():
     return render_template('show_public_match.html')
+
+@app.route("/confirm_tournament_screen")
+@role_required("admin")
+def confirm_tournament_screen():
+    return render_template('confirm_tournament_screen.html')
+
 #----------------------------------------------------------------------------------------
 
 
@@ -342,19 +353,19 @@ def upload_file():
     if 'file' not in request.files:
         return jsonify({
             'success': False,
-            'redirect': url_for('upload_screen')
+            'redirect': url_for('home_upload')
         })    
     file = request.files['file']
     
     if file.filename == '':
         return jsonify({
             'success': False,
-            'redirect': url_for('upload_screen')
+            'redirect': url_for('home_upload')
         })        
     if not allowed_file(file.filename):
         return jsonify({
             'success': False,
-            'redirect': url_for('upload_screen')
+            'redirect': url_for('home_upload')
         })    
     if os.path.exists(os.path.join(UPLOAD_FOLDER, 'competitors.xlsx')):
         return jsonify({
@@ -383,6 +394,42 @@ def upload_file():
             'redirect': url_for('upload_screen')
         })    
 
+@app.route('/create_confirm_file')
+def create_confirm_file():
+    data = []
+    categories = database.get_from_categories()
+    for category in categories:
+        ids = category[0] 
+        name = category_py.category_name(
+            name=category[1], 
+            belt_from=category[2],
+            belt_to=category[3],
+            weight_from=category[4],
+            weight_to=category[5],
+            age_from=category[6],
+            age_to=category[7],
+            type=category[8],
+            doyang=category[9],
+            index=category[10] 
+        )
+        competitors = database.get_from_competitors(category[0])
+        data.append({"Категория": name, "Спортсмены": competitors})
+
+    return Response(
+        build_csv(data),
+        mimetype="text/csv; charset=utf-8",
+        headers={"Content-Disposition": 'attachment; filename="protocol.csv"'},
+    )
+    
+
+def build_csv(data) -> bytes:
+    buf = io.StringIO()
+    w = csv.writer(buf, delimiter=";", lineterminator="\r\n")
+    w.writerow(["Категория", "Спортсмен", "Клуб"])
+    for item in data:
+        for athlete in item["Спортсмены"]:
+            w.writerow([item["Категория"], athlete.name, athlete.club])
+    return ("\ufeff" + buf.getvalue()).encode("utf-8")
 #----------------------------------------------------------------------------------------
 
 @app.route("/api/add_doyang", methods = ['POST'])
@@ -880,6 +927,15 @@ def back_to_admin():
         'redirect': url_for('home_admin')
     })
 
+@app.route("/api/confirm_protocol", methods = ['POST'])
+@role_required("admin")
+def confirm_protocol():
+    database.confirm_tournament()
+    return jsonify({
+        'success': True,
+        'redirect': url_for('home_admin')
+    })
+ 
 
 if __name__ == "__main__":
     # print('hash:' + generate_password_hash("123", method="pbkdf2:sha256"))

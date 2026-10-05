@@ -1,0 +1,36 @@
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taekwon-Do</title>   
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='confirm_tournament.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='access.js') }}"></script>
+</head>
+<body>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            checkAccess("admin", function(){
+                updateDoYangs(function(){}, role="admin");
+                rolesJudgesToChoose($('#choose_role_judge'));
+                updateJudgesAll(function(){});
+                setInterval(function() {
+                    updateDoYangs(function(){}, role="admin");
+                }, 5000);
+            });
+        });
+    </script>
+    <div class="upload-container"
+    style="display:flex; flex-direction: column; justify-content: center; align-items: center;">
+        Протокол:
+        <a href="/create_confirm_file" class="">📥 Скачать протокол</a>
+        <button id="uploadBtn" onclick="confirmProtocol()" class="button-secondary start-tournament secondary-clickable">
+            Подтвердить
+        </button>
+        <button id="uploadBtn" onclick="rejectProtocol()" class="button-secondary start-tournament secondary-clickable">
+            Отмена
+        </button>
+    </div>
+</body>
+</html>

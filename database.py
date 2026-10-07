@@ -497,6 +497,33 @@ def get_category_id(age, weight, belt, gender, type):
 
     if len(category) > 0:
         return category[0][0]
+        # if (age <= 6 and age >= 5 and type == 'тыль'):
+        #     print(category)
+        #     for index in range (0, len(category)):
+        #         connection = sqlite3.connect(database_path)
+        #         cursor = connection.cursor()
+
+        #         count = cursor.execute(f"""
+        #             SELECT 
+        #                 COUNT(*) 
+        #             FROM 
+        #                 Competitors 
+        #             WHERE
+        #                 Tuly = {category[index][0]}
+        #         """).fetchall()[0][0]
+
+        #         connection.commit()
+        #         connection.close()
+                
+        #         if count < 4:
+        #             return category[index][0]
+        #         else:
+        #             if index == len(category) - 1:
+        #                 add_extra_category(category[0][0], index + 1)
+        #                 return get_category_id(age, weight, belt, gender, type)
+
+        # else:
+        #     return category[0][0]
     else:
         return 0
 
@@ -1085,3 +1112,112 @@ def confirm_tournament():
 
     connection.commit()
     connection.close()    
+
+def add_extra_category(tuly, group, index):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    category = cursor.execute(f"""
+        SELECT 
+            Name, Gender, BeltFrom, BeltTo, WeightFrom, WeightTo, AgeFrom, AgeTo, Type, DoYangID
+        FROM 
+            Categories 
+        WHERE
+            CategoryID = {tuly}
+    """).fetchall()[0]
+
+
+
+    message = f"""
+        INSERT INTO Categories (
+            Name, Gender, BeltFrom, BeltTo, WeightFrom, WeightTo, AgeFrom, AgeTo, Type, DoYangID
+        ) VALUES (
+            '{"(" + str(index) +  ") " + str(category[0])}', '{category[1]}', {category[2]}, {category[3]}, {category[4]}, {category[5]}, {category[6]}, {category[7]}, '{category[8]}', 0
+        )
+    """
+    cursor.execute(message)
+
+    id = cursor.execute(f"""
+            SELECT 
+                MAX(CategoryID)
+            FROM 
+                Categories 
+        """).fetchall()[0][0]
+
+    connection.commit()
+    connection.close()
+
+    for competitor in group:
+        change_category_for_competitor(competitor[0], id)
+
+
+def split_on_four():
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    categories = cursor.execute(f"""
+        SELECT 
+            CategoryID
+        FROM 
+            Categories 
+        WHERE
+            AgeFrom >= 5
+        AND
+            AgeTo <= 6
+    """).fetchall()
+
+    connection.commit()
+    connection.close()
+    print("categories: ", categories)
+    for category in categories:
+        print("cat  ", category)
+        connection = sqlite3.connect(database_path)
+        cursor = connection.cursor()
+
+        competitors = cursor.execute(f"""
+            SELECT 
+                CompetitorID
+            FROM 
+                Competitors 
+            WHERE
+                Tuly = {category[0]}
+        """).fetchall()
+
+        print("comp: ", competitors)
+
+        connection.commit()
+        connection.close()
+
+        k = -(-len(competitors) // 4)
+        q, r = divmod(len(competitors), k)
+        sizes = [q + 1] * r + [q] * (k - r)
+
+        groups, idx = [], 0
+        for size in sizes:
+            groups.append(competitors[idx:idx + size])
+            idx += size
+        print(groups)
+        for i in range(len(groups)-1):
+            add_extra_category(category[0], groups[i+1], i+2)
+
+        
+        
+
+def change_category_for_competitor(competitor_id, new_category_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+
+    print("competitor_id ", competitor_id)
+    print("new_category_id ", new_category_id)
+    cursor.execute(f"""
+        UPDATE 
+            Competitors
+        SET 
+            Tuly = {new_category_id}
+        WHERE
+            CompetitorID = {competitor_id}
+            
+    """)
+
+    connection.commit()
+    connection.close()

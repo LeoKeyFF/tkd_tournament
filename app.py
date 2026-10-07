@@ -391,7 +391,7 @@ def upload_file():
     except Exception as e:
         return jsonify({
             'success': False,
-            'redirect': url_for('upload_screen')
+            'redirect': url_for('home_upload')
         })    
 
 @app.route('/create_confirm_file')

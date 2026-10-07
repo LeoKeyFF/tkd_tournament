@@ -95,6 +95,7 @@ def read_cometitors():
         )
 
     database.delete_unused_categories()
+    # database.split_on_four()
 
 def read_categories():
     datatype = {

@@ -1188,17 +1188,24 @@ def split_on_four():
         connection.commit()
         connection.close()
 
-        k = -(-len(competitors) // 4)
-        q, r = divmod(len(competitors), k)
-        sizes = [q + 1] * r + [q] * (k - r)
+
+        n = len(competitors)
+
+        if n == 0:
+            sizes = []
+        else:
+            k = -(-n // 4) 
+            q, r = divmod(n, k) 
+            sizes = [q + 1] * r + [q] * (k - r)
 
         groups, idx = [], 0
         for size in sizes:
             groups.append(competitors[idx:idx + size])
             idx += size
         print(groups)
-        for i in range(len(groups)-1):
-            add_extra_category(category[0], groups[i+1], i+2)
+        if len(groups) > 1:
+            for i in range(len(groups)-1):
+                add_extra_category(category[0], groups[i+1], i+2)
 
         
         

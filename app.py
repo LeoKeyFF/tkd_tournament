@@ -761,7 +761,6 @@ def get_playing_match():
         competitor_1_name = match[-2]
         competitor_2_name = match[-1]
         play_number = match[7]
-        print('round play' + str(play_number))
     data = {
         'match_id': match_id,
         'competitor_1_id': competitor_1_id,
@@ -778,7 +777,6 @@ def get_playing_match():
 def get_data_of_judge():
     login = get_current_login()
     data_of_judge = database.get_data_of_judge(login)
-    print(data_of_judge[0][2])
     data = {
         'score1': data_of_judge[0][0],
         'score2': data_of_judge[0][1],
@@ -887,7 +885,6 @@ def add_current_score_to_main():
 @app.route("/api/pj/clean_score", methods = ['POST'])
 @role_required("pj")
 def clean_score():
-    print('clinning :)')
     data = request.get_json()
     match_id = data.get('match_id')
     database.clean_score(match_id)

@@ -271,13 +271,12 @@ def add_judge(login, password, doyang_id, role):
     login_is_used = cursor.execute(
         f"SELECT Login FROM Judges WHERE Login = '{login}'"
     ).fetchall()
-    print(login_is_used)
     if len(login_is_used) != 0:
         cursor.execute(f"DELETE FROM Judges WHERE Login = '{login}'")
 
     message = f"""
-        INSERT INTO Judges (Login, Password, DoYangID, Role) 
-        VALUES ('{login}', '{password}', {doyang_id}, '{role}')
+        INSERT INTO Judges (Login, Password, DoYangID, Role, Competitor1ScoreCurrent, Competitor2ScoreCurrent) 
+        VALUES ('{login}', '{password}', {doyang_id}, '{role}', 0, 0)
     """
     cursor.execute(message)
 
@@ -457,7 +456,6 @@ def set_winner(match_id, winner):
     """)    
 
     if next_match_id == 0:
-            print('it is final!')
             cursor.execute(f"""
                 UPDATE Categories 
                 SET 
@@ -1168,9 +1166,7 @@ def split_on_four():
 
     connection.commit()
     connection.close()
-    print("categories: ", categories)
     for category in categories:
-        print("cat  ", category)
         connection = sqlite3.connect(database_path)
         cursor = connection.cursor()
 
@@ -1182,8 +1178,6 @@ def split_on_four():
             WHERE
                 Tuly = {category[0]}
         """).fetchall()
-
-        print("comp: ", competitors)
 
         connection.commit()
         connection.close()
@@ -1202,7 +1196,6 @@ def split_on_four():
         for size in sizes:
             groups.append(competitors[idx:idx + size])
             idx += size
-        print(groups)
         if len(groups) > 1:
             for i in range(len(groups)-1):
                 add_extra_category(category[0], groups[i+1], i+2)
@@ -1214,8 +1207,6 @@ def change_category_for_competitor(competitor_id, new_category_id):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
 
-    print("competitor_id ", competitor_id)
-    print("new_category_id ", new_category_id)
     cursor.execute(f"""
         UPDATE 
             Competitors

@@ -44,14 +44,20 @@ def read_cometitors():
             'ведомство': str,
             'клуб': str,
             'тренер': str,
+            'год рождения': str,
+            'месяц рождения': str,
+            'день рождения': str,
         },
-        parse_dates=['дата рожд']
+        # parse_dates=['дата рожд']
     )
 
     for index, row in df.iterrows():
         name = row['ФИО']
         gender = 'm' if 'м' in row['пол'].lower() else 'w'
-        birth_date = row['дата рожд'].strftime('%Y-%m-%d')
+        # birth_date = row['дата рожд'].strftime('%Y-%m-%d')
+        year_birth = int(row['год рождения'])
+        month_bitrth = int(row['месяц рождения'])
+        day_birth = int(row['день рождения'])
         qualification = row['спорт квал']
         belt =  set_tech_qual(row['техн квал']) 
         weight = row['весовая кат']
@@ -59,7 +65,7 @@ def read_cometitors():
 
         age = count_age(
             year, month, day, 
-            row['дата рожд'].year, row['дата рожд'].month ,row['дата рожд'].day
+            year_birth, month_bitrth ,day_birth
         )
         
         sparring = database.get_category_id(
@@ -88,7 +94,7 @@ def read_cometitors():
         club = row['клуб']
         coach = row['тренер']
         database.add_competitor(
-            name, gender, birth_date, qualification, 
+            name, gender, str(year_birth) + "/" + str(month_bitrth) + "/" + str(day_birth), qualification, 
             belt, weight, sparring, tuly, power, special_technic, 
             team_sparring, team_tuly, team_power, team_special_technic,
             traditional, is_judge, region, federal_district, security, club, coach

@@ -340,18 +340,22 @@ def get_from_categories():
 
     return categories
 
-def get_from_competitors(category):
+def get_from_competitors(category, all=0):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
-
-    competitors_selected = cursor.execute(f"""
-        SELECT CompetitorID, Name, Club FROM Competitors
-        WHERE 
-            Sparring = {category} OR Tuly = {category} 
-            OR Power = {category} OR SpecialTechnic = {category} 
-            OR TeamSparring = {category} OR TeamTuly = {category} 
-            OR TeamPower = {category} OR TeamSpecialTechnic = {category} OR Traditional = {category}
-    """)
+    if int(all) != 0:
+        competitors_selected = cursor.execute(f"""
+            SELECT CompetitorID, Name, Club FROM Competitors
+        """)
+    else:
+        competitors_selected = cursor.execute(f"""
+            SELECT CompetitorID, Name, Club FROM Competitors
+            WHERE 
+                Sparring = {category} OR Tuly = {category} 
+                OR Power = {category} OR SpecialTechnic = {category} 
+                OR TeamSparring = {category} OR TeamTuly = {category} 
+                OR TeamPower = {category} OR TeamSpecialTechnic = {category} OR Traditional = {category}
+        """)
 
     competitors_selected = competitors_selected.fetchall()
     competitors = []
@@ -360,7 +364,6 @@ def get_from_competitors(category):
 
     connection.commit()
     connection.close()
-
     return competitors
 
 def get_from_matches(category_id):
@@ -1216,6 +1219,78 @@ def change_category_for_competitor(competitor_id, new_category_id):
             CompetitorID = {competitor_id}
             
     """)
+
+    connection.commit()
+    connection.close()
+
+def change_category_to_competitor(competitors_ids, category_id):
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+    print(category_id)
+    type = cursor.execute(f"""
+        SELECT Type FROM Categories WHERE CategoryID = {category_id}
+    """).fetchall()[0][0]
+    connection.commit()
+    connection.close()
+
+    if type == 'тыль':
+        for competitor in competitors_ids:
+            connection = sqlite3.connect(database_path)
+            cursor = connection.cursor()
+            old_category = cursor.execute(f"""
+                SELECT Tuly FROM Competitors WHERE CompetitorID = {competitor}
+            """).fetchall()[0][0]
+            cursor.execute(f"""
+                UPDATE Competitors
+                SET 
+                    Tuly = {category_id}
+                WHERE 
+                    CompetitorID = {competitor}
+            """) 
+            
+            cursor.execute(f"DELETE FROM Matches WHERE CategoryID = {old_category}")
+            connection.commit()
+            connection.close()
+
+            connection = sqlite3.connect(database_path)
+            cursor = connection.cursor()
+            add_matches(old_category)
+            connection.commit()
+            connection.close()
+
+    elif type == 'матсоги':
+        for competitor in competitors_ids:
+            connection = sqlite3.connect(database_path)
+            cursor = connection.cursor()
+            old_category = cursor.execute(f"""
+                SELECT Sparring FROM Competitors WHERE CompetitorID = {competitor}
+            """).fetchall()[0][0]
+            cursor.execute(f"""
+                UPDATE Competitors
+                SET 
+                    Sparring = {category_id}
+                WHERE 
+                    CompetitorID = {competitor}
+            """)
+            cursor.execute(f"DELETE FROM Matches WHERE CategoryID = {old_category}")
+            connection.commit()
+            connection.close()
+
+            connection = sqlite3.connect(database_path)
+            cursor = connection.cursor()
+            add_matches(old_category)
+            connection.commit()
+            connection.close()
+
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+    cursor.execute(f"DELETE FROM Matches WHERE CategoryID = {category_id}")
+    connection.commit()
+    connection.close()
+
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+    add_matches(category_id)
 
     connection.commit()
     connection.close()

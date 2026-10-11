@@ -182,16 +182,18 @@ function updateMatches(){
     });
 }
 
-function updateCompetitors(callback){
+function updateCompetitors(callback, all=0){
     $.ajax({
         url: '/api/get_data_competitors',
         method: 'GET',
         dataType: 'json',
         data: {
             category_id: current_category,
+            all: all
         },
         success: function (data) {
             competitorsContent(data.ids, data.names, data.clubs, data.categories, data.categories_list);
+            allCompetitors(data.ids, data.names, data.categories);
             callback();
         },
         error: function () {
@@ -352,4 +354,37 @@ function backToAdminPage(){
         complete: function (jqXHR, textStatus) {
         }
     }); 
+}
+
+function searchCompetitor(){
+    updateCompetitors(function() {
+    }, 1)
+}
+
+function changeCategoryToCompetitor(){
+    const dataToSend = { 
+        competitors: choosen_competitors,
+        category_id: current_category
+    };
+    if (confirm('Добавление учатника(ов) изменит жеребьёвку как этой сетки, так и сетки(ок) из которой(ых) учатник(и) будет(ут) перемещен(ы)')) {
+        $.ajax({
+            type: "POST",
+            url: '/api/change_category_to_competitor',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(dataToSend),
+            // dataType: 'json',
+            success: function (response, status, jqXHR) {
+                choosen_competitors = []
+                updateCompetitors(function() {
+                    showPage(2)
+                })
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // Error handling
+            },
+            complete: function (jqXHR, textStatus) {
+            }
+        });  
+    }
+   
 }

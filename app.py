@@ -412,7 +412,7 @@ def create_confirm_file():
             doyang=category[9],
             index=category[10] 
         )
-        competitors = database.get_from_competitors(category[0])
+        competitors = database.get_from_competitors(category[0], all=0)
         data.append({"Категория": name, "Спортсмены": competitors})
 
     return Response(
@@ -630,7 +630,8 @@ def get_data_categories():
 @app.route("/api/get_data_competitors", methods = ['GET'])
 def get_data_competitors():
     category = request.args.get('category_id')
-    competitors = database.get_from_competitors(category)
+    all = request.args.get('all')
+    competitors = database.get_from_competitors(category, all)
     categories_list_initial = database.get_from_categories()
     categories_list = []
     for category_initial in categories_list_initial:
@@ -932,6 +933,16 @@ def confirm_protocol():
         'success': True,
         'redirect': url_for('home_admin')
     })
+
+@app.route("/api/change_category_to_competitor", methods = ['POST'])
+@role_required("admin")
+def change_category_to_competitor():
+    data = request.get_json()
+    category_id = data.get('category_id')
+    competitors_ids = data.get('competitors')
+    print(competitors_ids)
+    database.change_category_to_competitor(competitors_ids, category_id)
+    return jsonify(success=True)
  
 
 if __name__ == "__main__":
@@ -944,3 +955,4 @@ if __name__ == "__main__":
         port=5001,
         allow_unsafe_werkzeug=True
     )
+

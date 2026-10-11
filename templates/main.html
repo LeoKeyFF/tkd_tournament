@@ -185,6 +185,11 @@
         <div class="grid-div" id="grid_div"></div>
         Соперники:
         <div class="competitors-list" id="competitors_list"></div>
+        {% if user == 'admin' %}
+            <button class="button-secondary add open-add-categories secondary-clickable" onclick="openAllCompetitors()">
+                +
+            </button>
+        {% endif %}
     </div>
     {% if user == 'admin' %}
         <div class="add-categories-screen" id="add_categories">
@@ -211,6 +216,35 @@
                 </tr>
             </table>
             <div class="categories-list" id="categories_list_all"></div>
+        </div>
+    {% endif %}
+    
+    {% if user == 'admin' %}
+        <div class="add-categories-screen" id="add_competitors">
+            <table class="table-row">
+                <tr>
+                    <td>
+                        <button class="button-primary add add-categories primary-clickable" 
+                        onclick="updateCompetitors(function() { showPage(2)});">Отмена</button> 
+                    </td>
+                    <td>
+                        <button class="button-primary add add-categories primary-clickable" 
+                        onclick="changeCategoryToCompetitor()">Добавить</button>
+                    </td>
+                </tr>
+            </table>
+            <table class="table-row search-table">
+                <tr>
+                    <td colspan="6">
+                        <input type="text" id="search_competitor" class="input-search" placeholder="Поиск">
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="button-primary primary-clickable search-button" 
+                        onclick="searchCompetitor()">🔍</button>
+                    </td>
+                </tr>
+            </table>
+            <div class="categories-list" id="competitors_list_all"></div>
         </div>
     {% endif %}
 

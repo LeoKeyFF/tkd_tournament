@@ -5,6 +5,7 @@ let competitor2name = ''
 let match_id = 0
 
 let choosen_categories = []
+let choosen_competitors = []
 
 let sort_categories_by = 'index'
 
@@ -158,6 +159,7 @@ function showPage(page){
         $("#categories").css("display", "none");
         $("#competitors").css("display", "none");
         $("#add_categories").css("display", "none");
+        $("#add_competitors").css("display", "none");
         $("#path").css("display", "");
 
         $("#path_card_doyang").remove();
@@ -171,6 +173,7 @@ function showPage(page){
         $("#categories").css("display", "block");
         $("#competitors").css("display", "none");
         $("#add_categories").css("display", "none");
+        $("#add_competitors").css("display", "none");
         $("#path").css("display", "");
 
         $('#path_card_category').remove();
@@ -183,9 +186,13 @@ function showPage(page){
         $("#categories").css("display", "none");
         $("#competitors").css("display", "block");
         $("#add_categories").css("display", "none");
+        $("#add_competitors").css("display", "none");
         $("#path").css("display", "");
+
+        choosen_competitors = [];
+        $("#search_competitor").val("")
     }
-    else {
+    else if (page == 3){
         choosen_categories = [];
         $("#search_category").val("")
 
@@ -193,6 +200,18 @@ function showPage(page){
         $("#categories").css("display", "none");
         $("#competitors").css("display", "none");
         $("#add_categories").css("display", "block");
+        $("#add_competitors").css("display", "none");
+        $("#path").css("display", "none");
+    }
+    else {
+        choosen_competitors = [];
+        $("#search_competitor").val("")
+
+        $("#doyangs").css("display", "none");
+        $("#categories").css("display", "none");
+        $("#competitors").css("display", "none");
+        $("#add_categories").css("display", "none");
+        $("#add_competitors").css("display", "block");
         $("#path").css("display", "none");
     }
 }
@@ -439,4 +458,58 @@ function allCategories(categories){
         }
     }
     
+}
+
+function openAllCompetitors(){
+    updateCompetitors(function(){
+        showPage(4);
+    }, 1);
+}
+
+function allCompetitors(ids, names, categories){
+    $('#competitors_list_all').empty();
+    console.log(current_category)
+    for (let i = 0; i < ids.length; i++){
+        competitor_search = $("#search_competitor").val() ?? '';
+        console.log(competitor_search)
+        if (names[i].toLowerCase().includes(competitor_search.toLowerCase())){
+            const competitorDiv = $('<button>', {
+                class: 'button-secondary competitor-div',
+                text: names[i]
+            });
+            // if (current_category != categories[i]){
+                competitorDiv.addClass('button-primary')
+                competitorDiv.addClass('primary-clickable')
+                competitorDiv.removeClass('button-secondary')
+
+                competitorDiv.on('click', function() {
+                    if (choosen_competitors.includes(ids[i])){
+                        choosen_competitors = choosen_competitors.filter(item => item !== ids[i]);
+                    }
+                    else {
+                        choosen_competitors.push(ids[i]);
+                    }
+                    allCompetitors(ids, names, categories)
+                })
+            // }
+            // else {
+            //     competitorDiv.removeClass('button-primary')
+            //     competitorDiv.removeClass('primary-clickable')
+            //     competitorDiv.addClass('button-secondary')
+
+            // }
+
+            if (choosen_competitors.includes(ids[i])){
+                competitorDiv.addClass('chosen')
+                competitorDiv.removeClass('primary-clickable')
+            }
+            else {
+                competitorDiv.removeClass('chosen')
+                if (current_category != categories[i]){
+                    competitorDiv.addClass('primary-clickable')
+                }
+            }
+            $('#competitors_list_all').append(competitorDiv);
+        }
+    }
 }
